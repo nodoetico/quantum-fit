@@ -1,0 +1,172 @@
+[8:59 a.m., 29/4/2026] Crystal Desarrollo S.R.L: Buenos días! Cómo va todo?. Ahora te voy pasando las cosas así vas empezando. Primero te paso la documentación
+[8:59 a.m., 29/4/2026] Crystal Desarrollo S.R.L: https://getmifit.app/api/documentation
+[8:59 a.m., 29/4/2026] Crystal Desarrollo S.R.L: Tenés los endpoints de login y de perfil. Incluyendo get de membresías y asistencias
+[9:00 a.m., 29/4/2026] Crystal Desarrollo S.R.L: Para autenticarte vas a necesitar un token de acceso que te la mando al final así no se mezcla jajaja. Eso en el header así el back sabe que la petición viene de tu app
+[9:01 a.m., 29/4/2026] Crystal Desarrollo S.R.L: Habilitamos en gimnasio que tenemos para probar las cosas, así que el link para que probes seria
+[9:01 a.m., 29/4/2026] Crystal Desarrollo S.R.L: https://crystal.getmifit.app/api
+[9:02 a.m., 29/4/2026] Crystal Desarrollo S.R.L: Lo que si avísame si querés que te cree un usuario o buscamos uno que tenga más asistencias y esas cosas para que tengas acceso. Igual voy a necesitar tu correo
+[9:03 a.m., 29/4/2026] Buczek Guillermo: Buen día Nico, genial, dale dale nodoetico@gmail.com ese es mi correo.
+[9:04 a.m., 29/4/2026] Crystal Desarrollo S.R.L: Dale se lo pongo a un usuario que tenga asistencia y membresías? O queres que  haga uno nuevo?
+[9:04 a.m., 29/4/2026] Crystal Desarrollo S.R.L: Y te paso eso para que puedas hacer la petición
+[9:05 a.m., 29/4/2026] Crystal Desarrollo S.R.L: rlEoYmi9HdMRzRCfwbZ8gRssnGiPLrM1A3LLpcb7iWIdT85DncHR05Z44yrxrJQm
+[9:21 a.m., 29/4/2026] Buczek Guillermo: Ahh bien, preferiría un usuario nuevo por favor,
+[9:21 a.m., 29/4/2026] Crystal Desarrollo S.R.L: Dale ahora te lo creo
+[9:23 a.m., 29/4/2026] Crystal Desarrollo S.R.L: Listo si queres que le ponga una membresía me avisas y lo voy haciendo. Sin miedo 👌🏻
+[9:28 a.m., 29/4/2026] Buczek Guillermo: Dale de 10 estimado, cualquier cosa te informo por si necesito algo 👍
+[9:29 a.m., 29/4/2026] Crystal Desarrollo S.R.L: Dale, si. Sin problema 🙌🏼
+
+-------------------------------------------NUEVO-----------------------------------------------
+
+USUARIO: nodoetico@gmail.com
+PASSWORD: AdN1yTq7RAfIXzZl
+
+MENSAJE DE NICO
+
+[11:02 a.m., 4/5/2026] Crystal Desarrollo S.R.L: Buen día! No es ninguna molestia. 
+
+Para autenticar te necesitas dos cosas
+
+1 el api token que te mandé por acá. 
+2 el autorización Bearer que obtienes cuando haces el login. Cuando haces el login te lo devuelve.
+[11:02 a.m., 4/5/2026] Crystal Desarrollo S.R.L: rlEoYmi9HdMRzRCfwbZ8gRssnGiPLrM1A3LLpcb7iWIdT85DncHR05Z44yrxrJQm
+Osea en el POST del login tenés que poner en el header el api token  que te pase como
+X-Api-Token: [el token]
+[11:03 a.m., 4/5/2026] Crystal Desarrollo S.R.L: Y la contraseña te tuvo que llegar al mismo mail, confírmame
+[11:03 a.m., 4/5/2026] Crystal Desarrollo S.R.L: Fíjate en el no deseado
+[11:04 a.m., 4/5/2026] Buczek Guillermo: Ahh bien, a ver ahora lo veo 👍
+[11:05 a.m., 4/5/2026] Crystal Desarrollo S.R.L: Avísame, sino te mando de nuevo
+
+
+
+
+
+
+----------------------------------------------
+
+
+fetch('https://crystal.getmifit.app/api/payment-methods', {
+  headers: { 'Accept': 'application/json', 'X-Api-Token': 'rlEoYmi9HdMRzRCfwbZ8gRssnGiPLrM1A3LLpcb7iWIdT85DncHR05Z44yrxrJQm' }
+}).then(r => r.text()).then(console.log)
+Promise {<pending>}
+VM135:1  GET https://crystal.getmifit.app/api/payment-methods 401 (Unauthorized)
+(anónimo) @ VM135:1Entender este error
+{"message":"Unauthenticated."}
+
+
+
+----------------------------------------------------
+
+
+Auth
+Auth
+
+
+
+POST
+/api/login
+Iniciar sesión
+
+
+Perfil
+Perfil
+
+
+
+GET
+/api/user/me
+Obtener perfil del usuario
+
+
+
+PATCH
+/api/user/profile
+Actualizar perfil
+
+
+
+PATCH
+/api/user/emergency-contact
+Actualizar contacto de emergencia
+
+
+
+POST
+/api/user/change-password
+Cambiar contraseña
+
+
+
+GET
+/api/user/memberships
+Listar membresías
+
+
+
+GET
+/api/user/attendances
+Listar asistencias
+
+
+
+GET
+/api/user/transactions
+Listar transacciones
+
+
+Inscripción
+Inscripción
+
+
+
+GET
+/api/user/enrollment
+Obtener estado de inscripción
+
+
+
+POST
+/api/user/enrollment/renew
+Crear o renovar inscripción
+
+
+Membresías
+Membresías
+
+
+
+POST
+/api/memberships/renew
+Renovar membresía
+
+
+Métodos de pago
+Métodos de pago
+
+
+
+GET
+/api/payment-methods
+Listar métodos de pago
+
+
+
+-----------------------------------------------------
+
+[6:17 p.m., 21/5/2026] Buczek Guillermo: Nico como estás? Te molestaba por lo de la pasarela de pago, tendrías la documentación?
+[6:18 p.m., 21/5/2026] Crystal Desarrollo S.R.L: Buenas tardes!
+[6:18 p.m., 21/5/2026] Crystal Desarrollo S.R.L: Justo estaba ordenando unas cosas y te iba a hablar
+[6:20 p.m., 21/5/2026] Crystal Desarrollo S.R.L: https://getmifit.app/api/documentation
+Si entras a la página de documentación ya dejé nuevos endpoint para que uses.
+
+Con esto te hice endpoint para
+- Obtener el estado de la inscripción que se renueva
+- un post para renovar o crear la inscripción 
+
+Después del lado de la membresía o plan, hice un endpoint para que que renueves la membresía que tenga el usuario
+[6:21 p.m., 21/5/2026] Crystal Desarrollo S.R.L: También hice un endpoint un get para que tengas los métodos de pago
+[6:22 p.m., 21/5/2026] Crystal Desarrollo S.R.L: Entonces una vez que hagas el pago de tu lado y manejes eso. Haces el endpoint con el método de pago. Ya sea tarjeta o débito automático los comentarios y el ID de la membresía y de este lado se renueva y se hace la transacción de nuestro lado.
+[6:23 p.m., 21/5/2026] Crystal Desarrollo S.R.L: Entonces una vez que hagas el pago de tu lado y manejes eso. Haces el endpoint con el método de pago. Ya sea tarjeta o débito automático los comentarios y el ID de la membresía y de este lado se renueva y se hace la transacción de nuestro lado.
+En caso de la membresía
+[6:48 p.m., 21/5/2026] Buczek Guillermo: Ahhh genial Nico, de 10.. veré de probarlos y ver qué pasa.
+[6:54 p.m., 21/5/2026] Crystal Desarrollo S.R.L: Dale, avísame cualquier cosa
+[6:54 p.m., 21/5/2026] Crystal Desarrollo S.R.L: Y vamos viendo

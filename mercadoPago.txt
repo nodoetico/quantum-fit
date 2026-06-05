@@ -1,0 +1,12 @@
+Integración con
+WooCommerce
+Modelo de integración
+CheckoutPro
+Credenciales de producción
+Usalas para permitir que tu integración reciba pagos reales.
+Credenciales de prueba
+Usalas para simular pagos y probar tus integraciones.
+Recibí ayuda para integrar
+Invitá a colaboradores para trabajar en tu cuenta y agilizar el proceso de integración. Conocer más
+Invitar colaboradores
+Da acceso y definí los permisos de cada colaborador.

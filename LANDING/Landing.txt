@@ -1,0 +1,33 @@
+Fix layout and rendering issues across the landing page:
+
+1. Remove horizontal overflow:
+   - Replace all width: 100vw with width: 100%
+   - Apply global box-sizing: border-box
+
+2. Standardize container:
+   - max-width: 1200px
+   - margin: 0 auto
+   - padding: 0 20px
+
+3. Fix contact form:
+   - Inputs width: 100%
+   - Prevent overflow
+   - Ensure flex-wrap if using flex
+
+4. Fix grids:
+   - Use CSS Grid with auto-fit/minmax
+   - Add consistent gap (20px)
+
+5. Fix gallery images:
+   - Validate image paths
+   - Ensure assets exist
+   - Handle fallback images
+
+6. Normalize spacing:
+   - section padding: 80px 0
+
+7. Ensure responsive behavior:
+   - No fixed widths
+   - Use flexible layouts
+
+Goal: eliminate horizontal scroll, align all sections, and ensure responsive consistency.

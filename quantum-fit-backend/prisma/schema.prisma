@@ -1,0 +1,671 @@
+// Schema de Prisma para QUANTUM FIT
+// Base de datos: PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+// ============================================
+// USUARIOS
+// ============================================
+model User {
+  id                String    @id @default(uuid())
+  name              String
+  email             String    @unique
+  passwordHash      String
+  avatarUrl         String?
+
+  // Rol de usuario (para permisos rápidos)
+  role              UserRole  @default(USER)
+
+  // Estado VIP (suscripción premium)
+  isVip             Boolean   @default(false)
+  vipSince          DateTime?
+
+  // Gamificación
+  level             Int       @default(1)
+  points            Int       @default(0)
+  totalPointsEarned Int       @default(0)
+
+  // Estadísticas
+  totalWorkouts     Int       @default(0)
+  totalClasses      Int       @default(0)
+  currentStreak     Int       @default(0)
+  longestStreak     Int       @default(0)
+  lastCheckinDate   DateTime? @db.Date
+
+  // Ranking
+  rank              Int       @default(9999)
+
+  // Metadata
+  memberSince       DateTime  @default(now())
+  lastActive        DateTime  @default(now())
+
+  // DNI para integración con software externo
+  dni               String?   @unique
+
+  // Estado
+  isActive          Boolean   @default(true)
+
+  // Account lockout (protección brute force)
+  failedLoginAttempts Int     @default(0)
+  lockedUntil         DateTime?
+  lastFailedLogin    DateTime?
+
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  // Referidos
+  referralCode      String?      @unique
+  referredBy        String?
+  referredByUser    User?        @relation("Referrals", fields: [referredBy], references: [id])
+  referrals         User[]       @relation("Referrals")
+
+  // Relaciones
+  checkIns          CheckIn[]
+  bookings          Booking[]
+  activityLogs      ActivityLog[]
+  userAchievements  UserAchievement[]
+  weeklyStats       WeeklyStats[]
+  redeemedRewards   RedeemedReward[]
+  staff             Staff?
+  
+  // Pagos y Suscripciones
+  paymentMethods    PaymentMethod[]
+  payments          Payment[]
+  subscription      Subscription?
+
+  @@index([email])
+  @@index([points])
+  @@index([role])
+  @@index([isVip])
+  @@index([dni])
+}
+
+// ============================================
+// ROLES DE USUARIO
+// ============================================
+enum UserRole {
+  USER        // Usuario normal del gimnasio
+  ADMIN       // Dueño/encargado principal (acceso total)
+  MANAGER     // Gerente (gestión completa)
+  STAFF       // Personal (recepción, trainers)
+  VIP         // Usuario con suscripción premium
+}
+
+// ============================================
+// CHECK-INS (Registro de asistencias)
+// ============================================
+model CheckIn {
+  id              String    @id @default(uuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Tipo de actividad
+  checkInType     CheckInType
+  pointsEarned    Int
+  
+  // Validación
+  validatedBy     String?
+  validationMethod ValidationMethod
+  
+  // Timestamps
+  checkInTime     DateTime  @default(now())
+  checkOutTime    DateTime?
+  
+  // Metadata
+  gymLocation     String?
+  notes           String?
+  createdAt       DateTime  @default(now())
+  
+  @@index([userId])
+  @@index([checkInTime])
+  @@index([userId, checkInTime])
+}
+
+enum CheckInType {
+  CLASS
+  OPEN_GYM
+  PERSONAL_TRAINER
+}
+
+enum ValidationMethod {
+  QR_SCAN
+  STAFF_VALIDATION
+  GEOFENCE
+  EXTERNAL_SYSTEM
+}
+
+// ============================================
+// CLASES (Turnos disponibles)
+// ============================================
+model Class {
+  id              String     @id @default(uuid())
+  name            String
+  description     String?
+  
+  instructorId    String?
+  instructorName  String
+  
+  // Horario
+  startTime       DateTime
+  endTime         DateTime
+  durationMinutes Int
+  
+  // Capacidad
+  totalSpots      Int
+  bookedSpots     Int        @default(0)
+  
+  // Tipo
+  activityType    String
+  difficultyLevel DifficultyLevel
+  
+  // Ubicación
+  location        String?
+  gymZone         String?
+  
+  // Estado
+  isActive        Boolean    @default(true)
+  isCancelled     Boolean    @default(false)
+  
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  
+  // Relaciones
+  bookings        Booking[]
+  
+  @@index([startTime])
+  @@index([activityType])
+}
+
+enum DifficultyLevel {
+  PRINCIPIANTE
+  INTERMEDIO
+  AVANZADO
+}
+
+// ============================================
+// BOOKINGS (Reservas de clases)
+// ============================================
+model Booking {
+  id         String      @id @default(uuid())
+  userId     String
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  classId    String
+  class      Class       @relation(fields: [classId], references: [id], onDelete: Cascade)
+  
+  status     BookingStatus @default(CONFIRMED)
+  bookedAt   DateTime    @default(now())
+  cancelledAt DateTime?
+  
+  // Si asistió realmente
+  attended   Boolean     @default(false)
+  
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  
+  @@index([userId])
+  @@index([classId])
+  @@index([status])
+}
+
+enum BookingStatus {
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+}
+
+// ============================================
+// ACTIVITY_LOG (Historial completo)
+// ============================================
+model ActivityLog {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  activityType    ActivityType
+  points          Int
+  pointsBalanceAfter Int
+  
+  title           String?
+  description     String?
+  
+  // Referencia a otra tabla
+  referenceId     String?
+  referenceType   String?
+  
+  // Metadata
+  metadata        Json?
+  
+  createdAt       DateTime @default(now())
+  
+  @@index([userId])
+  @@index([createdAt])
+  @@index([userId, createdAt])
+}
+
+enum ActivityType {
+  CHECK_IN_CLASS
+  CHECK_IN_OPEN_GYM
+  CHECK_IN_PT
+  BOOKING_COMPLETED
+  ACHIEVEMENT_UNLOCKED
+  STREAK_BONUS
+  REWARD_REDEEMED
+  REFERRAL_BONUS
+  MANUAL_ADJUSTMENT
+}
+
+// ============================================
+// ACHIEVEMENTS (Logros del sistema)
+// ============================================
+model Achievement {
+  id               String   @id @default(uuid())
+  name             String
+  description      String
+  icon             String
+  achievementType  String
+  requirementType  String
+  requirementValue Int
+  pointsReward     Int      @default(0)
+  category         AchievementCategory
+  displayOrder     Int?
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  
+  userAchievements UserAchievement[]
+}
+
+enum AchievementCategory {
+  ASISTENCIA
+  RUTINA
+  ACTIVIDAD
+  SOCIAL
+  ESPECIAL
+}
+
+// ============================================
+// USER_ACHIEVEMENTS (Logros desbloqueados)
+// ============================================
+model UserAchievement {
+  id            String    @id @default(uuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievementId String
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  
+  unlockedAt    DateTime  @default(now())
+  currentProgress Int     @default(0)
+  
+  @@unique([userId, achievementId])
+  @@index([userId])
+}
+
+// ============================================
+// WEEKLY_STATS (Estadísticas semanales)
+// ============================================
+model WeeklyStats {
+  id              String    @id @default(uuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  year            Int
+  week            Int
+  weekStartDate   DateTime  @db.Date
+  weekEndDate     DateTime  @db.Date
+  
+  workoutsCompleted Int     @default(0)
+  classesAttended   Int     @default(0)
+  totalPoints       Int     @default(0)
+  totalCheckIns     Int     @default(0)
+  
+  attendanceRate    Decimal @default(0) @db.Decimal(5, 2)
+  activeDays        Int     @default(0)
+  activeDaysBitmap  Int     @default(0)
+  
+  isPerfectWeek     Boolean @default(false)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@unique([userId, year, week])
+  @@index([userId])
+  @@index([weekStartDate])
+}
+
+// ============================================
+// REWARDS (Premios canjeables)
+// ============================================
+model Reward {
+  id             String         @id @default(uuid())
+  name           String
+  description    String?
+  pointsCost     Int
+  category       RewardCategory
+  stockTotal     Int            @default(0)
+  stockAvailable Int            @default(0)
+  imageUrl       String?
+  isActive       Boolean        @default(true)
+  isFeatured     Boolean        @default(false)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  
+  redeemedRewards RedeemedReward[]
+  
+  @@index([category])
+}
+
+enum RewardCategory {
+  PRODUCTO
+  BEBIDA
+  DESCUENTO
+  PROMOCION
+}
+
+// ============================================
+// REDEEMED_REWARDS (Premios canjeados)
+// ============================================
+model RedeemedReward {
+  id              String           @id @default(uuid())
+  userId          String
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rewardId        String
+  reward          Reward           @relation(fields: [rewardId], references: [id], onDelete: Cascade)
+  
+  status          RedemptionStatus @default(PENDING)
+  pointsSpent     Int
+  
+  pickupCode      String           @unique
+  pickupDeadline  DateTime?
+  pickedUpAt      DateTime?
+  
+  notes           String?
+  fulfilledBy     String?
+  
+  redeemedAt      DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  
+  @@index([userId])
+  @@index([status])
+}
+
+enum RedemptionStatus {
+  PENDING
+  APPROVED
+  FULFILLED
+  CANCELLED
+}
+
+// ============================================
+// STAFF (Personal del gimnasio)
+// ============================================
+model Staff {
+  id         String   @id @default(uuid())
+  userId     String   @unique
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  role       StaffRole
+  permissions Json?
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+}
+
+enum StaffRole {
+  TRAINER
+  RECEPTIONIST
+  MANAGER
+  ADMIN
+}
+
+// ============================================
+// GYMS (Ubicaciones del gimnasio)
+// ============================================
+model Gym {
+  id                 String   @id @default(uuid())
+  name               String
+  address            String?
+  city               String?
+
+  latitude           Decimal? @db.Decimal(10, 8)
+  longitude          Decimal? @db.Decimal(11, 8)
+  geofenceRadiusMeters Int    @default(50)
+
+  checkInEnabled     Boolean  @default(true)
+  qrCodeEnabled      Boolean  @default(true)
+
+  isActive           Boolean  @default(true)
+  createdAt          DateTime @default(now())
+}
+
+// ============================================
+// PAGOS Y SUSCRIPCIONES
+// ============================================
+
+// Métodos de pago guardados del usuario
+model PaymentMethod {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Datos de MercadoPago
+  mpPaymentMethodId String?  // ID del método en MercadoPago
+  cardLastFour    String?  // Últimos 4 dígitos de la tarjeta
+  cardExpiration  String?  // MM/YY
+  paymentMethodType String?  // credit_card, debit_card, account_money
+  
+  // Token para cobros recurrentes
+  cardToken       String?  @db.Text
+  
+  // Estado
+  isActive        Boolean  @default(true)
+  isDefault       Boolean  @default(false)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  payments        Payment[]
+  
+  @@index([userId])
+}
+
+// Historial de pagos
+model Payment {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  paymentMethodId String?
+  paymentMethod   PaymentMethod? @relation(fields: [paymentMethodId], references: [id], onDelete: SetNull)
+  
+  // Datos del pago
+  amount          Decimal  @db.Decimal(10, 2)
+  currency        String   @default("ARS")
+  
+  // Tipo de pago
+  paymentType     PaymentType
+  
+  // Estado
+  status          PaymentStatus @default(PENDING)
+  
+  // Integración con MercadoPago
+  mpPaymentId     String?  // Payment ID de MercadoPago
+  mpSubscriptionId String? // Subscription ID si es recurrente
+  
+  // Metadata
+  description     String?
+  metadata        Json?
+  
+  // Fechas
+  paidAt          DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([status])
+  @@index([paymentType])
+}
+
+enum PaymentType {
+  SUBSCRIPTION_VIP      // Suscripción VIP mensual
+  SUBSCRIPTION_ANNUAL   // Suscripción anual
+  SINGLE_PAYMENT        // Pago único (ej: clase suelta)
+  RECURRING_CHARGE      // Cargo recurrente automático
+}
+
+enum PaymentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  REFUNDED
+  CANCELLED
+}
+
+// Suscripciones activas
+model Subscription {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Tipo de suscripción
+  subscriptionType SubscriptionType @default(VIP_MONTHLY)
+  
+  // Estado
+  status          SubscriptionStatus @default(ACTIVE)
+  
+  // Precios
+  price           Decimal  @db.Decimal(10, 2)
+  currency        String   @default("ARS")
+  
+  // Ciclo de facturación
+  billingCycle    BillingCycle @default(MONTHLY)
+  
+  // Integración con MercadoPago
+  mpSubscriptionId String? @db.Text
+  
+  // Fechas
+  startDate       DateTime @default(now())
+  endDate         DateTime?
+  nextBillingDate DateTime?
+  cancelledAt     DateTime?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([status])
+}
+
+enum SubscriptionType {
+  VIP_MONTHLY     // VIP mensual
+  VIP_QUARTERLY   // VIP trimestral (con descuento)
+  VIP_ANNUAL      // VIP anual (mejor descuento)
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PENDING         // Esperando primer pago
+  SUSPENDED       // Pago fallido
+  CANCELLED       // Cancelada por usuario
+  EXPIRED         // Llegó a su fin
+}
+
+enum BillingCycle {
+  MONTHLY
+  QUARTERLY
+  ANNUAL
+}
+
+// ============================================
+// LANDING PAGE - Contenido gestionable
+// ============================================
+
+// Contenido general de la landing (hero, about, features, contact)
+model LandingContent {
+  id          String   @id @default(uuid())
+  section     String   // "hero", "about", "features", "contact"
+  title       String?
+  subtitle    String?
+  description String?  @db.Text
+  imageUrl    String?
+  ctaText     String?
+  ctaLink     String?
+  isActive    Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([section])
+  @@index([isActive])
+}
+
+// Testimonios de usuarios
+model Testimonial {
+  id        String   @id @default(uuid())
+  name      String
+  role      String?  // "Miembro desde 2024"
+  text      String   @db.Text
+  photoUrl  String?
+  rating    Int      // 1-5
+  isActive  Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive])
+}
+
+// Planes y precios
+model Plan {
+  id          String   @id @default(uuid())
+  name        String   // "Básico", "VIP", "Anual"
+  description String?  @db.Text
+  price       Decimal  @db.Decimal(10, 2)
+  period      String   // "mensual", "trimestral", "anual"
+  currency    String   @default("ARS")
+  features    String[] // lista de beneficios
+  isFeatured  Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isActive])
+}
+
+// Banners promocionales
+model Banner {
+  id        String   @id @default(uuid())
+  title     String
+  subtitle  String?
+  imageUrl  String
+  linkUrl   String?
+  linkText  String?
+  isActive  Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive])
+}
+
+// Galería de imágenes
+model GalleryImage {
+  id        String   @id @default(uuid())
+  url       String
+  alt       String?
+  category  String?  // "instalaciones", "clases", "eventos"
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+  @@index([isActive])
+}
