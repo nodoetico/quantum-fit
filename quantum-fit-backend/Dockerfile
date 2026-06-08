@@ -11,7 +11,7 @@ WORKDIR /app
 RUN apk add --no-cache openssl && \
     addgroup --system --gid 1001 appuser && \
     adduser --system --uid 1001 appuser && \
-    printf '#!/bin/sh\necho "=== Running migrations ==="\nnpx prisma migrate deploy 2>&1\nMIGRATE_EXIT=$?\necho "=== Migration exit code: $MIGRATE_EXIT ==="\necho "=== Node version ==="\nnode --version 2>&1\necho "=== Testing simple script ==="\nnode -e "console.log(\"Node works!\"); process.exit(0);" 2>&1\necho "=== Starting server ==="\nnode dist/index.js 2>&1\nRET=$?\necho "=== Server exited with code $RET ===" >&2\nexit $RET\n' > /app/start.sh && \
+    printf '#!/bin/sh\necho "PWD: $(pwd)"\necho "WHO: $(whoami)"\necho "NODE: $(command -v node || echo 'not found')"\necho "NODE_VER: $(/usr/local/bin/node --version 2>&1 || /usr/bin/node --version 2>&1 || echo 'VER_FAIL')"\necho "=== Running migrations ==="\ncd /app && npx prisma migrate deploy 2>&1\necho "=== Starting server ==="\ncd /app && /usr/local/bin/node /app/dist/index.js 2>&1\nRET=$?\necho "=== Server exited with code $RET ==="\nexit $RET\n' > /app/start.sh && \
     chmod +x /app/start.sh
 COPY --from=builder /app/dist ./dist
 COPY --from=builder --chown=appuser:appuser /app/node_modules ./node_modules
