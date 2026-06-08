@@ -12,9 +12,9 @@ RUN apk add --no-cache openssl
 RUN addgroup --system --gid 1001 appuser && \
     adduser --system --uid 1001 appuser
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder --chown=appuser:appuser /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./
-COPY --from=builder /app/prisma ./prisma
+COPY --from=builder --chown=appuser:appuser /app/prisma ./prisma
 USER appuser
 EXPOSE 3000
 ENV NODE_ENV=production
