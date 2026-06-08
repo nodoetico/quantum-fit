@@ -20,7 +20,8 @@ class WebSocketService {
       transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionDelay: 1000,
-      reconnectionAttempts: 5,
+      reconnectionDelayMax: 10000,
+      reconnectionAttempts: 20,
     });
 
     this.socket.on('connect', () => {

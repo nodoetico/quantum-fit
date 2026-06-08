@@ -1,100 +1,11 @@
 // Servicio de PULL - Consulta datos desde el sistema externo (Crystal MiFit)
-import axios, { AxiosInstance } from 'axios';
+import { getCrystalClient, getCrystalToken } from './crystal-auth.service';
 import { prisma } from '../database';
 import { POINTS_TABLE } from '../types';
 import { notifyUser } from './notification.service';
 import { recalculateUserLevel } from './level.service';
 
-// Configuración de la API externa
 const EXTERNAL_API_BASE_URL = process.env.EXTERNAL_API_URL || 'https://crystal.getmifit.app';
-const EXTERNAL_USER_EMAIL = process.env.EXTERNAL_USER_EMAIL || 'nodoetico@gmail.com';
-const EXTERNAL_USER_PASSWORD = process.env.EXTERNAL_USER_PASSWORD || 'AdN1yTq7RAfIXzZl';
-
-// Bearer token obtenido tras login
-let bearerToken: string | null = null;
-
-// ============================================================================
-// AUTENTICACIÓN
-// ============================================================================
-
-/**
- * Realiza login y obtiene el Bearer token
- * El endpoint /api/login es público (no requiere X-Api-Token).
- */
-async function getBearerToken(): Promise<string | null> {
-  if (bearerToken) return bearerToken;
-
-  try {
-    const response = await axios.post(
-      `${EXTERNAL_API_BASE_URL}/api/login`,
-      {
-        email: EXTERNAL_USER_EMAIL,
-        password: EXTERNAL_USER_PASSWORD,
-      },
-      {
-        timeout: 10000,
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      }
-    );
-
-    // La API de MiFit/Laravel devuelve el token en varios formatos posibles
-    const data = response.data;
-    
-    // Formato 1: { token: "..." } 
-    if (data?.token) {
-      bearerToken = data.token;
-      return bearerToken;
-    }
-
-    // Formato 2: { access_token: "..." }
-    if (data?.access_token) {
-      bearerToken = data.access_token;
-      return bearerToken;
-    }
-
-    // Formato 3: { data: { token: "..." } }
-    if (data?.data?.token) {
-      bearerToken = data.data.token;
-      return bearerToken;
-    }
-
-    // Formato 4: { data: { access_token: "..." } }
-    if (data?.data?.access_token) {
-      bearerToken = data.data.access_token;
-      return bearerToken;
-    }
-
-    return null;
-  } catch (error: unknown) {
-    const apiError = error as { response?: { status?: number; data?: { token?: string } } };
-    // Si es 302, puede ser login exitoso con redirect
-    if (apiError.response?.status === 302 || apiError.response?.status === 301) {
-      const data = apiError.response.data;
-      if (data?.token) {
-        bearerToken = data.token;
-        return bearerToken;
-      }
-    }
-    return null;
-  }
-}
-
-async function getApiClient(): Promise<AxiosInstance> {
-  const bearer = await getBearerToken();
-
-  return axios.create({
-    baseURL: `${EXTERNAL_API_BASE_URL}/api`,
-    timeout: 10000,
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      ...(bearer ? { 'Authorization': `Bearer ${bearer}` } : {}),
-    },
-  });
-}
 
 // ============================================================================
 // INTERFACES DE RESPUESTA DEL SISTEMA EXTERNO
@@ -164,7 +75,7 @@ interface ExternalApiResponse<T> {
  */
 export async function pullUserProfile(dni?: string): Promise<ExternalUser | null> {
   try {
-    const client = await getApiClient();
+    const client = await getCrystalClient();
     const endpoint = dni ? `/users/by-dni/${dni}` : '/user/me';
     const response = await client.get<ExternalUser>(endpoint);
     
@@ -175,10 +86,11 @@ export async function pullUserProfile(dni?: string): Promise<ExternalUser | null
   } catch (error: unknown) {
     if (dni) {
       try {
-        const client = await getApiClient();
+        const client = await getCrystalClient();
         const response = await client.get<ExternalUser>('/user/me');
         return response.data || null;
       } catch (fallbackErr: unknown) {
+        console.error('[ExternalPull] Error en fallback de perfil:', fallbackErr instanceof Error ? fallbackErr.message : 'Error');
         return null;
       }
     }
@@ -192,7 +104,7 @@ export async function pullUserProfile(dni?: string): Promise<ExternalUser | null
  */
 export async function pullUserMemberships(dni?: string): Promise<ExternalMembership[]> {
   try {
-    const client = await getApiClient();
+    const client = await getCrystalClient();
     const endpoint = dni ? `/users/by-dni/${dni}/memberships` : '/user/memberships';
     const response = await client.get<ExternalApiResponse<ExternalMembership[]>>(endpoint);
     
@@ -201,6 +113,7 @@ export async function pullUserMemberships(dni?: string): Promise<ExternalMembers
     }
     return [];
   } catch (error: unknown) {
+    console.error('[ExternalPull] Error al obtener membresías:', error instanceof Error ? error.message : 'Error');
     return [];
   }
 }
@@ -211,7 +124,7 @@ export async function pullUserMemberships(dni?: string): Promise<ExternalMembers
  */
 export async function pullUserAttendances(startDate?: string, endDate?: string, dni?: string): Promise<ExternalAttendance[]> {
   try {
-    const client = await getApiClient();
+    const client = await getCrystalClient();
     const params: Record<string, string> = {};
     if (startDate) params.startDate = startDate;
     if (endDate) params.endDate = endDate;
@@ -224,6 +137,7 @@ export async function pullUserAttendances(startDate?: string, endDate?: string, 
     }
     return [];
   } catch (error: unknown) {
+    console.error('[ExternalPull] Error al obtener asistencias:', error instanceof Error ? error.message : 'Error');
     return [];
   }
 }
@@ -234,7 +148,7 @@ export async function pullUserAttendances(startDate?: string, endDate?: string, 
  */
 export async function pullUserTransactions(startDate?: string, endDate?: string, dni?: string): Promise<ExternalTransaction[]> {
   try {
-    const client = await getApiClient();
+    const client = await getCrystalClient();
     const params: Record<string, string> = {};
     if (startDate) params.startDate = startDate;
     if (endDate) params.endDate = endDate;
@@ -247,6 +161,7 @@ export async function pullUserTransactions(startDate?: string, endDate?: string,
     }
     return [];
   } catch (error: unknown) {
+    console.error('[ExternalPull] Error al obtener transacciones:', error instanceof Error ? error.message : 'Error');
     return [];
   }
 }
@@ -301,7 +216,8 @@ export async function syncMembershipsFromExternal(user: { id: string; dni?: stri
           }
         });
       }
-    } catch {
+    } catch (syncErr: unknown) {
+      console.error('[ExternalPull] Error al sincronizar membresía:', syncErr instanceof Error ? syncErr.message : 'Error');
     }
   }
 
@@ -339,41 +255,40 @@ export async function syncAttendancesFromExternal(user: { id: string; dni?: stri
       });
 
       if (!existingCheckIn && attendance.type !== 'exit') {
+        const pointsToAdd = POINTS_TABLE.CHECK_IN_OPEN_GYM;
+
+        const updatedUser = await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            points: { increment: pointsToAdd },
+            totalPointsEarned: { increment: pointsToAdd },
+            lastActive: new Date(),
+          },
+        });
+
         await prisma.checkIn.create({
           data: {
             userId: user.id,
             checkInType: 'OPEN_GYM',
-            pointsEarned: POINTS_TABLE.CHECK_IN_OPEN_GYM,
+            pointsEarned: pointsToAdd,
             validationMethod: 'EXTERNAL_SYSTEM',
             checkInTime: attendanceDate,
             gymLocation: attendance.location || 'Sede Externa',
           }
         });
 
-        const pointsToAdd = POINTS_TABLE.CHECK_IN_OPEN_GYM;
-        await prisma.user.update({
-          where: { id: user.id },
-          data: {
-            points: user.points + pointsToAdd,
-            totalPointsEarned: user.totalPointsEarned + pointsToAdd,
-            lastActive: new Date(),
-          },
-        });
-
-        user.points += pointsToAdd;
-        user.totalPointsEarned += pointsToAdd;
-
         await recalculateUserLevel(user.id);
 
         notifyUser(user.id, 'points-updated', {
           userId: user.id,
-          newBalance: user.points,
+          newBalance: updatedUser.points,
           earned: pointsToAdd,
         });
 
         created++;
       }
-    } catch {
+    } catch (syncErr: unknown) {
+      console.error('[ExternalPull] Error al sincronizar asistencia:', syncErr instanceof Error ? syncErr.message : 'Error');
     }
   }
 
@@ -397,8 +312,7 @@ export async function testExternalConnection(): Promise<{
   apiUrl: string;
 }> {
   try {
-    // Probar login
-    const token = await getBearerToken();
+    const token = await getCrystalToken();
     
     if (!token) {
       return {
@@ -408,7 +322,7 @@ export async function testExternalConnection(): Promise<{
       };
     }
 
-    const client = await getApiClient();
+    const client = await getCrystalClient();
     await client.get('/user/me');
     
     return {

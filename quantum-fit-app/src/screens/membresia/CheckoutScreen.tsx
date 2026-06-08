@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -28,6 +28,25 @@ export default function CheckoutScreen({ navigation, route }: CheckoutScreenProp
   const [showSuccess, setShowSuccess] = useState(false);
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
+  useEffect(() => {
+    const handleDeepLink = ({ url }: { url: string }) => {
+      if (url.includes('payment/success') || url.includes('payment_id')) {
+        setShowSuccess(true);
+        refreshUser();
+      } else if (url.includes('payment/failure') || url.includes('payment_failed')) {
+        setErrorMessage('El pago fue cancelado o no se pudo procesar.');
+        setShowError(true);
+      }
+    };
+
+    const subscription = Linking.addEventListener('url', handleDeepLink);
+    Linking.getInitialURL().then((url) => {
+      if (url) handleDeepLink({ url });
+    });
+
+    return () => subscription.remove();
+  }, []);
 
   if (!plan) {
     return (

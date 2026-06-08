@@ -1,19 +1,8 @@
 // Servicio de Pagos - Comunicación con Crystal MiFit API
 // Este servicio actúa como proxy entre la App QuantumFit y el sistema de pagos de Crystal.
 // Flujo: App -> Backend QuantumFit -> API Crystal (MiFit) -> Pago procesado
-import axios, { AxiosInstance } from 'axios';
+import { getCrystalClient } from './crystal-auth.service';
 import { prisma } from '../database';
-
-// ============================================================================
-// CONFIGURACIÓN
-// ============================================================================
-
-const EXTERNAL_API_BASE_URL = process.env.EXTERNAL_API_URL || 'https://crystal.getmifit.app';
-
-// Bearer token obtenido tras login (caché)
-let bearerToken: string | null = null;
-let lastTokenRefresh: Date | null = null;
-const TOKEN_REFRESH_INTERVAL = 60 * 60 * 1000; // 1 hora
 
 // ============================================================================
 // INTERFACES
@@ -85,78 +74,6 @@ export interface CrystalRenewResponse {
 }
 
 // ============================================================================
-// AUTENTICACIÓN CON CRYSTAL API
-// ============================================================================
-
-/**
- * Obtiene un Bearer token de la API de Crystal MiFit.
- * El endpoint /api/login es público (no requiere X-Api-Token).
- */
-async function getBearerToken(): Promise<string | null> {
-  if (bearerToken && lastTokenRefresh) {
-    const elapsed = Date.now() - lastTokenRefresh.getTime();
-    if (elapsed < TOKEN_REFRESH_INTERVAL) {
-      return bearerToken;
-    }
-  }
-
-  try {
-    const response = await axios.post(
-      `${EXTERNAL_API_BASE_URL}/api/login`,
-      {
-        email: process.env.EXTERNAL_USER_EMAIL || 'nodoetico@gmail.com',
-        password: process.env.EXTERNAL_USER_PASSWORD || '',
-      },
-      {
-        timeout: 10000,
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      }
-    );
-
-    const data = response.data;
-
-    // Intentar varios formatos de respuesta
-    if (data?.token) {
-      bearerToken = data.token;
-    } else if (data?.access_token) {
-      bearerToken = data.access_token;
-    } else if (data?.data?.token) {
-      bearerToken = data.data.token;
-    } else if (data?.data?.access_token) {
-      bearerToken = data.data.access_token;
-    } else {
-      return null;
-    }
-
-    lastTokenRefresh = new Date();
-    return bearerToken;
-  } catch (error: unknown) {
-    return null;
-  }
-}
-
-/**
- * Crea un cliente Axios preconfigurado para la API de Crystal.
- * Se autentica con Bearer token obtenido del login.
- */
-async function getApiClient(): Promise<AxiosInstance> {
-  const bearer = await getBearerToken();
-
-  return axios.create({
-    baseURL: `${EXTERNAL_API_BASE_URL}/api`,
-    timeout: 15000,
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      ...(bearer ? { 'Authorization': `Bearer ${bearer}` } : {}),
-    },
-  });
-}
-
-// ============================================================================
 // CONSULTAS A CRYSTAL
 // ============================================================================
 
@@ -166,7 +83,7 @@ async function getApiClient(): Promise<AxiosInstance> {
  */
 export async function getPaymentMethods(): Promise<CrystalPaymentMethod[]> {
   try {
-    const client = await getApiClient();
+    const client = await getCrystalClient();
     const response = await client.get('/payment-methods');
 
     // La API devuelve { data: [...] }
@@ -186,7 +103,7 @@ export async function getPaymentMethods(): Promise<CrystalPaymentMethod[]> {
  */
 export async function getEnrollmentStatus(): Promise<CrystalEnrollment> {
   try {
-    const client = await getApiClient();
+    const client = await getCrystalClient();
     const response = await client.get('/user/enrollment');
 
     return response.data as CrystalEnrollment;
@@ -210,7 +127,7 @@ export async function renewEnrollment(
   comments?: string,
 ): Promise<CrystalRenewResponse> {
   try {
-    const client = await getApiClient();
+    const client = await getCrystalClient();
     const response = await client.post('/user/enrollment/renew', {
       payment_method_id: paymentMethodId,
       ...(comments ? { comments } : {}),
@@ -239,7 +156,7 @@ export async function renewMembership(
   comments?: string,
 ): Promise<CrystalRenewResponse> {
   try {
-    const client = await getApiClient();
+    const client = await getCrystalClient();
     const response = await client.post('/memberships/renew', {
       membership_id: membershipId,
       payment_method_id: paymentMethodId,
@@ -265,7 +182,7 @@ export async function getTransactions(
   perPage: number = 15,
 ): Promise<CrystalTransaction[]> {
   try {
-    const client = await getApiClient();
+    const client = await getCrystalClient();
     const response = await client.get('/user/transactions', {
       params: { per_page: perPage },
     });

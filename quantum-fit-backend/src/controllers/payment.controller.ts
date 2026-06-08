@@ -99,13 +99,16 @@ export async function processEnrollmentRenewal(req: Request & AuthRequest, res: 
 
     // Sincronizar en nuestra base de datos local
     const endDate = new Date(result.enrollment.due_date);
-    const renewalPrice = result.enrollment.last_payment_date
-      ? 0 // Si ya pagó antes, es renovación (el precio viene de Crystal)
-      : 0; // Lo obtendremos del estado de inscripción
 
-    // Intentar sincronizar la suscripción local
+    let renewalPrice = 0;
     try {
-      // Determinar el tipo de suscripción basado en la fecha de vencimiento
+      const updatedEnrollment = await getEnrollmentStatus();
+      renewalPrice = updatedEnrollment.renewal?.price || 0;
+    } catch (priceError: unknown) {
+      console.error('[PaymentController] No se pudo obtener el precio real del enrollment:', priceError instanceof Error ? priceError.message : 'Error');
+    }
+
+    try {
       const now = new Date();
       const monthsDiff = (endDate.getFullYear() - now.getFullYear()) * 12
         + (endDate.getMonth() - now.getMonth());
@@ -122,7 +125,7 @@ export async function processEnrollmentRenewal(req: Request & AuthRequest, res: 
         undefined
       );
     } catch (syncError: unknown) {
-      // No interrumpimos el flujo, el pago ya se procesó en Crystal
+      console.error('[PaymentController] Error al sincronizar suscripción local después de pago:', syncError instanceof Error ? syncError.message : 'Error');
     }
 
     res.json({
@@ -171,15 +174,24 @@ export async function processMembershipRenewal(req: Request & AuthRequest, res: 
     if (result.membership) {
       const endDate = new Date(result.membership.end_date);
 
+      let renewalPrice = 0;
+      try {
+        const updatedEnrollment = await getEnrollmentStatus();
+        renewalPrice = updatedEnrollment.renewal?.price || 0;
+      } catch (priceError: unknown) {
+        console.error('[PaymentController] No se pudo obtener precio real tras renovar membresía:', priceError instanceof Error ? priceError.message : 'Error');
+      }
+
       try {
         await syncSubscriptionLocally(
           userId!,
           'VIP_MONTHLY',
           endDate,
-          0,
+          renewalPrice,
           undefined
         );
-      } catch {
+      } catch (syncError: unknown) {
+        console.error('[PaymentController] Error al sincronizar membresía local:', syncError instanceof Error ? syncError.message : 'Error');
       }
     }
 

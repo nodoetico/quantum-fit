@@ -18,4 +18,5 @@ COPY --from=builder --chown=appuser:appuser /app/prisma ./prisma
 USER appuser
 EXPOSE 3000
 ENV NODE_ENV=production
-CMD npx prisma migrate deploy && node dist/index.js
+RUN printf '#!/bin/sh\nset -e\necho "=== Running migrations ==="\nnpx prisma migrate deploy\necho "=== Starting server ==="\nnode dist/index.js 2>&1\n' > /app/start.sh && chmod +x /app/start.sh
+CMD ["/app/start.sh"]

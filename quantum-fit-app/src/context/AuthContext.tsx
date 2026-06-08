@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { authService, checkInService, userService, bookingsService, externalPullService, paymentService, isAuthenticated as checkIsAuthenticated } from '../services/api';
+import { authService, checkInService, userService, bookingsService, externalPullService, paymentService, isAuthenticated as checkIsAuthenticated, getToken } from '../services/api';
 import { websocketService } from '../services/websocket';
 import { User, Booking, Achievement, ActivityLog, WeeklyStats, LocalSubscription } from '../types';
 
@@ -89,15 +89,31 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         unsubscribePoints();
         unsubscribeAchievements();
         unsubscribeStreak();
+        websocketService.disconnect();
       };
     }
   }, [user?.id]);
+
+  const isTokenExpired = (token: string): boolean => {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.exp * 1000 < Date.now();
+    } catch {
+      return true;
+    }
+  };
 
   const loadUser = async () => {
     try {
       const isAuth = await checkIsAuthenticated();
       
       if (isAuth) {
+        const token = await getToken();
+        if (token && isTokenExpired(token)) {
+          await authService.logout();
+          setIsLoading(false);
+          return;
+        }
         const userData = await authService.getCurrentUser();
         if (userData) {
           setUser(userData);
@@ -110,6 +126,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
       }
     } catch (error) {
+      console.error('loadUser failed:', error);
     } finally {
       setIsLoading(false);
     }
@@ -123,6 +140,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         date: log.date ? new Date(log.date) : new Date(),
       })));
     } catch (error) {
+      console.error('loadActivity failed:', error);
     }
   };
 
@@ -131,6 +149,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const data = await userService.getAchievements();
       setAchievements(data?.all || []);
     } catch (error) {
+      console.error('loadUserAchievements failed:', error);
     }
   };
 
@@ -139,6 +158,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const data = await bookingsService.getMyBookings();
       setBookings(data || []);
     } catch (error) {
+      console.error('loadUserBookings failed:', error);
     }
   };
 
@@ -149,6 +169,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setWeeklyStats(data);
       }
     } catch (error) {
+      console.error('loadWeeklyStats failed:', error);
     }
   };
 
@@ -164,6 +185,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setExternalMemberships(membershipsData?.data || []);
       setExternalAttendances(attendancesData?.data || []);
     } catch (error) {
+      console.error('loadExternalData failed:', error);
     } finally {
       setIsExternalLoading(false);
     }
@@ -178,6 +200,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setUser(prev => prev ? { ...prev, isVip: sub.isVip, vipSince: sub.vipSince } : prev);
       }
     } catch (error) {
+      console.error('loadSubscription failed:', error);
     }
   };
 
@@ -216,6 +239,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       websocketService.connect(userData.id);
       return true;
     } catch (error: any) {
+      if (error?.response?.data?.error) {
+        console.error('Registration failed:', error.response.data.error);
+      } else {
+        console.error('Registration failed:', error);
+      }
       return false;
     }
   };
@@ -233,6 +261,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setExternalMemberships([]);
       setSubscription(null);
     } catch (error) {
+      console.error('logout failed:', error);
     }
   };
 
@@ -265,6 +294,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const userData = await userService.getProfile();
       setUser(userData);
     } catch (error) {
+      console.error('refreshUser failed:', error);
     }
   };
 

@@ -1,7 +1,7 @@
 // Servicio de API para QUANTUM FIT
 import axios from 'axios';
-import { secureGetItem, secureSetItem, secureRemoveItem } from './secureStorage';
-import { API_URL } from '../config/api';
+import { secureGetItem, secureSetItem, secureRemoveItem, STORAGE_KEYS } from './secureStorage';
+import { API_URL, API_CONFIG } from '../config/api';
 
 // Crear instancia de axios
 const api = axios.create({
@@ -9,7 +9,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000,
+  timeout: API_CONFIG.TIMEOUT,
 });
 
 // Endpoints que NO requieren token (ni deben enviarlo)
@@ -23,7 +23,7 @@ api.interceptors.request.use(
     if (isAuthEndpoint) {
       return config;
     }
-    const token = await secureGetItem('quantumfit.auth.token');
+    const token = await secureGetItem(STORAGE_KEYS.AUTH_TOKEN);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -34,6 +34,19 @@ api.interceptors.request.use(
   }
 );
 
+// Cola de refresh para evitar race conditions
+let isRefreshing = false;
+let refreshSubscribers: Array<(token: string) => void> = [];
+
+function onRefreshed(token: string) {
+  refreshSubscribers.forEach(cb => cb(token));
+  refreshSubscribers = [];
+}
+
+function addRefreshSubscriber(cb: (token: string) => void) {
+  refreshSubscribers.push(cb);
+}
+
 // Interceptor para manejar errores de autenticación
 api.interceptors.response.use(
   (response) => response,
@@ -43,25 +56,39 @@ api.interceptors.response.use(
       const isAuthEndpoint = AUTH_ENDPOINTS.some((e) => url.includes(e));
 
       if (!isAuthEndpoint) {
-        try {
-          const storedRefreshToken = await secureGetItem('quantumfit.auth.refresh_token');
-          if (storedRefreshToken) {
-            const response = await axios.post(`${API_URL}/auth/refresh`, {
-              refreshToken: storedRefreshToken,
-            });
+        if (!isRefreshing) {
+          isRefreshing = true;
+          try {
+            const storedRefreshToken = await secureGetItem(STORAGE_KEYS.REFRESH_TOKEN);
+            if (storedRefreshToken) {
+              const response = await axios.post(`${API_URL}/auth/refresh`, {
+                refreshToken: storedRefreshToken,
+              });
 
-            const { accessToken, refreshToken: newRefreshToken } = response.data.data;
+              const { accessToken, refreshToken: newRefreshToken } = response.data.data;
 
-            await secureSetItem('quantumfit.auth.token', accessToken);
-            await secureSetItem('quantumfit.auth.refresh_token', newRefreshToken);
+              await secureSetItem(STORAGE_KEYS.AUTH_TOKEN, accessToken);
+              await secureSetItem(STORAGE_KEYS.REFRESH_TOKEN, newRefreshToken);
 
-            error.config.headers.Authorization = `Bearer ${accessToken}`;
-            return api(error.config);
+              onRefreshed(accessToken);
+              error.config.headers.Authorization = `Bearer ${accessToken}`;
+              return api(error.config);
+            }
+          } catch (refreshError) {
+            console.error('Token refresh failed:', refreshError);
+            await secureRemoveItem(STORAGE_KEYS.AUTH_TOKEN);
+            await secureRemoveItem(STORAGE_KEYS.REFRESH_TOKEN);
+            await secureRemoveItem(STORAGE_KEYS.USER);
+          } finally {
+            isRefreshing = false;
           }
-        } catch {
-          await secureRemoveItem('quantumfit.auth.token');
-          await secureRemoveItem('quantumfit.auth.refresh_token');
-          await secureRemoveItem('quantumfit.auth.user');
+        } else {
+          return new Promise((resolve) => {
+            addRefreshSubscriber((token: string) => {
+              error.config.headers.Authorization = `Bearer ${token}`;
+              resolve(api(error.config));
+            });
+          });
         }
       }
     }
@@ -87,9 +114,9 @@ export const authService = {
     const { user, accessToken, refreshToken } = response.data.data;
 
     // Guardar tokens y usuario
-    await secureSetItem('quantumfit.auth.token', accessToken);
-    await secureSetItem('quantumfit.auth.refresh_token', refreshToken);
-    await secureSetItem('quantumfit.auth.user', JSON.stringify(user));
+    await secureSetItem(STORAGE_KEYS.AUTH_TOKEN, accessToken);
+    await secureSetItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
+    await secureSetItem(STORAGE_KEYS.USER, JSON.stringify(user));
 
     return user;
   },
@@ -106,9 +133,9 @@ export const authService = {
     const { user, accessToken, refreshToken } = response.data.data;
 
     // Guardar tokens y usuario
-    await secureSetItem('quantumfit.auth.token', accessToken);
-    await secureSetItem('quantumfit.auth.refresh_token', refreshToken);
-    await secureSetItem('quantumfit.auth.user', JSON.stringify(user));
+    await secureSetItem(STORAGE_KEYS.AUTH_TOKEN, accessToken);
+    await secureSetItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
+    await secureSetItem(STORAGE_KEYS.USER, JSON.stringify(user));
 
     return user;
   },
@@ -117,9 +144,9 @@ export const authService = {
    * Cerrar sesión
    */
   async logout() {
-    await secureRemoveItem('quantumfit.auth.token');
-    await secureRemoveItem('quantumfit.auth.refresh_token');
-    await secureRemoveItem('quantumfit.auth.user');
+    await secureRemoveItem(STORAGE_KEYS.AUTH_TOKEN);
+    await secureRemoveItem(STORAGE_KEYS.REFRESH_TOKEN);
+    await secureRemoveItem(STORAGE_KEYS.USER);
   },
 
   /**
@@ -129,13 +156,13 @@ export const authService = {
     try {
       const response = await api.get('/auth/me');
       const user = response.data.data;
-      await secureSetItem('quantumfit.auth.user', JSON.stringify(user));
+      await secureSetItem(STORAGE_KEYS.USER, JSON.stringify(user));
       return user;
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 401) {
         return null;
       }
-      const userJson = await secureGetItem('quantumfit.auth.user');
+      const userJson = await secureGetItem(STORAGE_KEYS.USER);
       if (userJson) {
         return JSON.parse(userJson);
       }
@@ -151,7 +178,7 @@ export const authService = {
     const user = response.data.data;
     
     // Actualizar usuario en storage
-    await secureSetItem('quantumfit.auth.user', JSON.stringify(user));
+    await secureSetItem(STORAGE_KEYS.USER, JSON.stringify(user));
     
     return user;
   },
@@ -424,7 +451,7 @@ export const externalPullService = {
  * Verificar si hay token válido
  */
 export async function isAuthenticated(): Promise<boolean> {
-  const token = await secureGetItem('quantumfit.auth.token');
+  const token = await secureGetItem(STORAGE_KEYS.AUTH_TOKEN);
   return !!token;
 }
 
@@ -432,7 +459,7 @@ export async function isAuthenticated(): Promise<boolean> {
  * Obtener token actual
  */
 export async function getToken(): Promise<string | null> {
-  return secureGetItem('quantumfit.auth.token');
+  return secureGetItem(STORAGE_KEYS.AUTH_TOKEN);
 }
 
 // ============================================

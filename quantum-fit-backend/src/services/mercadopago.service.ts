@@ -84,7 +84,8 @@ export async function processPaymentWebhook(paymentId: string, topic: string): P
   try {
     const result = await paymentClient.get({ id: paymentId }) as PaymentResponse;
     paymentResponse = result;
-  } catch {
+  } catch (err: unknown) {
+    console.error('[MercadoPago] Error al obtener pago:', err instanceof Error ? err.message : 'Error');
     return;
   }
 
@@ -113,6 +114,7 @@ export async function processPaymentWebhook(paymentId: string, topic: string): P
       crystalPaymentMethodId = tarjeta?.id || methods[0].id;
     }
   } catch {
+    console.error('[MercadoPago] Error al obtener métodos de pago para webhook');
   }
 
   let enrollmentResult: any = null;
@@ -121,7 +123,8 @@ export async function processPaymentWebhook(paymentId: string, topic: string): P
       crystalPaymentMethodId,
       `MercadoPago - Pago ${mpPaymentId}`,
     );
-  } catch {
+  } catch (renewErr: unknown) {
+    console.error('[MercadoPago] Error al renovar enrollment desde webhook:', renewErr instanceof Error ? renewErr.message : 'Error');
   }
 
   const endDate = enrollmentResult?.enrollment?.due_date

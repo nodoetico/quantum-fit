@@ -57,6 +57,23 @@ export interface WeeklyStats {
 
 export interface Booking {
   id: string;
+  class?: {
+    id: string;
+    name: string;
+    description: string | null;
+    instructorName: string;
+    startTime: string;
+    endTime: string;
+    durationMinutes: number;
+    totalSpots: number;
+    bookedSpots: number;
+    activityType: string;
+    difficultyLevel: string;
+    location: string | null;
+    gymZone: string | null;
+  };
+  status?: string;
+  createdAt?: string;
 }
 
 export interface Notification {

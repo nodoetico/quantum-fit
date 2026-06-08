@@ -9,7 +9,7 @@
 export const API_CONFIG = {
   BASE_URL: process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000/api',
   SOCKET_URL: process.env.EXPO_PUBLIC_SOCKET_URL || 'http://localhost:3000',
-  TIMEOUT: 10000,
+  TIMEOUT: parseInt(process.env.EXPO_PUBLIC_API_TIMEOUT || '10000', 10),
 };
 
 export const API_URL = API_CONFIG.BASE_URL;

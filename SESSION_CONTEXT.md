@@ -51,6 +51,12 @@ QuantumFit es un sistema de gestión de gimnasio con gamificación (niveles, pun
 - Production: (pendiente — URL de Railway)
 - 401 interceptor salta refresh para `/auth/login` y `/auth/register`
 
+### Crystal Integration (Unified Auth)
+- Auth compartida en `crystal-auth.service.ts` (antes duplicada en pull + payment)
+- Token con TTL 1h + caché disco en `data/crystal-token.json`
+- Credenciales Crystal: `nicolas@crystal-desarrollo.com` (desde .env)
+- Sin hardcoded fallbacks
+
 ---
 
 ## Backend Endpoints
@@ -157,16 +163,53 @@ QuantumFit es un sistema de gestión de gimnasio con gamificación (niveles, pun
 - Perfil con pestañas (stats, logros, actividad)
 - **Estado**: ✅ Implementado
 
-### 7. Deploy a Producción (En curso)
+### 7. Deploy a Producción (Pendiente — bloqueado por token de Railway)
 - **Dockerfile** actualizado: multistage build con Prisma generate + migrate deploy
 - **Git**: Repo creado en `github.com/nodoetico/quantum-fit`
-- **Railway**: CLI instalado, pendiente token de API
-- **Próximo**: Deploy del backend + PostgreSQL en Railway, configurar webhook MP, actualizar frontend
-- **Estado**: 🚧 En progreso
+- **Railway**: CLI instalado, pendiente token de API del usuario
+- **Código**: Todo listo (0 errores TypeScript en backend y app)
+- **Bloqueante**: Usuario debe generar token en https://railway.app → Settings → Tokens
+- **Próximo**: railway login → init → add postgres → vars set → up
+- **Estado**: 🚧 Bloqueado (falta token de Railway)
 
 ---
 
 ## Session History
+
+### Session 8 — Bugfixes pre-producción: Crystal auth, errores silenciosos, flujo de pago
+
+**Goal:** Corregir bugs críticos, errores silenciosos y configurar la app móvil para producción.
+
+**FASE 1 — Bugs que crashean la app:**
+1. `alert()` → `Alert.alert()` en `BeneficiosScreen.tsx` (crash en Android)
+2. Deep linking configurado en `AppNavigator.tsx` (scheme `quantumfit://`)
+3. Plugin `expo-camera` + permisos iOS/Android en `app.json`
+4. Interfaz `Booking` expandida en `types/index.ts` (antes solo `{ id: string }`)
+
+**FASE 2 — Flujos críticos:**
+5. `Linking.addEventListener` en `CheckoutScreen.tsx` para detectar vuelta de MercadoPago
+6. `websocketService.disconnect()` en cleanup del `useEffect` de `AuthContext.tsx`
+7. Race condition de refresh token corregida con cola de promesas en `api.ts`
+8. Helper `isTokenExpired()` + verificación pre-carga en `AuthContext.tsx`
+
+**FASE 3 — Errores silenciosos:**
+9. `console.error()` agregado en ~15 catch blocks vacíos (AuthContext, BeneficiosScreen, external-pull, payment, mercadopago, DashboardScreen)
+
+**FASE 4 — Config producción:**
+10. `STORAGE_KEYS` exportadas desde `secureStorage.ts`; todas las keys hardcodeadas en `api.ts` reemplazadas
+11. WebSocket reconexión: `5` → `20` intentos, `reconnectionDelayMax: 10000`
+12. Timeout configurable vía `EXPO_PUBLIC_API_TIMEOUT` en `src/config/api.ts`
+13. `SECURE_KEYS` tipado como `string[]` explícito (evita TS2345)
+
+**FASE 5 — Refactor integración Crystal (6 problemas detectados + corregidos):**
+14. **Password hardcodeado eliminado**: `external-pull.service.ts` ya no tiene `'AdN1yTq7RAfIXzZl'` como fallback
+15. **Auth unificada**: Creado `src/services/crystal-auth.service.ts` — ambos servicios (pull + payment) lo importan. TTL 1h + caché en disco
+16. **`renewalPrice` siempre 0 corregido**: ahora consulta `getEnrollmentStatus()` post-pago para obtener el precio real
+17. **Catch blocks vacíos llenados**: 8 bloques en backend + 1 en app con `console.error` descriptivo
+18. **Token persistente**: caché a disco + TTL refresh automático (1h)
+19. **Mutación de parámetro eliminada**: `user.points +=` reemplazado por `prisma.update({ increment })`
+
+**Resultado:** `npx tsc --noEmit` → **0 errores** en backend y app.
 
 ### Session 7 — Deploy prep: Docker, Git, GitHub + Railway setup
 
@@ -260,9 +303,9 @@ ORIGIN=http://localhost:3000
 
 # Crystal External API (Pull)
 EXTERNAL_API_URL=https://crystal.getmifit.app
-EXTERNAL_API_TOKEN=
-EXTERNAL_USER_EMAIL=nodoetico@gmail.com
-EXTERNAL_USER_PASSWORD=AdN1yTq7RAfIXzZl
+EXTERNAL_API_TOKEN=                         # ← Sin uso (login se hace con email+password)
+EXTERNAL_USER_EMAIL=nicolas@crystal-desarrollo.com
+EXTERNAL_USER_PASSWORD=test123456789!
 
 # External Sync (Check-in desde software del gimnasio)
 INTEGRATION_API_KEY=gimnasio_quantum_fit_2026_clave_secreta_xyz789
@@ -285,14 +328,14 @@ EMAIL_FROM=nodoetico@gmail.com
 ---
 
 ## TypeScript Status
-- Backend: `npx tsc --noEmit` → 0 errors
-- App: `npx tsc --noEmit` → 0 errors
+- Backend: `npx tsc --noEmit` → **0 errors** ✅
+- App: `npx tsc --noEmit` → **0 errors** ✅
 
 ---
 
 ## Deploy a Railway — Pasos para terminar
 
-### Prerrequisito: Generar API Token
+### ⚠️ Bloqueante: Generar API Token
 1. Ir a https://railway.app
 2. Login con GitHub (cuenta `nodoetico`)
 3. Avatar → Profile Settings → Tokens → Generate New Token
@@ -311,16 +354,19 @@ railway init --name quantum-fit
 railway add postgres
 
 # 4. Configurar variables de entorno (cada una con --key=value)
-railway vars set JWT_SECRET="..."
-railway vars set REFRESH_TOKEN_SECRET="..."
-railway vars set RESET_TOKEN_SECRET="..."
+railway vars set JWT_SECRET="quantum_fit_jwt_secret_key_2026_super_seguro_1234567890"
+railway vars set REFRESH_TOKEN_SECRET="quantum_fit_refresh_secret_key_2026_super_seguro_abcdefgh"
+railway vars set RESET_TOKEN_SECRET="quantum_fit_reset_token_secret_2026"
 railway vars set ALLOWED_ORIGINS="https://admin.quantumfit.com,https://quantumfit.com"
 railway vars set INTEGRATION_API_KEY="gimnasio_quantum_fit_2026_clave_secreta_xyz789"
 railway vars set EXTERNAL_API_URL="https://crystal.getmifit.app"
-railway vars set EXTERNAL_USER_EMAIL="nodoetico@gmail.com"
-railway vars set EXTERNAL_USER_PASSWORD="AdN1yTq7RAfIXzZl"
-railway vars set MERCADOPAGO_ACCESS_TOKEN="TEST-8770022280503036-112621-..."
+railway vars set EXTERNAL_USER_EMAIL="nicolas@crystal-desarrollo.com"
+railway vars set EXTERNAL_USER_PASSWORD="test123456789!"
+railway vars set MERCADOPAGO_ACCESS_TOKEN="TEST-8770022280503036-112621-2a9e80579f6a0960d0a1d02787fecca7-462069879"
 railway vars set MERCADOPAGO_NOTIFICATION_URL="https://quantumfit.railway.app/api/mercadopago/webhook"
+railway vars set MERCADOPAGO_SUCCESS_URL="quantumfit://payment/success"
+railway vars set MERCADOPAGO_FAILURE_URL="quantumfit://payment/failure"
+railway vars set MERCADOPAGO_PENDING_URL="quantumfit://payment/pending"
 railway vars set SMTP_HOST="smtp.gmail.com"
 railway vars set SMTP_PORT="587"
 railway vars set SMTP_USER="nodoetico@gmail.com"
@@ -339,9 +385,10 @@ railway domain
 
 ### Después del deploy
 1. **Actualizar webhook MP**: La URL de notificación debe apuntar al dominio real de Railway
-2. **Actualizar frontend**: Cambiar `EXPO_PUBLIC_API_URL` a `https://quantumfit.railway.app/api`
-3. **Configurar SMTP**: Si sigue sin funcionar, probar con otro proveedor (SendGrid, Mailgun, etc.)
-4. **Verificar**: `GET /health` desde el dominio de Railway
+2. **Actualizar frontend**: Cambiar `EXPO_PUBLIC_API_URL` react-native en el build de EAS a `https://quantumfit.railway.app/api`
+3. **Compilar app**: `npx eas build --platform all`
+4. **Configurar SMTP**: Si sigue sin funcionar, probar con otro proveedor (SendGrid, Mailgun, etc.)
+5. **Verificar**: `GET /health` desde el dominio de Railway
 
 ---
 

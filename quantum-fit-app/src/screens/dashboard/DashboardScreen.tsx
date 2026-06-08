@@ -37,6 +37,7 @@ export default function DashboardScreen({ navigation }: DashboardScreenProps) {
         setShowTutorial(true);
       }
     } catch (error) {
+      console.error('[Dashboard] Error al verificar tutorial:', error);
     }
   };
 

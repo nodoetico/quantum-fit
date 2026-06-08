@@ -8,6 +8,7 @@ import {
   Modal,
   ActivityIndicator,
   RefreshControl,
+  Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -56,6 +57,7 @@ export default function BeneficiosScreen({ navigation }: BeneficiosScreenProps) 
       const data = await rewardsService.getAll();
       setRewards(data);
     } catch (err) {
+      console.error('loadRewards failed:', err);
       setError('No se pudieron cargar los rewards. Intenta nuevamente.');
     } finally {
       setLoading(false);
@@ -118,7 +120,8 @@ export default function BeneficiosScreen({ navigation }: BeneficiosScreenProps) 
       setSuccessModalVisible(true);
       await loadRewards();
     } catch (err) {
-      alert('Error al canjear el reward. Intenta nuevamente.');
+      console.error('handleRedeem failed:', err);
+      Alert.alert('Error', 'Error al canjear el reward. Intenta nuevamente.');
     } finally {
       setIsRedeeming(false);
     }
