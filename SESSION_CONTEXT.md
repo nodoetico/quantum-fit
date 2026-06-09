@@ -1,6 +1,6 @@
 # QuantumFit — Session Context
 
-> Última actualización: 5 de junio de 2026 (fin de Sesión 7)
+> Última actualización: 8 de junio de 2026 (fin de Sesión 9)
 
 ---
 
@@ -163,14 +163,16 @@ QuantumFit es un sistema de gestión de gimnasio con gamificación (niveles, pun
 - Perfil con pestañas (stats, logros, actividad)
 - **Estado**: ✅ Implementado
 
-### 7. Deploy a Producción (Pendiente — bloqueado por token de Railway)
-- **Dockerfile** actualizado: multistage build con Prisma generate + migrate deploy
-- **Git**: Repo creado en `github.com/nodoetico/quantum-fit`
-- **Railway**: CLI instalado, pendiente token de API del usuario
-- **Código**: Todo listo (0 errores TypeScript en backend y app)
-- **Bloqueante**: Usuario debe generar token en https://railway.app → Settings → Tokens
-- **Próximo**: railway login → init → add postgres → vars set → up
-- **Estado**: 🚧 Bloqueado (falta token de Railway)
+### 7. Deploy a Producción (Completado — Railway operativo)
+- **Railway**: ✅ Proyecto `quantum-fit` creado en railway.app
+- **PostgreSQL**: ✅ Agregado y online (`Postgres` service, SFO region)
+- **Backend**: ✅ Deployado y corriendo en https://quantum-fit-backend-production.up.railway.app
+- **Health check**: ✅ `GET /health` responde OK
+- **Dockerfile**: Simplificado a single stage (se eliminó multistage por problemas de permisos con appuser)
+- **Variables de entorno**: ✅ JWT, MP, SMTP, Crystal, CORS configuradas
+- **Webhook MP**: ✅ Actualizado con dominio real de Railway
+- **Migraciones DB**: ✅ 3 migraciones aplicadas (init, roles/payments, dni/external)
+- **Estado**: ✅ Backend en producción
 
 ---
 
@@ -391,6 +393,36 @@ railway domain
 5. **Verificar**: `GET /health` desde el dominio de Railway
 
 ---
+
+## Session 9 — Deploy a Railway + Entrega
+
+**Goal:** Deploy backend a Railway y preparar documentación de entrega.
+
+**Hecho:**
+1. ✅ Railway CLI instalado
+2. ✅ Login con `nodoetico@gmail.com` via browserless OAuth
+3. ✅ Proyecto `quantum-fit` inicializado
+4. ✅ PostgreSQL agregado (2 instancias creadas por error, `Postgres-k41-` eliminada)
+5. ✅ 16 variables de entorno configuradas
+6. ✅ Backend deployado (3 intentos de build hasta éxito)
+   - Fix 1: `--chown=appuser:appuser` para permisos de Prisma
+   - Fix 2: Crear start.sh antes de `USER appuser`  
+   - Fix 3: Simplificar Dockerfile a single stage (eliminar multistage por problema con node no-root)
+7. ✅ `MERCADOPAGO_NOTIFICATION_URL` actualizada con dominio real
+8. ✅ `.env` de app móvil actualizado con URL de Railway
+9. ✅ Documento `ENTREGA_A_PROPIETARIA.md` creado
+
+**Pendiente para próxima sesión:**
+1. SMTP — Generar contraseña de aplicación de Gmail y setear `SMTP_PASS`
+2. Build de la app — Instalar EAS CLI, configurar, y buildear
+3. Migrar cuentas a Gmail genérico de la propietaria
+4. MercadoPago — Cambiar de sandbox a producción
+
+**URLs:**
+- API: https://quantum-fit-backend-production.up.railway.app
+- Health: https://quantum-fit-backend-production.up.railway.app/health
+- Railway Dashboard: https://railway.app/project/4eff5ceb-1f3f-4ceb-b880-1f697686174b
+- GitHub: https://github.com/nodoetico/quantum-fit
 
 ## Running the App (Development)
 ```bash
