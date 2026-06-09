@@ -13,6 +13,7 @@ export interface User {
   notificationsCount?: number;
   isVip?: boolean;
   vipSince?: string | null;
+  dni?: string | null;
 }
 
 export interface Reward {
@@ -47,12 +48,34 @@ export interface ActivityLog {
   description: string;
 }
 
-export interface WeeklyStats {
-  weekStart: Date;
+export interface WeekStats {
+  id?: string;
+  userId?: string;
+  year: number;
+  week: number;
+  weekStartDate: Date;
+  weekEndDate: Date;
   workoutsCompleted: number;
-  pointsEarned: number;
+  classesAttended: number;
+  totalPoints: number;
+  totalCheckIns: number;
   attendanceRate: number;
-  activeDays: number[]; // 0-6 (Domingo-Sábado)
+  activeDays: number;
+  activeDaysBitmap: number;
+  isPerfectWeek: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface WeeklyStats {
+  currentWeek: WeekStats;
+  previousWeeks: WeekStats[];
+  summary: {
+    totalWeeks: number;
+    perfectWeeks: number;
+    totalWorkouts: number;
+    totalPoints: number;
+  };
 }
 
 export interface Booking {

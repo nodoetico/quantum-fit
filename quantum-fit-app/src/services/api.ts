@@ -391,24 +391,27 @@ export const externalPullService = {
   /**
    * Obtener perfil desde sistema externo (MiFit)
    */
-  async getProfile() {
-    const response = await api.get('/external-pull/profile');
+  async getProfile(dni?: string) {
+    const params = dni ? `?dni=${dni}` : '';
+    const response = await api.get(`/external-pull/profile${params}`);
     return response.data.data;
   },
 
   /**
    * Obtener membresías desde sistema externo
    */
-  async getMemberships() {
-    const response = await api.get('/external-pull/memberships');
+  async getMemberships(dni?: string) {
+    const params = dni ? `?dni=${dni}` : '';
+    const response = await api.get(`/external-pull/memberships${params}`);
     return response.data;
   },
 
   /**
    * Obtener asistencias desde sistema externo
    */
-  async getAttendances(startDate?: string, endDate?: string) {
+  async getAttendances(dni?: string, startDate?: string, endDate?: string) {
     const params = new URLSearchParams();
+    if (dni) params.append('dni', dni);
     if (startDate) params.append('startDate', startDate);
     if (endDate) params.append('endDate', endDate);
     const response = await api.get(`/external-pull/attendances?${params}`);
@@ -418,8 +421,9 @@ export const externalPullService = {
   /**
    * Obtener transacciones desde sistema externo
    */
-  async getTransactions(startDate?: string, endDate?: string) {
+  async getTransactions(dni?: string, startDate?: string, endDate?: string) {
     const params = new URLSearchParams();
+    if (dni) params.append('dni', dni);
     if (startDate) params.append('startDate', startDate);
     if (endDate) params.append('endDate', endDate);
     const response = await api.get(`/external-pull/transactions?${params}`);
@@ -429,8 +433,9 @@ export const externalPullService = {
   /**
    * Obtener todos los datos del sistema externo
    */
-  async getAll() {
-    const response = await api.get('/external-pull/all');
+  async getAll(dni?: string) {
+    const params = dni ? `?dni=${dni}` : '';
+    const response = await api.get(`/external-pull/all${params}`);
     return response.data.data;
   },
 

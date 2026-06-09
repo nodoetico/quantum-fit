@@ -34,9 +34,6 @@
       "bundler": "metro"
     },
     "scheme": "quantumfit",
-    "updates": {
-      "fallbackToCacheTimeout": 0
-    },
     "assetBundlePatterns": [
       "**/*"
     ],

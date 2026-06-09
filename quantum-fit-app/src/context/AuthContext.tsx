@@ -52,11 +52,27 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [activityLog, setActivityLog] = useState<ActivityLog[]>([]);
   const [weeklyStats, setWeeklyStats] = useState<WeeklyStats>({
-    weekStart: new Date(),
-    workoutsCompleted: 0,
-    pointsEarned: 0,
-    attendanceRate: 0,
-    activeDays: [],
+    currentWeek: {
+      year: new Date().getFullYear(),
+      week: 1,
+      weekStartDate: new Date(),
+      weekEndDate: new Date(),
+      workoutsCompleted: 0,
+      classesAttended: 0,
+      totalPoints: 0,
+      totalCheckIns: 0,
+      attendanceRate: 0,
+      activeDays: 0,
+      activeDaysBitmap: 0,
+      isPerfectWeek: false,
+    },
+    previousWeeks: [],
+    summary: {
+      totalWeeks: 0,
+      perfectWeeks: 0,
+      totalWorkouts: 0,
+      totalPoints: 0,
+    },
   });
   const [isResetting, setIsResetting] = useState(false);
   const [externalProfile, setExternalProfile] = useState<ExternalProfile | null>(null);
@@ -176,10 +192,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const loadExternalData = async () => {
     try {
       setIsExternalLoading(true);
+      const dni = user?.dni || undefined;
       const [profile, membershipsData, attendancesData] = await Promise.all([
-        externalPullService.getProfile().catch(() => null),
-        externalPullService.getMemberships().catch(() => null),
-        externalPullService.getAttendances().catch(() => null),
+        externalPullService.getProfile(dni).catch(() => null),
+        externalPullService.getMemberships(dni).catch(() => null),
+        externalPullService.getAttendances(dni).catch(() => null),
       ]);
       setExternalProfile(profile);
       setExternalMemberships(membershipsData?.data || []);

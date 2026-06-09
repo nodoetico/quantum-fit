@@ -181,7 +181,7 @@ export default function DashboardScreen({ navigation }: DashboardScreenProps) {
                 <View style={[styles.statIconContainer, { backgroundColor: 'rgba(255, 215, 0, 0.1)' }]}>
                   <Ionicons name="calendar" size={24} color={colors.points} />
                 </View>
-                <Text style={styles.statValue}>{weeklyStats.workoutsCompleted}</Text>
+                <Text style={styles.statValue}>{weeklyStats.currentWeek.workoutsCompleted}</Text>
                 <Text style={styles.statLabel}>Esta semana</Text>
               </View>
 
@@ -189,7 +189,7 @@ export default function DashboardScreen({ navigation }: DashboardScreenProps) {
                 <View style={[styles.statIconContainer, { backgroundColor: 'rgba(255, 71, 87, 0.1)' }]}>
                   <Ionicons name="trending-up" size={24} color={colors.error} />
                 </View>
-                <Text style={styles.statValue}>{weeklyStats.attendanceRate}%</Text>
+                <Text style={styles.statValue}>{weeklyStats.currentWeek.attendanceRate}%</Text>
                 <Text style={styles.statLabel}>Asistencia</Text>
               </View>
             </>

@@ -18,7 +18,7 @@ import type { MainTabScreenProps } from '../../types/navigation';
 type PerfilScreenProps = MainTabScreenProps<'Perfil'>;
 
 export default function PerfilScreen({ navigation, route }: PerfilScreenProps) {
-  const { user, achievements, weeklyStats, activityLog } = useAuth();
+  const { user, achievements, weeklyStats, activityLog, externalAttendances } = useAuth();
   const [activeTab, setActiveTab] = useState<'stats' | 'achievements' | 'activity'>(route?.params?.tab || 'stats');
 
   if (!user) {
@@ -60,12 +60,17 @@ export default function PerfilScreen({ navigation, route }: PerfilScreenProps) {
     ? (typeof user.memberSince === 'string' ? new Date(user.memberSince) : user.memberSince)
     : new Date();
 
+  const crystalWorkouts = externalAttendances?.length ?? 0;
+  const totalWorkouts = crystalWorkouts > 0 ? crystalWorkouts : (user.totalWorkouts ?? 0);
+
+  const rankDisplay = user.rank && user.rank < 9999 ? `#${user.rank}` : '—';
+
   const stats = [
-    { label: 'Entrenamientos', value: user.totalWorkouts ?? 0, icon: 'barbell', color: colors.primary },
+    { label: 'Entrenamientos', value: totalWorkouts, icon: 'barbell', color: colors.primary },
     { label: 'Puntos Totales', value: (user.points ?? 0).toLocaleString(), icon: 'trophy', color: colors.points },
     { label: 'Racha Actual', value: `${user.currentStreak ?? 0} días`, icon: 'flame', color: colors.secondary },
     { label: 'Mejor Racha', value: `${user.longestStreak ?? 0} días`, icon: 'star', color: colors.error },
-    { label: 'Ranking Global', value: `#${user.rank ?? 'N/A'}`, icon: 'podium', color: colors.levelGold },
+    { label: 'Ranking Global', value: rankDisplay, icon: 'podium', color: colors.levelGold },
     { label: 'Miembro Desde', value: memberSinceDate.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' }), icon: 'calendar', color: colors.textSecondary },
   ];
 
@@ -248,46 +253,79 @@ export default function PerfilScreen({ navigation, route }: PerfilScreenProps) {
             {/* Weekly Activity Chart */}
             <View style={styles.weeklyChartCard}>
               <Text style={styles.cardTitle}>Actividad Semanal</Text>
-              {user.level === 1 ? (
-                <View style={styles.beginnerChart}>
-                  <Ionicons name="fitness-outline" size={48} color={colors.textMuted} />
-                  <Text style={styles.beginnerChartText}>
-                    ¡Completa tu primer entrenamiento para ver tu actividad!
-                  </Text>
-                </View>
-              ) : (
-                <View style={styles.weeklyChart}>
-                  {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((day, index) => {
-                    const isActive = weeklyStats.activeDays.includes(index);
-                    const intensity = isActive ? 1 : 0;
+              {(() => {
+                const today = new Date();
+                const dayOfWeek = today.getDay();
+                const monday = new Date(today);
+                monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+                monday.setHours(0, 0, 0, 0);
+                const sunday = new Date(monday);
+                sunday.setDate(monday.getDate() + 6);
 
-                    return (
-                      <View key={index} style={styles.dayColumn}>
-                        <View style={styles.barContainer}>
-                          <View
+                const crystalDays = new Set<number>();
+                if (externalAttendances?.length > 0) {
+                  externalAttendances.forEach((att: any) => {
+                    if (!att.date) return;
+                    const attDate = new Date(att.date);
+                    if (attDate >= monday && attDate <= sunday) {
+                      const attDay = attDate.getDay();
+                      const idx = attDay === 0 ? 6 : attDay - 1;
+                      crystalDays.add(idx);
+                    }
+                  });
+                }
+
+                const hasActivity = crystalDays.size > 0 || (weeklyStats.currentWeek?.activeDaysBitmap ?? 0) > 0;
+
+                if (!hasActivity) {
+                  return (
+                    <View style={styles.beginnerChart}>
+                      <Ionicons name="fitness-outline" size={48} color={colors.textMuted} />
+                      <Text style={styles.beginnerChartText}>
+                        No hay actividad registrada esta semana.
+                      </Text>
+                    </View>
+                  );
+                }
+
+                const bitmap = weeklyStats.currentWeek?.activeDaysBitmap ?? 0;
+
+                return (
+                  <View style={styles.weeklyChart}>
+                    {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((day, index) => {
+                      const isActive = crystalDays.size > 0
+                        ? crystalDays.has(index)
+                        : ((bitmap >> index) & 1) === 1;
+                      const intensity = isActive ? 1 : 0;
+
+                      return (
+                        <View key={index} style={styles.dayColumn}>
+                          <View style={styles.barContainer}>
+                            <View
+                              style={[
+                                styles.bar,
+                                {
+                                  height: `${20 + intensity * 80}%`,
+                                  backgroundColor: isActive ? colors.primary : colors.background,
+                                  borderColor: isActive ? colors.primary : colors.border,
+                                },
+                              ]}
+                            />
+                          </View>
+                          <Text
                             style={[
-                              styles.bar,
-                              {
-                                height: `${20 + intensity * 80}%`,
-                                backgroundColor: isActive ? colors.primary : colors.background,
-                                borderColor: isActive ? colors.primary : colors.border,
-                              },
+                              styles.dayLabel,
+                              isActive && styles.dayLabelActive,
                             ]}
-                          />
+                          >
+                            {day}
+                          </Text>
                         </View>
-                        <Text
-                          style={[
-                            styles.dayLabel,
-                            isActive && styles.dayLabelActive,
-                          ]}
-                        >
-                          {day}
-                        </Text>
-                      </View>
-                    );
-                  })}
-                </View>
-              )}
+                      );
+                    })}
+                  </View>
+                );
+              })()}
             </View>
 
             <View style={styles.statsFooter}>
@@ -389,45 +427,78 @@ export default function PerfilScreen({ navigation, route }: PerfilScreenProps) {
           <View style={styles.activityContainer}>
             <View style={styles.activityHeader}>
               <Text style={styles.activityTitle}>Historial de Actividad</Text>
-              <TouchableOpacity onPress={() => Alert.alert('Filtrar Actividad', 'Próximamente disponible')}>
-                <Text style={styles.activityFilter}>Filtrar</Text>
-              </TouchableOpacity>
             </View>
 
             <View style={styles.activityList}>
-              {activityLog.map((log, index) => (
-                <View key={log.id} style={styles.activityItem}>
-                  <View
-                    style={[
-                      styles.activityIcon,
-                      { backgroundColor: `${getActivityPoints(log.type)}15` },
-                    ]}
-                  >
-                    <Ionicons
-                      name={getActivityIcon(log.type) as any}
-                      size={20}
-                      color={getActivityPoints(log.type)}
-                    />
+              {externalAttendances && externalAttendances.length > 0 ? (
+                [...externalAttendances]
+                  .sort((a: any, b: any) => {
+                    const dateA = a.date ? new Date(a.date).getTime() : 0;
+                    const dateB = b.date ? new Date(b.date).getTime() : 0;
+                    return dateB - dateA;
+                  })
+                  .map((att: any, index: number) => {
+                    const attDate = att.date ? new Date(att.date) : null;
+                    return (
+                      <View key={att.id || index} style={styles.activityItem}>
+                        <View style={[styles.activityIcon, { backgroundColor: `${colors.primary}15` }]}>
+                          <Ionicons name="fitness" size={20} color={colors.primary} />
+                        </View>
+                        <View style={styles.activityInfo}>
+                          <Text style={styles.activityDescription}>
+                            {att.type || 'Entrenamiento'}
+                          </Text>
+                          <Text style={styles.activityDate}>
+                            {attDate
+                              ? attDate.toLocaleDateString('es-ES', {
+                                  day: 'numeric',
+                                  month: 'long',
+                                  year: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                })
+                              : 'Fecha no disponible'}
+                          </Text>
+                          {att.location ? (
+                            <Text style={styles.activityDate}>{att.location}</Text>
+                          ) : null}
+                        </View>
+                      </View>
+                    );
+                  })
+              ) : activityLog && activityLog.length > 0 ? (
+                activityLog.map((log: any) => (
+                  <View key={log.id} style={styles.activityItem}>
+                    <View style={[styles.activityIcon, { backgroundColor: `${getActivityPoints(log.type)}15` }]}>
+                      <Ionicons name={getActivityIcon(log.type) as any} size={20} color={getActivityPoints(log.type)} />
+                    </View>
+                    <View style={styles.activityInfo}>
+                      <Text style={styles.activityDescription}>{log.description}</Text>
+                      <Text style={styles.activityDate}>
+                        {log.date instanceof Date
+                          ? log.date.toLocaleDateString('es-ES', {
+                              day: 'numeric',
+                              month: 'long',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })
+                          : ''}
+                      </Text>
+                    </View>
+                    <View style={styles.activityPoints}>
+                      <Text style={styles.activityPointsValue}>+{log.points}</Text>
+                      <Ionicons name="trophy" size={14} color={colors.points} />
+                    </View>
                   </View>
-                  <View style={styles.activityInfo}>
-                    <Text style={styles.activityDescription}>{log.description}</Text>
-                    <Text style={styles.activityDate}>
-                      {log.date instanceof Date
-                        ? log.date.toLocaleDateString('es-ES', {
-                            day: 'numeric',
-                            month: 'long',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })
-                        : ''}
-                    </Text>
-                  </View>
-                  <View style={styles.activityPoints}>
-                    <Text style={styles.activityPointsValue}>+{log.points}</Text>
-                    <Ionicons name="trophy" size={14} color={colors.points} />
-                  </View>
+                ))
+              ) : (
+                <View style={styles.beginnerChart}>
+                  <Ionicons name="calendar-outline" size={48} color={colors.textMuted} />
+                  <Text style={styles.beginnerChartText}>
+                    No hay actividad registrada aún.
+                  </Text>
                 </View>
-              ))}
+              )}
             </View>
           </View>
         )}
