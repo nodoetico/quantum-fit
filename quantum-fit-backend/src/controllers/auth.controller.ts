@@ -10,19 +10,27 @@ import { UserRole } from '@prisma/client';
  */
 export async function register(req: Request, res: Response): Promise<void> {
   try {
-    const { name, email, password, referralCode } = req.body;
+    const { name, email, password, dni, referralCode } = req.body;
 
     // Validar campos requeridos
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !dni) {
       res.status(400).json({
         success: false,
-        error: 'Nombre, email y contraseña son requeridos',
+        error: 'Nombre, email, DNI y contraseña son requeridos',
+      });
+      return;
+    }
+
+    if (!/^\d{7,8}$/.test(dni)) {
+      res.status(400).json({
+        success: false,
+        error: 'El DNI debe tener 7 u 8 dígitos numéricos',
       });
       return;
     }
 
     // Registrar usuario
-    const result = await authService.registerUser({ name, email, password, referralCode });
+    const result = await authService.registerUser({ name, email, password, dni, referralCode });
 
     res.status(201).json({
       success: true,

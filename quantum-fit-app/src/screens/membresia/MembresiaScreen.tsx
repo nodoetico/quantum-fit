@@ -22,7 +22,7 @@ import type { MainStackScreenProps } from '../../types/navigation';
 type MembresiaScreenProps = MainStackScreenProps<'Membresia'>;
 
 export default function MembresiaScreen({ navigation }: MembresiaScreenProps) {
-  const { refreshUser } = useAuth();
+  const { user, externalProfile, refreshUser } = useAuth();
   const [subscription, setSubscription] = useState<LocalSubscription | null>(null);
   const [enrollment, setEnrollment] = useState<CrystalEnrollment | null>(null);
   const [loading, setLoading] = useState(true);
@@ -116,6 +116,9 @@ export default function MembresiaScreen({ navigation }: MembresiaScreenProps) {
     await refreshUser();
     setRefreshing(false);
   }, [refreshUser]);
+
+  // Solo mostrar datos de Crystal si el DNI del usuario está vinculado en Crystal
+  const hasCrystalProfile = !!externalProfile;
 
   // Determinar si el usuario ya tiene suscripción activa
   const hasActiveSubscription = subscription?.hasSubscription
@@ -236,7 +239,7 @@ export default function MembresiaScreen({ navigation }: MembresiaScreenProps) {
         {/* ================================================================= */}
         {/* SECCIÓN: Información de Crystal */}
         {/* ================================================================= */}
-        {enrollment?.enrollment && (
+        {hasCrystalProfile && enrollment?.enrollment && (
           <View style={styles.infoCard}>
             <View style={styles.infoRow}>
               <Ionicons
@@ -260,6 +263,16 @@ export default function MembresiaScreen({ navigation }: MembresiaScreenProps) {
                 </Text>
               </View>
             )}
+          </View>
+        )}
+        {!hasCrystalProfile && user?.dni && (
+          <View style={styles.infoCard}>
+            <View style={styles.infoRow}>
+              <Ionicons name="information-circle-outline" size={20} color={colors.textMuted} />
+              <Text style={styles.infoText}>
+                No tenés membresía activa. Elegí un plan para empezar.
+              </Text>
+            </View>
           </View>
         )}
 

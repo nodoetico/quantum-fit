@@ -504,3 +504,282 @@ export async function deleteGalleryImage(req: Request & AuthRequest, res: Respon
     res.status(400).json({ success: false, error: message });
   }
 }
+
+// ============================================
+// GYMS (SEDES)
+// ============================================
+
+export async function getGyms(_req: Request, res: Response): Promise<void> {
+  try {
+    const data = await landingService.getAllGyms();
+    res.status(200).json({ success: true, data });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error al obtener sedes';
+    res.status(400).json({ success: false, error: message });
+  }
+}
+
+export async function getGymsAdmin(_req: Request & AuthRequest, res: Response): Promise<void> {
+  try {
+    const data = await landingService.getAllGymsAdmin();
+    res.status(200).json({ success: true, data });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error al obtener sedes';
+    res.status(400).json({ success: false, error: message });
+  }
+}
+
+export async function createGym(req: Request & AuthRequest, res: Response): Promise<void> {
+  try {
+    const { name, address, city, phone, hours, latitude, longitude, isActive } = req.body;
+    if (!name) {
+      res.status(400).json({ success: false, error: 'El nombre es requerido' });
+      return;
+    }
+    const data = await landingService.createGym({
+      name, address, city, phone, hours, latitude, longitude, isActive,
+    });
+    res.status(201).json({ success: true, data, message: 'Sede creada exitosamente' });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error al crear sede';
+    res.status(400).json({ success: false, error: message });
+  }
+}
+
+export async function updateGym(req: Request & AuthRequest, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+    const { name, address, city, phone, hours, latitude, longitude, isActive } = req.body;
+    const data = await landingService.updateGym(id, {
+      name, address, city, phone, hours, latitude, longitude, isActive,
+    });
+    res.status(200).json({ success: true, data, message: 'Sede actualizada exitosamente' });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error al actualizar sede';
+    res.status(400).json({ success: false, error: message });
+  }
+}
+
+export async function deleteGym(req: Request & AuthRequest, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+    await landingService.deleteGym(id);
+    res.status(200).json({ success: true, message: 'Sede eliminada exitosamente' });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error al eliminar sede';
+    res.status(400).json({ success: false, error: message });
+  }
+}
+
+// ============================================
+// COURSES
+// ============================================
+
+export async function getCourses(_req: Request, res: Response): Promise<void> {
+  try {
+    const data = await landingService.getAllCourses();
+    res.status(200).json({ success: true, data });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error al obtener cursos';
+    res.status(400).json({ success: false, error: message });
+  }
+}
+
+export async function getCoursesAdmin(_req2: Request & AuthRequest, res: Response): Promise<void> {
+  try {
+    const data = await landingService.getAllCoursesAdmin();
+    res.status(200).json({ success: true, data });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error al obtener cursos';
+    res.status(400).json({ success: false, error: message });
+  }
+}
+
+export async function getCourseById(req: Request, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+    const data = await landingService.getCourseById(id);
+    if (!data) { res.status(404).json({ success: false, error: 'Curso no encontrado' }); return; }
+    res.status(200).json({ success: true, data });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error al obtener curso';
+    res.status(400).json({ success: false, error: message });
+  }
+}
+
+export async function createCourse(req: Request & AuthRequest, res: Response): Promise<void> {
+  try {
+    const { name, description, imageUrl, isActive, order } = req.body;
+    if (!name) { res.status(400).json({ success: false, error: 'El nombre es obligatorio' }); return; }
+    const data = await landingService.createCourse({ name, description, imageUrl, isActive, order });
+    res.status(201).json({ success: true, data, message: 'Curso creado exitosamente' });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error al crear curso';
+    res.status(400).json({ success: false, error: message });
+  }
+}
+
+export async function updateCourse(req: Request & AuthRequest, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+    const { name, description, imageUrl, isActive, order } = req.body;
+    const data = await landingService.updateCourse(id, { name, description, imageUrl, isActive, order });
+    res.status(200).json({ success: true, data, message: 'Curso actualizado exitosamente' });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error al actualizar curso';
+    res.status(400).json({ success: false, error: message });
+  }
+}
+
+export async function deleteCourse(req: Request & AuthRequest, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+    await landingService.deleteCourse(id);
+    res.status(200).json({ success: true, message: 'Curso eliminado exitosamente' });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error al eliminar curso';
+    res.status(400).json({ success: false, error: message });
+  }
+}
+
+// ============================================
+// BUFFET ITEMS
+// ============================================
+
+export async function getBuffetItems(_req: Request, res: Response): Promise<void> {
+  try {
+    const data = await landingService.getAllBuffetItems();
+    res.status(200).json({ success: true, data });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error al obtener items del buffet';
+    res.status(400).json({ success: false, error: message });
+  }
+}
+
+export async function getBuffetItemsAdmin(_req2: Request & AuthRequest, res: Response): Promise<void> {
+  try {
+    const data = await landingService.getAllBuffetItemsAdmin();
+    res.status(200).json({ success: true, data });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error al obtener items del buffet';
+    res.status(400).json({ success: false, error: message });
+  }
+}
+
+export async function getBuffetItemById(req: Request, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+    const data = await landingService.getBuffetItemById(id);
+    if (!data) { res.status(404).json({ success: false, error: 'Item no encontrado' }); return; }
+    res.status(200).json({ success: true, data });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error al obtener item';
+    res.status(400).json({ success: false, error: message });
+  }
+}
+
+export async function createBuffetItem(req: Request & AuthRequest, res: Response): Promise<void> {
+  try {
+    const { name, description, price, category, imageUrl, isActive, order } = req.body;
+    if (!name || !category) { res.status(400).json({ success: false, error: 'Nombre y categoría son obligatorios' }); return; }
+    const data = await landingService.createBuffetItem({ name, description, price, category, imageUrl, isActive, order });
+    res.status(201).json({ success: true, data, message: 'Item creado exitosamente' });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error al crear item';
+    res.status(400).json({ success: false, error: message });
+  }
+}
+
+export async function updateBuffetItem(req: Request & AuthRequest, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+    const { name, description, price, category, imageUrl, isActive, order } = req.body;
+    const data = await landingService.updateBuffetItem(id, { name, description, price, category, imageUrl, isActive, order });
+    res.status(200).json({ success: true, data, message: 'Item actualizado exitosamente' });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error al actualizar item';
+    res.status(400).json({ success: false, error: message });
+  }
+}
+
+export async function deleteBuffetItem(req: Request & AuthRequest, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+    await landingService.deleteBuffetItem(id);
+    res.status(200).json({ success: true, message: 'Item eliminado exitosamente' });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error al eliminar item';
+    res.status(400).json({ success: false, error: message });
+  }
+}
+
+// ============================================
+// NEWS
+// ============================================
+
+export async function getNews(_req: Request, res: Response): Promise<void> {
+  try {
+    const data = await landingService.getAllNews();
+    res.status(200).json({ success: true, data });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error al obtener noticias';
+    res.status(400).json({ success: false, error: message });
+  }
+}
+
+export async function getNewsAdmin(_req2: Request & AuthRequest, res: Response): Promise<void> {
+  try {
+    const data = await landingService.getAllNewsAdmin();
+    res.status(200).json({ success: true, data });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error al obtener noticias';
+    res.status(400).json({ success: false, error: message });
+  }
+}
+
+export async function getNewsById(req: Request, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+    const data = await landingService.getNewsById(id);
+    if (!data) { res.status(404).json({ success: false, error: 'Noticia no encontrada' }); return; }
+    res.status(200).json({ success: true, data });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error al obtener noticia';
+    res.status(400).json({ success: false, error: message });
+  }
+}
+
+export async function createNews(req: Request & AuthRequest, res: Response): Promise<void> {
+  try {
+    const { title, summary, content, imageUrl, author, publishedAt, isActive } = req.body;
+    if (!title) { res.status(400).json({ success: false, error: 'El título es obligatorio' }); return; }
+    const data = await landingService.createNews({ title, summary, content, imageUrl, author, publishedAt, isActive });
+    res.status(201).json({ success: true, data, message: 'Noticia creada exitosamente' });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error al crear noticia';
+    res.status(400).json({ success: false, error: message });
+  }
+}
+
+export async function updateNews(req: Request & AuthRequest, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+    const { title, summary, content, imageUrl, author, publishedAt, isActive } = req.body;
+    const data = await landingService.updateNews(id, { title, summary, content, imageUrl, author, publishedAt, isActive });
+    res.status(200).json({ success: true, data, message: 'Noticia actualizada exitosamente' });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error al actualizar noticia';
+    res.status(400).json({ success: false, error: message });
+  }
+}
+
+export async function deleteNews(req: Request & AuthRequest, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+    await landingService.deleteNews(id);
+    res.status(200).json({ success: true, message: 'Noticia eliminada exitosamente' });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error al eliminar noticia';
+    res.status(400).json({ success: false, error: message });
+  }
+}

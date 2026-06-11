@@ -177,3 +177,53 @@ export interface GalleryImage {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface Gym {
+  id: string;
+  name: string;
+  address?: string;
+  city?: string;
+  phone?: string;
+  hours?: string;
+  latitude?: number;
+  longitude?: number;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface Course {
+  id: string;
+  name: string;
+  description?: string;
+  imageUrl?: string;
+  isActive: boolean;
+  order: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BuffetItem {
+  id: string;
+  name: string;
+  description?: string;
+  price?: number;
+  category: string;
+  imageUrl?: string;
+  isActive: boolean;
+  order: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface NewsItem {
+  id: string;
+  title: string;
+  summary?: string;
+  content?: string;
+  imageUrl?: string;
+  author?: string;
+  publishedAt?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}

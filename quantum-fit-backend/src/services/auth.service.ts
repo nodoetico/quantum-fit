@@ -59,6 +59,7 @@ interface RegisterInput {
   name: string;
   email: string;
   password: string;
+  dni?: string;
   role?: UserRole;
   isVip?: boolean;
   referralCode?: string;
@@ -97,11 +98,23 @@ export async function registerUser(data: RegisterInput): Promise<AuthResponse> {
   // Hashear contraseña
   const passwordHash = await hashPassword(data.password);
 
+  // Verificar si el DNI ya existe (si se proporcionó)
+  if (data.dni) {
+    const existingDni = await prisma.user.findUnique({
+      where: { dni: data.dni },
+    });
+
+    if (existingDni) {
+      throw new Error('El DNI ya está registrado');
+    }
+  }
+
   // Crear usuario con puntos de bienvenida
   const user = await prisma.user.create({
     data: {
       name: data.name,
       email: data.email.toLowerCase(),
+      ...(data.dni && { dni: data.dni }),
       passwordHash,
       role: data.role || UserRole.USER,
       isVip: data.isVip || false,

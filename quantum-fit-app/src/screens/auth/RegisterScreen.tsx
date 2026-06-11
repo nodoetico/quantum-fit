@@ -20,6 +20,7 @@ type RegisterScreenProps = AuthScreenProps<'Register'>;
 
 export default function RegisterScreen({ navigation }: RegisterScreenProps) {
   const [name, setName] = useState('');
+  const [dni, setDni] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -32,8 +33,13 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
   const handleRegister = async () => {
     setError('');
     
-    if (!name || !email || !password || !confirmPassword) {
+    if (!name || !dni || !email || !password || !confirmPassword) {
       setError('Por favor completa todos los campos');
+      return;
+    }
+
+    if (!/^\d{7,8}$/.test(dni)) {
+      setError('Ingresá un DNI válido (7 u 8 dígitos)');
       return;
     }
 
@@ -45,6 +51,18 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
       setError('La contraseña debe tener al menos 8 caracteres');
       return;
     }
+    if (!/[A-Z]/.test(password)) {
+      setError('La contraseña debe tener al menos una mayúscula');
+      return;
+    }
+    if (!/[a-z]/.test(password)) {
+      setError('La contraseña debe tener al menos una minúscula');
+      return;
+    }
+    if (!/[0-9]/.test(password)) {
+      setError('La contraseña debe tener al menos un número');
+      return;
+    }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -53,10 +71,10 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
     }
 
     setIsRegistering(true);
-    const success = await register(name, email, password);
+    const errMsg = await register(name, email, password, dni);
     setIsRegistering(false);
-    if (!success) {
-      setError('Error al crear la cuenta');
+    if (errMsg) {
+      setError(errMsg);
     }
   };
 
@@ -106,8 +124,26 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
                 placeholder="Nombre completo"
                 placeholderTextColor={colors.textMuted}
                 value={name}
-                onChangeText={setName}
+                onChangeText={(v) => { setError(''); setName(v); }}
                 autoCapitalize="words"
+              />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Ionicons
+                name="card-outline"
+                size={20}
+                color={colors.textSecondary}
+                style={styles.inputIcon}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="DNI"
+                placeholderTextColor={colors.textMuted}
+                value={dni}
+                onChangeText={(v) => { setError(''); setDni(v); }}
+                keyboardType="number-pad"
+                maxLength={8}
               />
             </View>
 
@@ -123,7 +159,7 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
                 placeholder="Email"
                 placeholderTextColor={colors.textMuted}
                 value={email}
-                onChangeText={setEmail}
+                onChangeText={(v) => { setError(''); setEmail(v); }}
                 keyboardType="email-address"
                 autoCapitalize="none"
               />
@@ -141,7 +177,7 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
                 placeholder="Contraseña"
                 placeholderTextColor={colors.textMuted}
                 value={password}
-                onChangeText={setPassword}
+                onChangeText={(v) => { setError(''); setPassword(v); }}
                 secureTextEntry={!showPassword}
               />
               <TouchableOpacity
@@ -168,7 +204,7 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
                 placeholder="Confirmar contraseña"
                 placeholderTextColor={colors.textMuted}
                 value={confirmPassword}
-                onChangeText={setConfirmPassword}
+                onChangeText={(v) => { setError(''); setConfirmPassword(v); }}
                 secureTextEntry={!showConfirmPassword}
               />
               <TouchableOpacity

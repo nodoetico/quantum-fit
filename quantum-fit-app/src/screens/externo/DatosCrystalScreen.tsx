@@ -27,7 +27,7 @@ interface Transaction {
 }
 
 export default function DatosCrystalScreen({ navigation }: Props) {
-  const { externalProfile, externalAttendances, externalMemberships, isExternalLoading, loadExternalData } = useAuth();
+  const { user, externalProfile, externalAttendances, externalMemberships, isExternalLoading, loadExternalData } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loadingTx, setLoadingTx] = useState(false);
@@ -39,7 +39,8 @@ export default function DatosCrystalScreen({ navigation }: Props) {
   const loadTransactions = async () => {
     setLoadingTx(true);
     try {
-      const data = await externalPullService.getTransactions();
+      const dni = user?.dni || undefined;
+      const data = await externalPullService.getTransactions(dni);
       setTransactions(data?.data || []);
     } catch (e) {
     } finally {
@@ -61,6 +62,16 @@ export default function DatosCrystalScreen({ navigation }: Props) {
   if (isExternalLoading && !refreshing) {
     return (
       <View style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
+          </TouchableOpacity>
+          <View style={styles.headerTitleContainer}>
+            <Ionicons name="server-outline" size={20} color={colors.primary} />
+            <Text style={styles.headerTitle}>Datos Crystal</Text>
+          </View>
+          <View style={styles.backButton} />
+        </View>
         <View style={styles.syncContainer}>
           <ActivityIndicator size="large" color={colors.primary} />
           <Text style={styles.syncText}>Sincronizando con Crystal...</Text>
@@ -72,6 +83,16 @@ export default function DatosCrystalScreen({ navigation }: Props) {
   if (!externalProfile && externalAttendances.length === 0 && transactions.length === 0) {
     return (
       <View style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
+          </TouchableOpacity>
+          <View style={styles.headerTitleContainer}>
+            <Ionicons name="server-outline" size={20} color={colors.primary} />
+            <Text style={styles.headerTitle}>Datos Crystal</Text>
+          </View>
+          <View style={styles.backButton} />
+        </View>
         <View style={styles.emptyContainer}>
           <View style={styles.emptyIcon}>
             <Ionicons name="cloud-offline-outline" size={48} color={colors.textMuted} />

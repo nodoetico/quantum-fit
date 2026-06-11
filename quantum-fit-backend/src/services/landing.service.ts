@@ -286,3 +286,221 @@ export async function updateGalleryImage(
 export async function deleteGalleryImage(id: string) {
   return prisma.galleryImage.delete({ where: { id } });
 }
+
+// ============================================
+// GYMS (SEDES)
+// ============================================
+
+export async function getAllGyms() {
+  return prisma.gym.findMany({
+    where: { isActive: true },
+    orderBy: { name: 'asc' },
+  });
+}
+
+export async function getAllGymsAdmin() {
+  return prisma.gym.findMany({
+    orderBy: { name: 'asc' },
+  });
+}
+
+export async function getGymById(id: string) {
+  return prisma.gym.findUnique({ where: { id } });
+}
+
+export async function createGym(data: {
+  name: string;
+  address?: string;
+  city?: string;
+  phone?: string;
+  hours?: string;
+  latitude?: number;
+  longitude?: number;
+  isActive?: boolean;
+}) {
+  return prisma.gym.create({ data });
+}
+
+export async function updateGym(
+  id: string,
+  data: {
+    name?: string;
+    address?: string;
+    city?: string;
+    phone?: string;
+    hours?: string;
+    latitude?: number;
+    longitude?: number;
+    isActive?: boolean;
+  }
+) {
+  return prisma.gym.update({
+    where: { id },
+    data,
+  });
+}
+
+export async function deleteGym(id: string) {
+  return prisma.gym.delete({ where: { id } });
+}
+
+// ============================================
+// COURSES
+// ============================================
+
+export async function getAllCourses() {
+  return prisma.course.findMany({
+    where: { isActive: true },
+    orderBy: { order: 'asc' },
+  });
+}
+
+export async function getAllCoursesAdmin() {
+  return prisma.course.findMany({
+    orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
+  });
+}
+
+export async function getCourseById(id: string) {
+  return prisma.course.findUnique({ where: { id } });
+}
+
+export async function createCourse(data: {
+  name: string;
+  description?: string;
+  imageUrl?: string;
+  isActive?: boolean;
+  order?: number;
+}) {
+  return prisma.course.create({ data });
+}
+
+export async function updateCourse(
+  id: string,
+  data: {
+    name?: string;
+    description?: string;
+    imageUrl?: string;
+    isActive?: boolean;
+    order?: number;
+  }
+) {
+  return prisma.course.update({
+    where: { id },
+    data,
+  });
+}
+
+export async function deleteCourse(id: string) {
+  return prisma.course.delete({ where: { id } });
+}
+
+// ============================================
+// BUFFET ITEMS
+// ============================================
+
+export async function getAllBuffetItems() {
+  return prisma.buffetItem.findMany({
+    where: { isActive: true },
+    orderBy: [{ category: 'asc' }, { order: 'asc' }],
+  });
+}
+
+export async function getAllBuffetItemsAdmin() {
+  return prisma.buffetItem.findMany({
+    orderBy: [{ category: 'asc' }, { order: 'asc' }],
+  });
+}
+
+export async function getBuffetItemById(id: string) {
+  return prisma.buffetItem.findUnique({ where: { id } });
+}
+
+export async function createBuffetItem(data: {
+  name: string;
+  description?: string;
+  price?: number;
+  category: string;
+  imageUrl?: string;
+  isActive?: boolean;
+  order?: number;
+}) {
+  return prisma.buffetItem.create({ data });
+}
+
+export async function updateBuffetItem(
+  id: string,
+  data: {
+    name?: string;
+    description?: string;
+    price?: number;
+    category?: string;
+    imageUrl?: string;
+    isActive?: boolean;
+    order?: number;
+  }
+) {
+  return prisma.buffetItem.update({
+    where: { id },
+    data,
+  });
+}
+
+export async function deleteBuffetItem(id: string) {
+  return prisma.buffetItem.delete({ where: { id } });
+}
+
+// ============================================
+// NEWS
+// ============================================
+
+export async function getAllNews() {
+  return prisma.news.findMany({
+    where: { isActive: true },
+    orderBy: { publishedAt: 'desc' },
+  });
+}
+
+export async function getAllNewsAdmin() {
+  return prisma.news.findMany({
+    orderBy: [{ publishedAt: 'desc' }, { createdAt: 'desc' }],
+  });
+}
+
+export async function getNewsById(id: string) {
+  return prisma.news.findUnique({ where: { id } });
+}
+
+export async function createNews(data: {
+  title: string;
+  summary?: string;
+  content?: string;
+  imageUrl?: string;
+  author?: string;
+  publishedAt?: string;
+  isActive?: boolean;
+}) {
+  return prisma.news.create({ data });
+}
+
+export async function updateNews(
+  id: string,
+  data: {
+    title?: string;
+    summary?: string;
+    content?: string;
+    imageUrl?: string;
+    author?: string;
+    publishedAt?: string;
+    isActive?: boolean;
+  }
+) {
+  return prisma.news.update({
+    where: { id },
+    data,
+  });
+}
+
+export async function deleteNews(id: string) {
+  return prisma.news.delete({ where: { id } });
+}

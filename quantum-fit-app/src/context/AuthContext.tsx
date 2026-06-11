@@ -19,7 +19,7 @@ interface AuthContextType {
   isLoading: boolean;
   loginError: string;
   login: (email: string, password: string) => Promise<boolean>;
-  register: (name: string, email: string, password: string) => Promise<boolean>;
+  register: (name: string, email: string, password: string, dni: string) => Promise<string | null>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<boolean>;
   completeResetPassword: (token: string, password: string) => Promise<boolean>;
@@ -249,19 +249,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const register = async (name: string, email: string, password: string): Promise<boolean> => {
+  const register = async (name: string, email: string, password: string, dni: string): Promise<string | null> => {
     try {
-      const userData = await authService.register(name, email, password);
+      const userData = await authService.register(name, email, password, dni);
       setUser(userData);
       websocketService.connect(userData.id);
-      return true;
+      return null;
     } catch (error: any) {
-      if (error?.response?.data?.error) {
-        console.error('Registration failed:', error.response.data.error);
-      } else {
-        console.error('Registration failed:', error);
-      }
-      return false;
+      const msg = error?.response?.data?.error || error?.message || 'Error al conectar con el servidor';
+      console.error('Registration failed:', msg);
+      return msg;
     }
   };
 

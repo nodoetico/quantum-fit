@@ -5,6 +5,7 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius, typography } from '../../constants/theme';
@@ -83,7 +84,11 @@ export default function ConfiguracionScreen({ navigation }: Props) {
             icon="lock-closed-outline"
             label="Privacidad"
             color={colors.info}
-            onPress={() => {}}
+            onPress={() => Alert.alert(
+              'Privacidad',
+              'QuantumFit respeta tu privacidad. No compartimos tus datos personales con terceros sin tu consentimiento.\n\nPodés gestionar tus datos desde tu perfil o contactarnos en nodoetico@gmail.com.',
+              [{ text: 'Entendido' }]
+            )}
           />
         </View>
 
@@ -93,13 +98,21 @@ export default function ConfiguracionScreen({ navigation }: Props) {
             icon="help-circle-outline"
             label="Ayuda"
             color={colors.points}
-            onPress={() => {}}
+            onPress={() => Alert.alert(
+              'Ayuda',
+              'Si tenés alguna duda o problema con la app, escribinos a:\n\nnodoetico@gmail.com\n\nTe responderemos a la brevedad.',
+              [{ text: 'Entendido' }]
+            )}
           />
           <SettingItem
             icon="information-circle-outline"
             label="Acerca de"
             color={colors.textMuted}
-            onPress={() => {}}
+            onPress={() => Alert.alert(
+              'QuantumFit',
+              'Versión 1.0.0\n\nSistema de gestión de gimnasio con gamificación.\n\nDesarrollado por Nodo Etico.\n© 2026',
+              [{ text: 'Entendido' }]
+            )}
           />
         </View>
 

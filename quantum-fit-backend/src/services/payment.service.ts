@@ -98,16 +98,21 @@ export async function getPaymentMethods(): Promise<CrystalPaymentMethod[]> {
 }
 
 /**
- * Obtiene el estado de inscripción del usuario autenticado en Crystal.
- * Incluye si está inscripto, fecha de vencimiento, precio de renovación, etc.
+ * Obtiene el estado de inscripción del usuario en Crystal.
+ * Si se provee DNI, consulta los datos específicos de ese usuario.
+ * @param dni - DNI del usuario (opcional)
  */
-export async function getEnrollmentStatus(): Promise<CrystalEnrollment> {
+export async function getEnrollmentStatus(dni?: string): Promise<CrystalEnrollment> {
   try {
     const client = await getCrystalClient();
-    const response = await client.get('/user/enrollment');
+    const endpoint = dni ? `/users/by-dni/${dni}/enrollment` : '/user/enrollment';
+    const response = await client.get(endpoint);
 
     return response.data as CrystalEnrollment;
   } catch (error: unknown) {
+    if (dni) {
+      return { enrollment: null, renewal: null };
+    }
     throw new Error('No se pudo obtener el estado de la inscripción');
   }
 }
@@ -175,15 +180,19 @@ export async function renewMembership(
 
 /**
  * Obtiene el historial de transacciones del usuario en Crystal.
+ * Si se provee DNI, consulta las transacciones específicas de ese usuario.
  * 
  * @param perPage - Cantidad de resultados por página (default: 15)
+ * @param dni - DNI del usuario (opcional)
  */
 export async function getTransactions(
   perPage: number = 15,
+  dni?: string,
 ): Promise<CrystalTransaction[]> {
   try {
     const client = await getCrystalClient();
-    const response = await client.get('/user/transactions', {
+    const endpoint = dni ? `/users/by-dni/${dni}/transactions` : '/user/transactions';
+    const response = await client.get(endpoint, {
       params: { per_page: perPage },
     });
 
@@ -193,6 +202,9 @@ export async function getTransactions(
 
     return [];
   } catch (error: unknown) {
+    if (dni) {
+      return [];
+    }
     throw new Error('No se pudieron obtener las transacciones');
   }
 }

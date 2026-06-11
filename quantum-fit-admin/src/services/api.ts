@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { API_URL } from '../config/api';
 import type { AuthResponse, LoginInput, User, Class, Reward } from '../types';
-import type { LandingContent, Testimonial, Plan, Banner, GalleryImage } from '../types';
+import type { LandingContent, Testimonial, Plan, Banner, GalleryImage, Gym, Course, BuffetItem, NewsItem } from '../types';
 
 const api = axios.create({
   baseURL: API_URL,
@@ -281,6 +281,81 @@ export const rewardsService = {
   updateRedemptionStatus: async (id: string, status: string) => {
     const response = await api.put(`/admin/rewards/redemptions/${id}/status`, { status });
     return response.data;
+  },
+};
+
+export const gymService = {
+  getAll: async (): Promise<Gym[]> => {
+    const response = await api.get<{ success: boolean; data: Gym[] }>('/landing/gyms/admin');
+    return response.data.data;
+  },
+
+  create: async (data: Partial<Gym>): Promise<Gym> => {
+    const response = await api.post<{ success: boolean; data: Gym }>('/landing/gyms', data);
+    return response.data.data;
+  },
+
+  update: async (id: string, data: Partial<Gym>): Promise<Gym> => {
+    const response = await api.put<{ success: boolean; data: Gym }>(`/landing/gyms/${id}`, data);
+    return response.data.data;
+  },
+
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`/landing/gyms/${id}`);
+  },
+};
+
+export const coursesService = {
+  getAll: async (): Promise<Course[]> => {
+    const response = await api.get<{ success: boolean; data: Course[] }>('/landing/courses/admin');
+    return response.data.data;
+  },
+  create: async (data: Partial<Course>): Promise<Course> => {
+    const response = await api.post<{ success: boolean; data: Course }>('/landing/courses', data);
+    return response.data.data;
+  },
+  update: async (id: string, data: Partial<Course>): Promise<Course> => {
+    const response = await api.put<{ success: boolean; data: Course }>(`/landing/courses/${id}`, data);
+    return response.data.data;
+  },
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`/landing/courses/${id}`);
+  },
+};
+
+export const buffetService = {
+  getAll: async (): Promise<BuffetItem[]> => {
+    const response = await api.get<{ success: boolean; data: BuffetItem[] }>('/landing/buffet/admin');
+    return response.data.data;
+  },
+  create: async (data: Partial<BuffetItem>): Promise<BuffetItem> => {
+    const response = await api.post<{ success: boolean; data: BuffetItem }>('/landing/buffet', data);
+    return response.data.data;
+  },
+  update: async (id: string, data: Partial<BuffetItem>): Promise<BuffetItem> => {
+    const response = await api.put<{ success: boolean; data: BuffetItem }>(`/landing/buffet/${id}`, data);
+    return response.data.data;
+  },
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`/landing/buffet/${id}`);
+  },
+};
+
+export const newsService = {
+  getAll: async (): Promise<NewsItem[]> => {
+    const response = await api.get<{ success: boolean; data: NewsItem[] }>('/landing/news/admin');
+    return response.data.data;
+  },
+  create: async (data: Partial<NewsItem>): Promise<NewsItem> => {
+    const response = await api.post<{ success: boolean; data: NewsItem }>('/landing/news', data);
+    return response.data.data;
+  },
+  update: async (id: string, data: Partial<NewsItem>): Promise<NewsItem> => {
+    const response = await api.put<{ success: boolean; data: NewsItem }>(`/landing/news/${id}`, data);
+    return response.data.data;
+  },
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`/landing/news/${id}`);
   },
 };
 

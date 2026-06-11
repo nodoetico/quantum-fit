@@ -412,60 +412,38 @@ async function main() {
   // Hero
   await prisma.landingContent.upsert({
     where: { id: 'landing_hero_001' },
-    update: {},
+    update: {
+      title: 'Transformá tu cuerpo,<br />evolucioná tu mente',
+      subtitle: 'Transformación física y mental',
+      description: 'En Quantum Fit no es solo entrenar. Es descubrir tu mejor versión. Entrenamiento de élite, nutrición inteligente y una comunidad que te impulsa.',
+      ctaText: 'Ver planes',
+      ctaLink: '#ofertas',
+    },
     create: {
       id: 'landing_hero_001',
       section: 'hero',
-      title: 'Transformá tu cuerpo, ganá premios',
-      subtitle: 'El primer gimnasio gamificado de Argentina',
-      description: 'Entrená, competí y canjeá puntos por premios reales. La experiencia fitness más innovadora.',
-      ctaText: 'Empezar ahora',
-      ctaLink: '#planes',
+      title: 'Transformá tu cuerpo,<br />evolucioná tu mente',
+      subtitle: 'Transformación física y mental',
+      description: 'En Quantum Fit no es solo entrenar. Es descubrir tu mejor versión. Entrenamiento de élite, nutrición inteligente y una comunidad que te impulsa.',
+      ctaText: 'Ver planes',
+      ctaLink: '#ofertas',
       isActive: true,
       order: 0,
     },
   });
-
-  // Features
-  const features = [
-    { id: 'landing_feat_001', section: 'features', title: '🏋️ Gamificación', description: 'Ganá puntos por cada entrenamiento. Cada sesión suma, cada racha multiplica.', order: 0 },
-    { id: 'landing_feat_002', section: 'features', title: '🏆 Competencia', description: 'Competí en el ranking con otros miembros. Los mejores ganan premios extra.', order: 1 },
-    { id: 'landing_feat_003', section: 'features', title: '🎁 Premios Reales', description: 'Canjeá tus puntos por proteínas, bebidas, descuentos y más.', order: 2 },
-  ];
-
-  for (const feat of features) {
-    await prisma.landingContent.upsert({
-      where: { id: feat.id },
-      update: {},
-      create: feat,
-    });
-  }
 
   // About
   await prisma.landingContent.upsert({
     where: { id: 'landing_about_001' },
-    update: {},
+    update: {
+      title: 'Excelencia en movimiento',
+      description: 'En Quantum Fit combinamos entrenamiento de élite con un ambiente único. Instalaciones de primera, instructores certificados y una comunidad que te impulsa a dar lo mejor.',
+    },
     create: {
       id: 'landing_about_001',
       section: 'about',
-      title: 'Más que un gimnasio',
-      description: 'QUANTUM FIT es una experiencia completa donde cada entrenamiento cuenta. Nuestro sistema de gamificación único te motiva a dar lo mejor de vos.',
-      isActive: true,
-      order: 0,
-    },
-  });
-
-  // Contact
-  await prisma.landingContent.upsert({
-    where: { id: 'landing_contact_001' },
-    update: {},
-    create: {
-      id: 'landing_contact_001',
-      section: 'contact',
-      title: 'Visitanos',
-      description: 'Av. Principal 1234, Buenos Aires\nLunes a Viernes: 6:00 - 22:00\nSábados: 8:00 - 14:00\n\n📞 +54 11 1234-5678\n✉️ info@quantumfit.com',
-      ctaText: 'Ver en mapa',
-      ctaLink: 'https://maps.google.com',
+      title: 'Excelencia en movimiento',
+      description: 'En Quantum Fit combinamos entrenamiento de élite con un ambiente único. Instalaciones de primera, instructores certificados y una comunidad que te impulsa a dar lo mejor.',
       isActive: true,
       order: 0,
     },
@@ -473,15 +451,15 @@ async function main() {
 
   // Testimonials
   const landingTestimonials = [
-    { id: 'test_001', name: 'María García', role: 'Miembro desde 2024', text: 'El sistema de puntos me motiva a venir todos los días. Ya voy nivel 5 y canjeé mi primera proteína. ¡Increíble!', photoUrl: '', rating: 5, order: 0 },
-    { id: 'test_002', name: 'Carlos Rodríguez', role: 'Miembro VIP', text: 'Las clases son increíbles y los premios reales. El mejor gimnasio en el que estuve.', photoUrl: '', rating: 5, order: 1 },
-    { id: 'test_003', name: 'Laura Martínez', role: 'Miembro desde 2024', text: 'La comunidad es genial. Competir en el ranking me hace dar lo mejor cada día.', photoUrl: '', rating: 5, order: 2 },
+    { id: 'test_001', name: 'Lucía Gómez', role: 'Miembro desde 2023', text: 'Desde que entreno en Quantum Fit mi vida cambió completamente. La energía del lugar y el acompañamiento de los profesores es increíble. Bajé 15 kilos y gané mucha más confianza.', photoUrl: null, rating: 5, order: 0 },
+    { id: 'test_002', name: 'Martín Pérez', role: 'Miembro desde 2024', text: 'El plan Premium vale cada peso. Las clases grupales son espectaculares y el plan de nutrición me ayudó a entender cómo alimentarme realmente. Recomendado al 100%.', photoUrl: null, rating: 5, order: 1 },
+    { id: 'test_003', name: 'Camila Rodríguez', role: 'Miembro VIP desde 2022', text: 'Probé varios gimnasios pero ninguno como Quantum Fit. La atención personalizada, la calidad de las máquinas y el ambiente hacen la diferencia. Socio VIP y no cambio este lugar por nada.', photoUrl: null, rating: 5, order: 2 },
   ];
 
   for (const t of landingTestimonials) {
     await prisma.testimonial.upsert({
       where: { id: t.id },
-      update: {},
+      update: { name: t.name, role: t.role, text: t.text, photoUrl: t.photoUrl, rating: t.rating, order: t.order },
       create: t,
     });
   }
@@ -491,70 +469,40 @@ async function main() {
     {
       id: 'plan_001',
       name: 'Básico',
-      description: 'Ideal para empezar',
-      price: 15000,
+      price: 8000,
       period: 'mensual',
-      features: ['Acceso a sala de musculación', 'Clases grupales ilimitadas', 'App con gamificación', 'Seguimiento de progreso'],
+      currency: 'ARS',
+      features: ['Acceso a una sede', 'Horario libre (8-22hs)', 'Evaluación física inicial', 'App de seguimiento'],
       isFeatured: false,
-      order: 0,
-    },
-    {
-      id: 'plan_002',
-      name: 'VIP',
-      description: 'El más elegido',
-      price: 25000,
-      period: 'mensual',
-      features: ['Todo lo del Básico', 'Entrenador personal básico', 'Premios exclusivos VIP', 'Puntos dobles', 'Acceso prioritario a clases'],
-      isFeatured: true,
       order: 1,
     },
     {
-      id: 'plan_003',
-      name: 'Anual',
-      description: 'Ahorrá 2 meses',
-      price: 150000,
-      period: 'anual',
-      features: ['Todo lo del VIP', '2 meses gratis', 'Banner exclusivo en la app', 'Regalo de bienvenida', 'Congelamiento de membresía'],
-      isFeatured: false,
+      id: 'plan_002',
+      name: 'Premium',
+      price: 12000,
+      period: 'mensual',
+      currency: 'ARS',
+      features: ['Acceso a todas las sedes', 'Horario extendido (6-23hs)', 'Clases grupales ilimitadas', 'Plan de nutrición personalizado', 'App de seguimiento'],
+      isFeatured: true,
       order: 2,
+    },
+    {
+      id: 'plan_003',
+      name: 'VIP',
+      price: 18000,
+      period: 'mensual',
+      currency: 'ARS',
+      features: ['Acceso ilimitado a todas las sedes', 'Horario 24/7', 'Entrenador personal incluido', 'Clases grupales ilimitadas', 'Plan de nutrición personalizado', 'App de seguimiento premium'],
+      isFeatured: false,
+      order: 3,
     },
   ];
 
   for (const p of landingPlans) {
     await prisma.plan.upsert({
       where: { id: p.id },
-      update: {},
+      update: p,
       create: p,
-    });
-  }
-
-  // Banners
-  const landingBanners = [
-    {
-      id: 'banner_001',
-      title: '¡Semana de prueba gratis!',
-      subtitle: 'Probá QUANTUM FIT por 7 días sin costo',
-      imageUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&h=300&fit=crop',
-      linkUrl: '#planes',
-      linkText: 'Quiero probar',
-      order: 0,
-    },
-    {
-      id: 'banner_002',
-      title: 'Nuevo: Clases de Boxing',
-      subtitle: 'Sumamos la disciplina del ring a nuestras clases',
-      imageUrl: 'https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=600&h=300&fit=crop',
-      linkUrl: '#clases',
-      linkText: 'Ver horarios',
-      order: 1,
-    },
-  ];
-
-  for (const b of landingBanners) {
-    await prisma.banner.upsert({
-      where: { id: b.id },
-      update: {},
-      create: b,
     });
   }
 
@@ -571,24 +519,57 @@ async function main() {
   for (const img of galleryImages) {
     await prisma.galleryImage.upsert({
       where: { id: img.id },
-      update: {},
+      update: img,
       create: img,
+    });
+  }
+
+  // Gyms (Sedes)
+  const landingGyms = [
+    {
+      id: 'gym_centro',
+      name: 'Sede Centro',
+      address: 'Av. Corrientes 1234, CABA',
+      city: 'CABA',
+      phone: '+54 11 1234-5678',
+      hours: 'Lun a Vie: 6:00 - 23:00 | Sáb: 8:00 - 20:00',
+      latitude: -34.6037,
+      longitude: -58.3816,
+      isActive: true,
+    },
+    {
+      id: 'gym_belgrano',
+      name: 'Sede Belgrano',
+      address: 'Av. Cabildo 2345, CABA',
+      city: 'CABA',
+      phone: '+54 11 2345-6789',
+      hours: 'Lun a Vie: 6:00 - 23:00 | Sáb: 8:00 - 20:00',
+      latitude: -34.5630,
+      longitude: -58.4580,
+      isActive: true,
+    },
+  ];
+
+  for (const gym of landingGyms) {
+    await prisma.gym.upsert({
+      where: { id: gym.id },
+      update: gym,
+      create: gym,
     });
   }
 
   console.log('✅ Contenido de Landing Page creado');
   console.log('═══════════════════════════════════════════════════════');
   console.log('📊 RESUMEN:');
-  console.log(`   • ${achievements.length} Logros`);
-  console.log(`   • 1 Gimnasio`);
-  console.log(`   • 1 Administrador`);
-  console.log(`   • 1 Usuario Demo`);
-  console.log(`   • ${rewards.length} Recompensas`);
-  console.log(`   • 5 Contenidos Landing (hero, features, about, contact)`);
-  console.log(`   • ${landingTestimonials.length} Testimonios`);
-  console.log(`   • ${landingPlans.length} Planes`);
-  console.log(`   • ${landingBanners.length} Banners`);
-  console.log(`   • ${galleryImages.length} Imágenes de Galería`);
+   console.log(`   • ${achievements.length} Logros`);
+   console.log(`   • 1 Gimnasio (seed principal) + ${landingGyms.length} Sedes`);
+   console.log(`   • 1 Administrador`);
+   console.log(`   • 1 Usuario Demo`);
+   console.log(`   • ${rewards.length} Recompensas`);
+   console.log(`   • 2 Contenidos Landing (hero, about)`);
+   console.log(`   • ${landingTestimonials.length} Testimonios`);
+   console.log(`   • ${landingPlans.length} Planes`);
+   console.log(`   • ${galleryImages.length} Imágenes de Galería`);
   console.log('═══════════════════════════════════════════════════════');
   console.log('');
   console.log('🔐 CREDENCIALES:');

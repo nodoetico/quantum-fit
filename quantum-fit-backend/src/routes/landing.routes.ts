@@ -25,6 +25,9 @@ router.get('/banners', landingController.getBanners);
 // Galería
 router.get('/gallery', landingController.getGallery);
 
+// Sedes / Gyms
+router.get('/gyms', landingController.getGyms);
+
 // ============================================
 // RUTAS PROTEGIDAS (solo ADMIN)
 // ============================================
@@ -58,5 +61,53 @@ router.get('/gallery/admin', authenticate, requireAdmin, landingController.getGa
 router.post('/gallery', authenticate, requireAdmin, landingController.createGalleryImage);
 router.put('/gallery/:id', authenticate, requireAdmin, landingController.updateGalleryImage);
 router.delete('/gallery/:id', authenticate, requireAdmin, landingController.deleteGalleryImage);
+
+// Sedes / Gyms - CRUD admin
+router.get('/gyms/admin', authenticate, requireAdmin, landingController.getGymsAdmin);
+router.post('/gyms', authenticate, requireAdmin, landingController.createGym);
+router.put('/gyms/:id', authenticate, requireAdmin, landingController.updateGym);
+router.delete('/gyms/:id', authenticate, requireAdmin, landingController.deleteGym);
+
+// ============================================
+// COURSES
+// ============================================
+
+// Públicas
+router.get('/courses', landingController.getCourses);
+router.get('/courses/:id', landingController.getCourseById);
+
+// Admin
+router.get('/courses/admin', authenticate, requireAdmin, landingController.getCoursesAdmin);
+router.post('/courses', authenticate, requireAdmin, landingController.createCourse);
+router.put('/courses/:id', authenticate, requireAdmin, landingController.updateCourse);
+router.delete('/courses/:id', authenticate, requireAdmin, landingController.deleteCourse);
+
+// ============================================
+// BUFFET ITEMS
+// ============================================
+
+// Públicas
+router.get('/buffet', landingController.getBuffetItems);
+router.get('/buffet/:id', landingController.getBuffetItemById);
+
+// Admin
+router.get('/buffet/admin', authenticate, requireAdmin, landingController.getBuffetItemsAdmin);
+router.post('/buffet', authenticate, requireAdmin, landingController.createBuffetItem);
+router.put('/buffet/:id', authenticate, requireAdmin, landingController.updateBuffetItem);
+router.delete('/buffet/:id', authenticate, requireAdmin, landingController.deleteBuffetItem);
+
+// ============================================
+// NEWS
+// ============================================
+
+// Públicas
+router.get('/news', landingController.getNews);
+router.get('/news/:id', landingController.getNewsById);
+
+// Admin
+router.get('/news/admin', authenticate, requireAdmin, landingController.getNewsAdmin);
+router.post('/news', authenticate, requireAdmin, landingController.createNews);
+router.put('/news/:id', authenticate, requireAdmin, landingController.updateNews);
+router.delete('/news/:id', authenticate, requireAdmin, landingController.deleteNews);
 
 export default router;

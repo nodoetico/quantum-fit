@@ -25,7 +25,6 @@ export default function ForgotPasswordScreen({ navigation }: ForgotPasswordScree
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
-  const [showManualToken, setShowManualToken] = useState(false);
   const [manualToken, setManualToken] = useState('');
   const { resetPassword, completeResetPassword, isResetting } = useAuth();
 
@@ -208,47 +207,25 @@ export default function ForgotPasswordScreen({ navigation }: ForgotPasswordScree
                   Si existe una cuenta asociada a {email}, vas a recibir instrucciones para restablecer tu contraseña.
                 </Text>
 
+                <View style={styles.inputContainer}>
+                  <Ionicons name="key-outline" size={20} color={colors.textSecondary} style={styles.inputIcon} />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Código de restablecimiento"
+                    placeholderTextColor={colors.textMuted}
+                    value={manualToken}
+                    onChangeText={setManualToken}
+                    autoCapitalize="none"
+                  />
+                </View>
                 <TouchableOpacity
-                  style={styles.sendButton}
-                  onPress={() => setStep('reset')}
+                  style={[styles.sendButton, !manualToken && styles.buttonDisabled]}
+                  onPress={handleGoToReset}
+                  disabled={!manualToken}
                 >
                   <Ionicons name="key" size={20} color={colors.background} style={styles.sendIcon} />
                   <Text style={styles.sendButtonText}>INGRESAR CÓDIGO DE RESETEO</Text>
                 </TouchableOpacity>
-
-                {!showManualToken && (
-                  <TouchableOpacity
-                    style={styles.linkButton}
-                    onPress={() => setShowManualToken(true)}
-                  >
-                    <Text style={styles.linkButtonText}>
-                      ¿Tenés un código de restablecimiento?
-                    </Text>
-                  </TouchableOpacity>
-                )}
-
-                {showManualToken && (
-                  <View style={styles.manualTokenSection}>
-                    <View style={styles.inputContainer}>
-                      <Ionicons name="key-outline" size={20} color={colors.textSecondary} style={styles.inputIcon} />
-                      <TextInput
-                        style={styles.input}
-                        placeholder="Código de restablecimiento"
-                        placeholderTextColor={colors.textMuted}
-                        value={manualToken}
-                        onChangeText={setManualToken}
-                        autoCapitalize="none"
-                      />
-                    </View>
-                    <TouchableOpacity
-                      style={styles.smallButton}
-                      onPress={handleGoToReset}
-                      disabled={!manualToken}
-                    >
-                      <Text style={styles.smallButtonText}>CONTINUAR</Text>
-                    </TouchableOpacity>
-                  </View>
-                )}
 
                 {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
@@ -459,9 +436,6 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.sm,
     textDecorationLine: 'underline',
   },
-  manualTokenSection: {
-    marginBottom: spacing.md,
-  },
   smallButton: {
     backgroundColor: colors.primary,
     borderRadius: borderRadius.lg,
@@ -475,6 +449,9 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.sm,
     fontWeight: '700',
     letterSpacing: 2,
+  },
+  buttonDisabled: {
+    opacity: 0.5,
   },
   successContainer: {
     flex: 1,

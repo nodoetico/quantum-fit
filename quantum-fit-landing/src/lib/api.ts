@@ -1,7 +1,15 @@
-// API para obtener contenido de la landing desde el backend
-const API_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
 
-export interface LandingContent {
+async function fetchJSON<T>(path: string): Promise<T> {
+  const res = await fetch(`${API_URL}${path}`, {
+    next: { revalidate: 60 },
+  });
+  if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
+  const json = await res.json();
+  return json.data;
+}
+
+export interface ApiContent {
   id: string;
   section: string;
   title?: string;
@@ -14,17 +22,17 @@ export interface LandingContent {
   order: number;
 }
 
-export interface Testimonial {
+export interface ApiTestimonial {
   id: string;
   name: string;
   role?: string;
   text: string;
   photoUrl?: string;
   rating: number;
-  isActive: boolean;
+  order: number;
 }
 
-export interface Plan {
+export interface ApiPlan {
   id: string;
   name: string;
   description?: string;
@@ -34,9 +42,10 @@ export interface Plan {
   features: string[];
   isFeatured: boolean;
   isActive: boolean;
+  order: number;
 }
 
-export interface Banner {
+export interface ApiBanner {
   id: string;
   title: string;
   subtitle?: string;
@@ -44,49 +53,49 @@ export interface Banner {
   linkUrl?: string;
   linkText?: string;
   isActive: boolean;
+  order: number;
 }
 
-export interface GalleryImage {
+export interface ApiGalleryImage {
   id: string;
   url: string;
   alt?: string;
   category?: string;
   order: number;
+  isActive?: boolean;
+}
+
+export interface ApiGym {
+  id: string;
+  name: string;
+  address?: string;
+  city?: string;
+  phone?: string;
+  hours?: string;
   isActive: boolean;
 }
 
-async function fetchApi<T>(endpoint: string): Promise<T | null> {
-  try {
-    const res = await fetch(`${API_URL}${endpoint}`);
-    if (!res.ok) return null;
-    const json = await res.json();
-    return json.success ? json.data : null;
-  } catch (err) {
-    return null;
-  }
-}
-
-export async function getContentBySection(section: string): Promise<LandingContent[]> {
-  return (await fetchApi<LandingContent[]>(`/landing/content?section=${section}`)) || [];
-}
-
-export async function getAllContent(): Promise<LandingContent[]> {
-  return (await fetchApi<LandingContent[]>('/landing/content')) || [];
-}
-
-export async function getTestimonials(): Promise<Testimonial[]> {
-  return (await fetchApi<Testimonial[]>('/landing/testimonials')) || [];
-}
-
-export async function getPlans(): Promise<Plan[]> {
-  return (await fetchApi<Plan[]>('/landing/plans')) || [];
-}
-
-export async function getBanners(): Promise<Banner[]> {
-  return (await fetchApi<Banner[]>('/landing/banners')) || [];
-}
-
-export async function getGallery(category?: string): Promise<GalleryImage[]> {
-  const endpoint = category ? `/landing/gallery?category=${category}` : '/landing/gallery';
-  return (await fetchApi<GalleryImage[]>(endpoint)) || [];
-}
+export const api = {
+  content: {
+    getAll: () => fetchJSON<ApiContent[]>("/landing/content/admin"),
+    getBySection: async (section: string) => {
+      const all = await fetchJSON<ApiContent[]>("/landing/content/admin");
+      return all.filter((c) => c.section === section && c.isActive).sort((a, b) => a.order - b.order);
+    },
+  },
+  testimonials: {
+    getAll: () => fetchJSON<ApiTestimonial[]>("/landing/testimonials/admin"),
+  },
+  plans: {
+    getAll: () => fetchJSON<ApiPlan[]>("/landing/plans/admin"),
+  },
+  banners: {
+    getAll: () => fetchJSON<ApiBanner[]>("/landing/banners/admin"),
+  },
+  gallery: {
+    getAll: () => fetchJSON<ApiGalleryImage[]>("/landing/gallery/admin"),
+  },
+  gyms: {
+    getAll: () => fetchJSON<ApiGym[]>("/landing/gyms/admin"),
+  },
+};

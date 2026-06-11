@@ -3,6 +3,7 @@
 // con el sistema de pagos a través de Crystal MiFit API.
 import { Request, Response } from 'express';
 import { AuthRequest } from '../types';
+import { prisma } from '../database';
 import {
   getPaymentMethods,
   getEnrollmentStatus,
@@ -49,9 +50,22 @@ export async function listPaymentMethods(_req: Request, res: Response): Promise<
  * Obtiene el estado actual de la inscripción del usuario en Crystal.
  * Incluye si está al día, vencimiento, precio de renovación, etc.
  */
-export async function checkEnrollmentStatus(_req: Request, res: Response): Promise<void> {
+export async function checkEnrollmentStatus(req: Request & AuthRequest, res: Response): Promise<void> {
   try {
-    const enrollment = await getEnrollmentStatus();
+    const user = await prisma.user.findUnique({
+      where: { id: req.userId },
+      select: { dni: true },
+    });
+
+    if (!user?.dni) {
+      res.json({
+        success: true,
+        data: { enrollment: null, renewal: null },
+      });
+      return;
+    }
+
+    const enrollment = await getEnrollmentStatus(user.dni);
 
     res.json({
       success: true,
@@ -102,7 +116,11 @@ export async function processEnrollmentRenewal(req: Request & AuthRequest, res: 
 
     let renewalPrice = 0;
     try {
-      const updatedEnrollment = await getEnrollmentStatus();
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { dni: true },
+      });
+      const updatedEnrollment = await getEnrollmentStatus(user?.dni || undefined);
       renewalPrice = updatedEnrollment.renewal?.price || 0;
     } catch (priceError: unknown) {
       console.error('[PaymentController] No se pudo obtener el precio real del enrollment:', priceError instanceof Error ? priceError.message : 'Error');
@@ -176,7 +194,11 @@ export async function processMembershipRenewal(req: Request & AuthRequest, res: 
 
       let renewalPrice = 0;
       try {
-        const updatedEnrollment = await getEnrollmentStatus();
+        const user = await prisma.user.findUnique({
+          where: { id: userId },
+          select: { dni: true },
+        });
+        const updatedEnrollment = await getEnrollmentStatus(user?.dni || undefined);
         renewalPrice = updatedEnrollment.renewal?.price || 0;
       } catch (priceError: unknown) {
         console.error('[PaymentController] No se pudo obtener precio real tras renovar membresía:', priceError instanceof Error ? priceError.message : 'Error');
@@ -220,10 +242,23 @@ export async function processMembershipRenewal(req: Request & AuthRequest, res: 
  * Obtiene el historial de transacciones del usuario desde Crystal.
  * Query params: perPage (opcional, default: 15)
  */
-export async function listTransactions(req: Request, res: Response): Promise<void> {
+export async function listTransactions(req: Request & AuthRequest, res: Response): Promise<void> {
   try {
     const perPage = req.query.perPage ? parseInt(req.query.perPage as string) : 15;
-    const transactions = await getTransactions(perPage);
+    const user = await prisma.user.findUnique({
+      where: { id: req.userId },
+      select: { dni: true },
+    });
+
+    if (!user?.dni) {
+      res.json({
+        success: true,
+        data: [],
+      });
+      return;
+    }
+
+    const transactions = await getTransactions(perPage, user.dni);
 
     res.json({
       success: true,

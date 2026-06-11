@@ -104,11 +104,12 @@ export const authService = {
   /**
    * Registrar nuevo usuario
    */
-  async register(name: string, email: string, password: string) {
+  async register(name: string, email: string, password: string, dni: string) {
     const response = await api.post('/auth/register', {
       name,
       email,
       password,
+      dni,
     });
 
     const { user, accessToken, refreshToken } = response.data.data;
