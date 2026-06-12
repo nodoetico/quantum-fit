@@ -135,11 +135,7 @@ async function main() {
   ];
 
   for (const achievement of achievements) {
-    await prisma.achievement.upsert({
-      where: { id: achievement.id },
-      update: achievement,
-      create: achievement,
-    });
+    await prisma.achievement.create({ data: achievement }).catch(() => {});
   }
 
   console.log(`✅ ${achievements.length} logros creados/actualizados`);
@@ -341,11 +337,7 @@ async function main() {
   ];
 
   for (const reward of rewards) {
-    await prisma.reward.upsert({
-      where: { id: reward.id },
-      update: reward,
-      create: reward,
-    });
+    await prisma.reward.create({ data: reward }).catch(() => {});
   }
 
   console.log(`✅ ${rewards.length} recompensas creadas`);
@@ -410,36 +402,23 @@ async function main() {
   console.log('🌐 Creando contenido de Landing Page...');
 
   // Hero
-  await prisma.landingContent.upsert({
-    where: { id: 'landing_hero_001' },
-    update: {
-      title: 'Transformá tu cuerpo,<br />evolucioná tu mente',
-      subtitle: 'Transformación física y mental',
-      description: 'En Quantum Fit no es solo entrenar. Es descubrir tu mejor versión. Entrenamiento de élite, nutrición inteligente y una comunidad que te impulsa.',
-      ctaText: 'Ver planes',
-      ctaLink: '#ofertas',
-    },
-    create: {
+  await prisma.landingContent.create({
+    data: {
       id: 'landing_hero_001',
       section: 'hero',
       title: 'Transformá tu cuerpo,<br />evolucioná tu mente',
       subtitle: 'Transformación física y mental',
       description: 'En Quantum Fit no es solo entrenar. Es descubrir tu mejor versión. Entrenamiento de élite, nutrición inteligente y una comunidad que te impulsa.',
       ctaText: 'Ver planes',
-      ctaLink: '#ofertas',
+      ctaLink: '#planes',
       isActive: true,
       order: 0,
     },
-  });
+  }).catch(() => {});
 
   // About
-  await prisma.landingContent.upsert({
-    where: { id: 'landing_about_001' },
-    update: {
-      title: 'Excelencia en movimiento',
-      description: 'En Quantum Fit combinamos entrenamiento de élite con un ambiente único. Instalaciones de primera, instructores certificados y una comunidad que te impulsa a dar lo mejor.',
-    },
-    create: {
+  await prisma.landingContent.create({
+    data: {
       id: 'landing_about_001',
       section: 'about',
       title: 'Excelencia en movimiento',
@@ -447,7 +426,7 @@ async function main() {
       isActive: true,
       order: 0,
     },
-  });
+  }).catch(() => {});
 
   // Testimonials
   const landingTestimonials = [
@@ -457,11 +436,7 @@ async function main() {
   ];
 
   for (const t of landingTestimonials) {
-    await prisma.testimonial.upsert({
-      where: { id: t.id },
-      update: { name: t.name, role: t.role, text: t.text, photoUrl: t.photoUrl, rating: t.rating, order: t.order },
-      create: t,
-    });
+    await prisma.testimonial.create({ data: t }).catch(() => {});
   }
 
   // Plans
@@ -509,11 +484,7 @@ async function main() {
   ];
 
   for (const p of landingPlans) {
-    await prisma.plan.upsert({
-      where: { id: p.id },
-      update: p,
-      create: p,
-    });
+    await prisma.plan.create({ data: p }).catch(() => {});
   }
 
   // Gallery
@@ -529,11 +500,7 @@ async function main() {
   ];
 
   for (const img of galleryImages) {
-    await prisma.galleryImage.upsert({
-      where: { id: img.id },
-      update: img,
-      create: img,
-    });
+    await prisma.galleryImage.create({ data: img }).catch(() => {});
   }
 
   // Gyms (Sedes)
@@ -562,12 +529,8 @@ async function main() {
     },
   ];
 
-  for (const gym of landingGyms) {
-    await prisma.gym.upsert({
-      where: { id: gym.id },
-      update: gym,
-      create: gym,
-    });
+  for (const lg of landingGyms) {
+    await prisma.gym.create({ data: lg }).catch(() => {});
   }
 
   console.log('✅ Contenido de Landing Page creado');
@@ -598,11 +561,7 @@ async function main() {
     { id: 'course_008', name: 'Personalizado', description: 'Programas diseñados a tu medida con un coach profesional.', imageUrl: '', isActive: true, order: 7 },
   ];
   for (const c of courses) {
-    await prisma.course.upsert({
-      where: { id: c.id },
-      update: c,
-      create: c,
-    });
+    await prisma.course.create({ data: c }).catch(() => {});
   }
   console.log(`✅ ${courses.length} cursos creados`);
 
@@ -623,11 +582,7 @@ async function main() {
     { id: 'buf_010', name: 'BCAA', description: 'Aminoácidos ramificados 200g', price: 2000, category: 'suplementacion', imageUrl: '', isActive: true, order: 1 },
   ];
   for (const item of buffetItems) {
-    await prisma.buffetItem.upsert({
-      where: { id: item.id },
-      update: item,
-      create: item,
-    });
+    await prisma.buffetItem.create({ data: item }).catch(() => {});
   }
   console.log(`✅ ${buffetItems.length} items de buffet creados`);
 
@@ -641,11 +596,7 @@ async function main() {
     { id: 'news_003', title: 'Nuevos horarios de clases nocturnas', summary: 'Ampliamos nuestra oferta horaria para adaptarnos a tu rutina.', content: 'Ahora podés entrenar hasta más tarde. Sumamos nuevos horarios nocturnos de clases grupales para que no te pierdas tu entrenamiento.', imageUrl: '', author: 'Quantum Fit', publishedAt: new Date(Date.now() - 86400000 * 14).toISOString(), isActive: true },
   ];
   for (const n of newsItems) {
-    await prisma.news.upsert({
-      where: { id: n.id },
-      update: n,
-      create: n,
-    });
+    await prisma.news.create({ data: n }).catch(() => {});
   }
   console.log(`✅ ${newsItems.length} noticias creadas`);
 

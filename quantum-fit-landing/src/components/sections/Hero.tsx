@@ -20,7 +20,7 @@ export default function Hero() {
   const description = hero?.subtitle || hero?.description || staticSiteInfo.description;
   const bgImage = hero?.imageUrl || "/imagenes/hero-bg.jpeg";
   const ctaText = hero?.ctaText || "Comenzar Ahora";
-  const ctaLink = hero?.ctaLink || "#ofertas";
+  const ctaLink = hero?.ctaLink || "#planes";
   const whatsappUrl = siteConfig
     ? `https://wa.me/${siteConfig.whatsapp}?text=Hola%20${encodeURIComponent(siteConfig.siteName)}%2C%20me%20gustar%C3%ADa%20recibir%20informaci%C3%B3n.`
     : staticSiteInfo.whatsappUrl;

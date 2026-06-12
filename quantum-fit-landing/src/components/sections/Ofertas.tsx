@@ -29,11 +29,11 @@ export default function Ofertas() {
   }));
 
   return (
-    <section id="ofertas" className="bg-white px-6 py-24 sm:py-32">
+    <section id="planes" className="bg-white px-6 py-24 sm:py-32">
       <div className="mx-auto max-w-7xl">
         <ScrollReveal>
           <h2 className="mb-4 text-center text-3xl font-bold tracking-tight text-night sm:text-4xl">
-            Ofertas y Promociones
+            Planes y Precios
           </h2>
           <p className="mx-auto mb-16 max-w-2xl text-center text-base text-charcoal">
             Elegí el plan que mejor se adapte a tus objetivos

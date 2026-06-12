@@ -41,8 +41,8 @@ export default function Ubicaciones() {
 
         <div className="grid gap-8 md:grid-cols-2">
           {display.map((gym, i) => (
-            <ScrollReveal key={gym.id} delay={i * 0.15}>
-              <div className="overflow-hidden rounded-2xl bg-white shadow-sm">
+            <ScrollReveal key={gym.id} delay={i * 0.15} className="flex">
+              <div className="flex w-full flex-col overflow-hidden rounded-2xl bg-white shadow-sm">
                 <div className="h-48 w-full bg-charcoal">
                   <iframe
                     src={googleMapsUrl(gym.name)}
@@ -55,9 +55,9 @@ export default function Ubicaciones() {
                     title={gym.name}
                   />
                 </div>
-                <div className="p-6">
+                <div className="flex flex-1 flex-col p-6">
                   <h3 className="mb-4 text-xl font-semibold text-night">{gym.name}</h3>
-                  <div className="flex flex-col gap-3">
+                  <div className="flex flex-1 flex-col gap-3">
                     {gym.address && (
                       <div className="flex items-start gap-3">
                         <MapPin size={18} className="mt-0.5 shrink-0 text-charcoal" />

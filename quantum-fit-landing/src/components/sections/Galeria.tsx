@@ -37,12 +37,12 @@ export default function Galeria() {
           </p>
         </ScrollReveal>
 
-        <div className="columns-1 gap-4 sm:columns-2 lg:columns-3 xl:columns-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {items.map((img, i) => (
             <ScrollReveal key={img.id} delay={i * 0.05}>
               <button
                 onClick={() => setSelected(i)}
-                className="mb-4 w-full overflow-hidden rounded-2xl transition-all duration-300 hover:opacity-90"
+                className="w-full overflow-hidden rounded-2xl transition-all duration-300 hover:opacity-90"
               >
                 {img.url ? (
                   // eslint-disable-next-line @next/next/no-img-element
