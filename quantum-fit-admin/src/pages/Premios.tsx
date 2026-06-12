@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { rewardsService, usersService } from '../services/api';
+import { rewardsService, authService } from '../services/api';
 import { useAuth } from '../context/useAuth';
 import type { Reward, RedeemedReward, User } from '../types';
 import ImageUpload from '../components/ImageUpload';
@@ -70,7 +70,7 @@ export default function Premios() {
 
   useEffect(() => {
     if (showRedemptionForm) {
-      usersService.getUsers().then(setUsers).catch(() => {});
+      authService.getUsers().then(setUsers).catch(() => {});
     }
   }, [showRedemptionForm]);
 
