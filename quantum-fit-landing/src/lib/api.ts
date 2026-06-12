@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://quantum-fit-backend-production.up.railway.app/api";
 
 async function fetchJSON<T>(path: string): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
