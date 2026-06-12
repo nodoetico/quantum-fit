@@ -5,7 +5,7 @@ import ScrollReveal from "@/components/ui/ScrollReveal";
 
 export default function DescargaApp() {
   return (
-    <section className="bg-night px-6 py-24 sm:py-32">
+    <section id="descargar" className="bg-night px-6 py-24 sm:py-32">
       <div className="mx-auto max-w-7xl">
         <div className="grid items-center gap-12 md:grid-cols-2">
           <ScrollReveal>
