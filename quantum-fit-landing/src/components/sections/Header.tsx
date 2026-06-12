@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Menu, X, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { navLinks, siteInfo as staticSiteInfo } from "@/data/siteData";
+import type { NavLink } from "@/data/siteData";
 import { api, type ApiSiteConfig } from "@/lib/api";
 
 export default function Header() {
@@ -37,16 +38,38 @@ export default function Header() {
           <span className="text-xl font-bold tracking-tight text-night">Quantum Fit</span>
         </a>
 
-        <nav className="hidden gap-8 lg:flex">
-          {navLinks.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              className="text-sm font-medium text-charcoal transition-colors hover:text-night"
-            >
-              {link.label}
-            </a>
-          ))}
+        <nav className="hidden items-center gap-6 lg:flex">
+          {navLinks.map((link) =>
+            link.children ? (
+              <div key={link.label} className="group relative">
+                <button className="flex items-center gap-1 text-sm font-medium text-charcoal transition-colors hover:text-night">
+                  {link.label}
+                  <ChevronDown size={14} className="transition-transform group-hover:rotate-180" />
+                </button>
+                <div className="absolute left-1/2 top-full -translate-x-1/2 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                  <div className="flex flex-col gap-1 rounded-xl border border-silver bg-white p-2 shadow-lg min-w-[200px]">
+                    {link.children.map((child) => (
+                      <a
+                        key={child.label}
+                        href={child.href}
+                        className="rounded-lg px-4 py-2.5 text-sm font-medium text-charcoal transition-colors hover:bg-silver hover:text-night"
+                      >
+                        {child.label}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <a
+                key={link.label}
+                href={link.href!}
+                className="text-sm font-medium text-charcoal transition-colors hover:text-night"
+              >
+                {link.label}
+              </a>
+            )
+          )}
         </nav>
 
         <div className="hidden items-center gap-4 lg:flex">
@@ -78,16 +101,34 @@ export default function Header() {
             className="overflow-hidden border-t border-silver bg-white lg:hidden"
           >
             <nav className="flex flex-col gap-2 px-6 py-6">
-              {navLinks.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  onClick={() => setMenuOpen(false)}
-                  className="py-2 text-sm font-medium text-charcoal transition-colors hover:text-night"
-                >
-                  {link.label}
-                </a>
-              ))}
+              {navLinks.map((link) =>
+                link.children ? (
+                  <div key={link.label} className="flex flex-col gap-1">
+                    <span className="py-2 text-sm font-semibold text-night">{link.label}</span>
+                    <div className="flex flex-col gap-1 pl-4 border-l-2 border-silver">
+                      {link.children.map((child) => (
+                        <a
+                          key={child.label}
+                          href={child.href}
+                          onClick={() => setMenuOpen(false)}
+                          className="py-2 text-sm font-medium text-charcoal transition-colors hover:text-night"
+                        >
+                          {child.label}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <a
+                    key={link.label}
+                    href={link.href!}
+                    onClick={() => setMenuOpen(false)}
+                    className="py-2 text-sm font-medium text-charcoal transition-colors hover:text-night"
+                  >
+                    {link.label}
+                  </a>
+                )
+              )}
               <a
                 href={whatsappUrl}
                 target="_blank"

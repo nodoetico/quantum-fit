@@ -17,7 +17,7 @@ export default function Nosotros() {
   const aboutImg = about.find((c) => c.imageUrl)?.imageUrl;
 
   return (
-    <section className="bg-white px-6 py-24 sm:py-32">
+    <section id="nosotros" className="bg-white px-6 py-24 sm:py-32">
       <div className="mx-auto max-w-7xl">
         <ScrollReveal>
           <h2 className="mb-4 text-center text-3xl font-bold tracking-tight text-night sm:text-4xl">

@@ -8,14 +8,24 @@ export const siteInfo = {
   whatsappUrl: "https://wa.me/541112345678?text=Hola%20Quantum%20Fit%2C%20me%20gustar%C3%ADa%20recibir%20informaci%C3%B3n.",
 };
 
-export const navLinks = [
+export interface NavLink {
+  label: string;
+  href?: string;
+  children?: { label: string; href: string }[];
+}
+
+export const navLinks: NavLink[] = [
   { label: "Inicio", href: "#inicio" },
   { label: "Clases", href: "#clases" },
   { label: "Galería", href: "#galeria" },
   { label: "Noticias", href: "#noticias" },
   { label: "Planes", href: "#planes" },
   { label: "Buffet", href: "#buffet" },
-  { label: "Testimonios", href: "#testimonios" },
+  { label: "Testimonios", href: "#testimonios", children: [
+    { label: "¿Por qué Quantum Fit?", href: "#features" },
+    { label: "Nosotros", href: "#nosotros" },
+  ]},
+  { label: "Descargar App", href: "#descargar" },
   { label: "Contacto", href: "#contacto" },
 ];
 
