@@ -70,19 +70,15 @@ interface ExternalApiResponse<T> {
 // ============================================================================
 
 /**
- * Obtiene el perfil del usuario desde el sistema externo
- * @param dni - DNI del usuario a consultar (opcional, si no se provee usa el admin)
+ * Obtiene el perfil del usuario desde el sistema externo (Crystal)
+ * NOTA: Crystal NO tiene endpoint público por DNI. Solo devuelve datos del usuario autenticado.
+ * @param dni - Ignorado. Crystal siempre devuelve el perfil del dueño del token.
  */
-export async function pullUserProfile(dni?: string): Promise<ExternalUser | null> {
+export async function pullUserProfile(_dni?: string): Promise<ExternalUser | null> {
   try {
     const client = await getCrystalClient();
-    const endpoint = dni ? `/users/by-dni/${dni}` : '/user/me';
-    const response = await client.get<ExternalUser>(endpoint);
-    
-    if (response.data) {
-      return response.data;
-    }
-    return null;
+    const response = await client.get<ExternalUser>('/user/me');
+    return response.data || null;
   } catch (error: unknown) {
     console.error('[ExternalPull] Error al obtener perfil:', error instanceof Error ? error.message : 'Error');
     return null;
@@ -90,15 +86,13 @@ export async function pullUserProfile(dni?: string): Promise<ExternalUser | null
 }
 
 /**
- * Obtiene las membresías de un usuario desde el sistema externo
- * @param dni - DNI del usuario (opcional)
+ * Obtiene las membresías del usuario autenticado desde Crystal
+ * NOTA: Crystal solo devuelve membresías del dueño del token, no por DNI.
  */
-export async function pullUserMemberships(dni?: string): Promise<ExternalMembership[]> {
+export async function pullUserMemberships(_dni?: string): Promise<ExternalMembership[]> {
   try {
     const client = await getCrystalClient();
-    const endpoint = dni ? `/users/by-dni/${dni}/memberships` : '/user/memberships';
-    const response = await client.get<ExternalApiResponse<ExternalMembership[]>>(endpoint);
-    
+    const response = await client.get<ExternalApiResponse<ExternalMembership[]>>('/user/memberships');
     if (response.data?.data) {
       return response.data.data;
     }
@@ -110,19 +104,17 @@ export async function pullUserMemberships(dni?: string): Promise<ExternalMembers
 }
 
 /**
- * Obtiene las asistencias de un usuario desde el sistema externo
- * @param dni - DNI del usuario (opcional)
+ * Obtiene las asistencias del usuario autenticado desde Crystal
+ * NOTA: Crystal solo devuelve asistencias del dueño del token, no por DNI.
  */
-export async function pullUserAttendances(startDate?: string, endDate?: string, dni?: string): Promise<ExternalAttendance[]> {
+export async function pullUserAttendances(startDate?: string, endDate?: string, _dni?: string): Promise<ExternalAttendance[]> {
   try {
     const client = await getCrystalClient();
     const params: Record<string, string> = {};
     if (startDate) params.startDate = startDate;
     if (endDate) params.endDate = endDate;
     
-    const endpoint = dni ? `/users/by-dni/${dni}/attendances` : '/user/attendances';
-    const response = await client.get<ExternalApiResponse<ExternalAttendance[]>>(endpoint, { params });
-    
+    const response = await client.get<ExternalApiResponse<ExternalAttendance[]>>('/user/attendances', { params });
     if (response.data?.data) {
       return response.data.data;
     }
@@ -134,19 +126,17 @@ export async function pullUserAttendances(startDate?: string, endDate?: string, 
 }
 
 /**
- * Obtiene las transacciones de un usuario desde el sistema externo
- * @param dni - DNI del usuario (opcional)
+ * Obtiene las transacciones del usuario autenticado desde Crystal
+ * NOTA: Crystal solo devuelve transacciones del dueño del token, no por DNI.
  */
-export async function pullUserTransactions(startDate?: string, endDate?: string, dni?: string): Promise<ExternalTransaction[]> {
+export async function pullUserTransactions(startDate?: string, endDate?: string, _dni?: string): Promise<ExternalTransaction[]> {
   try {
     const client = await getCrystalClient();
     const params: Record<string, string> = {};
     if (startDate) params.startDate = startDate;
     if (endDate) params.endDate = endDate;
     
-    const endpoint = dni ? `/users/by-dni/${dni}/transactions` : '/user/transactions';
-    const response = await client.get<ExternalApiResponse<ExternalTransaction[]>>(endpoint, { params });
-    
+    const response = await client.get<ExternalApiResponse<ExternalTransaction[]>>('/user/transactions', { params });
     if (response.data?.data) {
       return response.data.data;
     }

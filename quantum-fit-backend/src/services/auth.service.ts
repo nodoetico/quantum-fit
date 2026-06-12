@@ -5,7 +5,6 @@ import { generateAccessToken, generateRefreshToken, generateResetToken, verifyRe
 import { User, UserRole } from '@prisma/client';
 import { assignReferralCode, processReferral } from './referral.service';
 import { sendResetPasswordEmail } from './email.service';
-import { pullUserProfile, syncMembershipsFromExternal, syncAttendancesFromExternal } from './external-pull.service';
 
 const MAX_FAILED_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MS = 15 * 60 * 1000;
@@ -148,22 +147,10 @@ export async function registerUser(data: RegisterInput): Promise<AuthResponse> {
     }
   }
 
-  // Sincronizar datos desde Crystal (MiFit) si el usuario tiene DNI
-  if (data.dni) {
-    (async () => {
-      try {
-        const profile = await pullUserProfile(data.dni);
-        if (profile) {
-          await Promise.all([
-            syncMembershipsFromExternal({ id: user.id, dni: data.dni }),
-            syncAttendancesFromExternal({ id: user.id, dni: data.dni, points: user.points, totalPointsEarned: user.totalPointsEarned }),
-          ]);
-        }
-      } catch {
-        // No bloquear registro si Crystal no responde
-      }
-    })();
-  }
+  // NOTA: Crystal no tiene endpoint público por DNI.
+  // La sincronización de datos históricos (membresías, asistencias) se hará
+  // cuando Crystal envíe check-ins vía POST /api/external/checkin.
+  // Mientras tanto, el usuario arranca con puntos de bienvenida.
 
   // Generar tokens con el rol del usuario
   const accessToken = generateAccessToken({
