@@ -34,15 +34,22 @@ export default function Buffet() {
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           {Object.entries(grouped).map(([category, categoryItems], i) => (
             <ScrollReveal key={category} delay={i * 0.1}>
-              <div className="flex h-full flex-col rounded-2xl border border-silver p-6 transition-all duration-300 hover:shadow-md">
-                <h3 className="mb-4 text-lg font-semibold text-night capitalize">{category}</h3>
-                <ul className="flex flex-1 flex-col gap-3">
-                  {categoryItems.map((item) => (
-                    <li key={item.id} className="text-sm text-charcoal">
-                      {item.name}{item.price ? ` — $${item.price}` : ""}
-                    </li>
-                  ))}
-                </ul>
+              <div className="flex h-full flex-col rounded-2xl border border-silver transition-all duration-300 hover:shadow-md">
+                {categoryItems[0]?.imageUrl && (
+                  <div className="overflow-hidden rounded-t-2xl">
+                    <img src={categoryItems[0].imageUrl} alt={category} className="h-40 w-full object-cover" />
+                  </div>
+                )}
+                <div className="flex flex-1 flex-col p-6">
+                  <h3 className="mb-4 text-lg font-semibold text-night capitalize">{category}</h3>
+                  <ul className="flex flex-1 flex-col gap-3">
+                    {categoryItems.map((item) => (
+                      <li key={item.id} className="text-sm text-charcoal">
+                        {item.name}{item.price ? ` — $${item.price}` : ""}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             </ScrollReveal>
           ))}

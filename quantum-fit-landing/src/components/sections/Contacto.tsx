@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Send } from "lucide-react";
 import ScrollReveal from "@/components/ui/ScrollReveal";
+import { api, type ApiContent } from "@/lib/api";
 
 interface FormData {
   nombre: string;
@@ -25,6 +26,13 @@ const initialForm: FormData = {
 export default function Contacto() {
   const [form, setForm] = useState<FormData>(initialForm);
   const [errors, setErrors] = useState<Partial<FormData>>({});
+  const [contactContent, setContactContent] = useState<ApiContent | null>(null);
+
+  useEffect(() => {
+    api.content.getBySection("contact").then((data) => {
+      if (data.length > 0) setContactContent(data[0]);
+    }).catch(() => {});
+  }, []);
 
   const validate = (): boolean => {
     const newErrors: Partial<FormData> = {};
@@ -59,11 +67,16 @@ export default function Contacto() {
     <section id="contacto" className="bg-white px-6 py-24 sm:py-32">
       <div className="mx-auto max-w-3xl">
         <ScrollReveal>
+          {contactContent?.imageUrl && (
+            <div className="mb-8 overflow-hidden rounded-2xl">
+              <img src={contactContent.imageUrl} alt="" className="max-h-48 w-full object-cover" />
+            </div>
+          )}
           <h2 className="mb-4 text-center text-3xl font-bold tracking-tight text-night sm:text-4xl">
-            Contacto
+            {contactContent?.title || "Contacto"}
           </h2>
           <p className="mx-auto mb-16 max-w-2xl text-center text-base text-charcoal">
-            Dejanos tu consulta y te responderemos a la brevedad
+            {contactContent?.description || "Dejanos tu consulta y te responderemos a la brevedad"}
           </p>
         </ScrollReveal>
 

@@ -14,6 +14,7 @@ export default function Nosotros() {
   const historia = about.find((c) => c.title === "Historia");
   const mision = about.find((c) => c.title === "Misión");
   const vision = about.find((c) => c.title === "Visión");
+  const aboutImg = about.find((c) => c.imageUrl)?.imageUrl;
 
   return (
     <section className="bg-white px-6 py-24 sm:py-32">
@@ -26,6 +27,12 @@ export default function Nosotros() {
             Conocé nuestra historia y filosofía
           </p>
         </ScrollReveal>
+
+        {aboutImg && (
+          <div className="mb-12 overflow-hidden rounded-2xl">
+            <img src={aboutImg} alt="Nosotros" className="max-h-80 w-full object-cover" />
+          </div>
+        )}
 
         <div className="grid gap-12 md:grid-cols-2">
           <ScrollReveal delay={0.1}>

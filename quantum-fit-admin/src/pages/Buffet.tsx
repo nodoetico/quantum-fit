@@ -139,6 +139,11 @@ export default function Buffet() {
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {catItems.map((item) => (
                 <div key={item.id} className="bg-dark-100 rounded-lg border border-primary-500/20 p-4 group">
+                  {item.imageUrl && (
+                    <div className="mb-3 overflow-hidden rounded-lg">
+                      <img src={item.imageUrl} alt={item.name} className="h-32 w-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                    </div>
+                  )}
                   <div className="flex items-start justify-between mb-2">
                     <h4 className="font-medium text-white">{item.name}</h4>
                     <span className={`px-2 py-0.5 rounded text-xs font-medium ${item.isActive ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>

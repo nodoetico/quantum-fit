@@ -250,6 +250,11 @@ function ContentSection() {
             <div className="space-y-3">
               {sectionItems.map((item) => (
                 <div key={item.id} className="flex items-center justify-between bg-dark-100 rounded-lg p-4 border border-primary-500/20">
+                  {item.imageUrl && (
+                    <div className="mr-3 shrink-0">
+                      <img src={item.imageUrl} alt="" className="h-12 w-12 rounded-lg object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                    </div>
+                  )}
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-white truncate">{item.title || <span className="text-primary-400 italic">Sin título</span>}</p>
                     <p className="text-sm text-primary-400 truncate">{item.description?.substring(0, 80) || ''}</p>

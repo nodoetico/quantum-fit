@@ -21,6 +21,11 @@ export default function CursosClases() {
     <section id="clases" className="bg-silver px-6 py-24 sm:py-32">
       <div className="mx-auto max-w-7xl">
         <ScrollReveal>
+          {sectionContent?.imageUrl && (
+            <div className="mb-8 overflow-hidden rounded-2xl">
+              <img src={sectionContent.imageUrl} alt="" className="max-h-64 w-full object-cover" />
+            </div>
+          )}
           <h2 className="mb-4 text-center text-3xl font-bold tracking-tight text-night sm:text-4xl">
             {sectionContent?.title || "Cursos y Clases"}
           </h2>
