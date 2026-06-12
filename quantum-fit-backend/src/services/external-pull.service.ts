@@ -84,16 +84,7 @@ export async function pullUserProfile(dni?: string): Promise<ExternalUser | null
     }
     return null;
   } catch (error: unknown) {
-    if (dni) {
-      try {
-        const client = await getCrystalClient();
-        const response = await client.get<ExternalUser>('/user/me');
-        return response.data || null;
-      } catch (fallbackErr: unknown) {
-        console.error('[ExternalPull] Error en fallback de perfil:', fallbackErr instanceof Error ? fallbackErr.message : 'Error');
-        return null;
-      }
-    }
+    console.error('[ExternalPull] Error al obtener perfil:', error instanceof Error ? error.message : 'Error');
     return null;
   }
 }

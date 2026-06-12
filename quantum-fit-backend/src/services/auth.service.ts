@@ -5,6 +5,7 @@ import { generateAccessToken, generateRefreshToken, generateResetToken, verifyRe
 import { User, UserRole } from '@prisma/client';
 import { assignReferralCode, processReferral } from './referral.service';
 import { sendResetPasswordEmail } from './email.service';
+import { pullUserProfile, syncMembershipsFromExternal, syncAttendancesFromExternal } from './external-pull.service';
 
 const MAX_FAILED_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MS = 15 * 60 * 1000;
@@ -145,6 +146,23 @@ export async function registerUser(data: RegisterInput): Promise<AuthResponse> {
     } catch {
       // Si el código es inválido, no bloquear el registro
     }
+  }
+
+  // Sincronizar datos desde Crystal (MiFit) si el usuario tiene DNI
+  if (data.dni) {
+    (async () => {
+      try {
+        const profile = await pullUserProfile(data.dni);
+        if (profile) {
+          await Promise.all([
+            syncMembershipsFromExternal({ id: user.id, dni: data.dni }),
+            syncAttendancesFromExternal({ id: user.id, dni: data.dni, points: user.points, totalPointsEarned: user.totalPointsEarned }),
+          ]);
+        }
+      } catch {
+        // No bloquear registro si Crystal no responde
+      }
+    })();
   }
 
   // Generar tokens con el rol del usuario
