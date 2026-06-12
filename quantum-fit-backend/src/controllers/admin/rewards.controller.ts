@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { prisma } from '../../database';
 import { RewardCategory } from '@prisma/client';
+import { adminCreateRedemption, adminDeleteRedemption } from '../../services/rewards.service';
 
 export async function getAllRewards(req: Request, res: Response): Promise<void> {
   try {
@@ -196,6 +197,32 @@ export async function getRedemptions(req: Request, res: Response): Promise<void>
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Error al obtener canjes';
+    res.status(500).json({ success: false, error: message });
+  }
+}
+
+export async function createRedemption(req: Request, res: Response): Promise<void> {
+  try {
+    const { userId, rewardId, notes } = req.body;
+    if (!userId || !rewardId) {
+      res.status(400).json({ success: false, error: 'userId y rewardId son requeridos' });
+      return;
+    }
+    const redemption = await adminCreateRedemption(userId, rewardId, notes);
+    res.status(201).json({ success: true, data: redemption, message: 'Canje creado exitosamente' });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error al crear canje';
+    res.status(500).json({ success: false, error: message });
+  }
+}
+
+export async function deleteRedemption(req: Request, res: Response): Promise<void> {
+  try {
+    const { id } = req.params;
+    const result = await adminDeleteRedemption(id);
+    res.status(200).json({ success: true, ...result });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error al eliminar canje';
     res.status(500).json({ success: false, error: message });
   }
 }

@@ -1,6 +1,7 @@
 import Header from "@/components/sections/Header";
 import Hero from "@/components/sections/Hero";
 import Nosotros from "@/components/sections/Nosotros";
+import Features from "@/components/sections/Features";
 import CursosClases from "@/components/sections/CursosClases";
 import Ofertas from "@/components/sections/Ofertas";
 import Galeria from "@/components/sections/Galeria";
@@ -19,6 +20,7 @@ export default function Home() {
       <Header />
       <main>
         <Hero />
+        <Features />
         <Nosotros />
         <CursosClases />
         <Ofertas />

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { rewardsService } from '../services/api';
+import { rewardsService, usersService } from '../services/api';
 import { useAuth } from '../context/useAuth';
-import type { Reward, RedeemedReward } from '../types';
+import type { Reward, RedeemedReward, User } from '../types';
 import ImageUpload from '../components/ImageUpload';
 
 type Tab = 'rewards' | 'redemptions';
@@ -48,6 +48,9 @@ export default function Premios() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<Partial<Reward>>(defaultForm);
   const [redemptionFilter, setRedemptionFilter] = useState('');
+  const [showRedemptionForm, setShowRedemptionForm] = useState(false);
+  const [users, setUsers] = useState<User[]>([]);
+  const [redemptionForm, setRedemptionForm] = useState({ userId: '', rewardId: '', notes: '' });
 
   useEffect(() => {
     if (tab === 'rewards') {
@@ -64,6 +67,12 @@ export default function Premios() {
         .finally(() => setIsLoading(false));
     }
   }, [tab, redemptionFilter]);
+
+  useEffect(() => {
+    if (showRedemptionForm) {
+      usersService.getUsers().then(setUsers).catch(() => {});
+    }
+  }, [showRedemptionForm]);
 
   async function loadRewards() {
     setIsLoading(true);
@@ -148,6 +157,26 @@ export default function Premios() {
     }
   }
 
+  async function handleCreateRedemption(e: React.FormEvent) {
+    e.preventDefault();
+    try {
+      await rewardsService.createRedemption(redemptionForm);
+      setShowRedemptionForm(false);
+      setRedemptionForm({ userId: '', rewardId: '', notes: '' });
+      await loadRedemptions();
+    } catch {
+    }
+  }
+
+  async function handleDeleteRedemption(id: string) {
+    if (!confirm('¿Eliminar este canje? Se revertirán los puntos y el stock.')) return;
+    try {
+      await rewardsService.deleteRedemption(id);
+      await loadRedemptions();
+    } catch {
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -168,7 +197,7 @@ export default function Premios() {
         <button
           onClick={() => setTab('rewards')}
           className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-            tab === 'rewards' ? 'bg-primary-600 text-white' : 'text-dark-400 hover:text-white'
+            tab === 'rewards' ? 'bg-primary-600 text-white' : 'text-primary-400 hover:text-white'
           }`}
         >
           Premios
@@ -176,7 +205,7 @@ export default function Premios() {
         <button
           onClick={() => setTab('redemptions')}
           className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-            tab === 'redemptions' ? 'bg-primary-600 text-white' : 'text-dark-400 hover:text-white'
+            tab === 'redemptions' ? 'bg-primary-600 text-white' : 'text-primary-400 hover:text-white'
           }`}
         >
           Canjes
@@ -267,7 +296,7 @@ export default function Premios() {
           {/* Rewards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {rewards.length === 0 ? (
-              <p className="text-dark-400 col-span-full text-center py-12">No hay premios creados</p>
+              <p className="text-primary-400 col-span-full text-center py-12">No hay premios creados</p>
             ) : (
               rewards.map((reward) => (
                 <div
@@ -329,19 +358,81 @@ export default function Premios() {
 
       {tab === 'redemptions' && (
         <>
-          <div className="flex gap-2">
-            {['', 'PENDING', 'APPROVED', 'FULFILLED', 'CANCELLED'].map((s) => (
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div className="flex gap-2">
+              {['', 'PENDING', 'APPROVED', 'FULFILLED', 'CANCELLED'].map((s) => (
+                <button
+                  key={s}
+                  onClick={() => { setRedemptionFilter(s); setTimeout(loadRedemptions, 0); }}
+                  className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
+                    redemptionFilter === s ? 'bg-primary-600 text-white' : 'bg-dark-200 text-primary-400 hover:text-white'
+                  }`}
+                >
+                  {s ? statusLabels[s] : 'Todos'}
+                </button>
+              ))}
+            </div>
+            {isAdmin && (
               <button
-                key={s}
-                onClick={() => { setRedemptionFilter(s); setTimeout(loadRedemptions, 0); }}
-                className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
-                  redemptionFilter === s ? 'bg-primary-600 text-white' : 'bg-dark-200 text-dark-400 hover:text-white'
-                }`}
+                onClick={() => setShowRedemptionForm(!showRedemptionForm)}
+                className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-all flex items-center gap-2"
               >
-                {s ? statusLabels[s] : 'Todos'}
+                <span className="text-xl">{showRedemptionForm ? '✕' : '+'}</span>
+                {showRedemptionForm ? 'Cerrar' : 'Nuevo Canje'}
               </button>
-            ))}
+            )}
           </div>
+
+          {showRedemptionForm && (
+            <div className="bg-dark-200 rounded-xl border border-primary-500/30 p-6">
+              <h2 className="text-xl font-bold text-white mb-4">Nuevo Canje Manual</h2>
+              <form onSubmit={handleCreateRedemption} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-primary-300 mb-1">Usuario *</label>
+                    <select value={redemptionForm.userId}
+                      onChange={(e) => setRedemptionForm({ ...redemptionForm, userId: e.target.value })}
+                      required
+                      className="w-full px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    >
+                      <option value="">Seleccionar usuario</option>
+                      {users.map((u) => (
+                        <option key={u.id} value={u.id}>{u.name} ({u.email}) — {u.points} pts</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-primary-300 mb-1">Premio *</label>
+                    <select value={redemptionForm.rewardId}
+                      onChange={(e) => setRedemptionForm({ ...redemptionForm, rewardId: e.target.value })}
+                      required
+                      className="w-full px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    >
+                      <option value="">Seleccionar premio</option>
+                      {rewards.filter((r) => r.isActive && r.stockAvailable > 0).map((rw) => (
+                        <option key={rw.id} value={rw.id}>{rw.name} — {rw.pointsCost} pts (stock: {rw.stockAvailable})</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-primary-300 mb-1">Notas (opcional)</label>
+                    <input type="text" placeholder="Motivo del canje manual" value={redemptionForm.notes}
+                      onChange={(e) => setRedemptionForm({ ...redemptionForm, notes: e.target.value })}
+                      className="w-full px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <button type="submit" className="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-all">
+                    Crear Canje
+                  </button>
+                  <button type="button" onClick={() => { setShowRedemptionForm(false); setRedemptionForm({ userId: '', rewardId: '', notes: '' }); }}
+                    className="px-6 py-2 bg-dark-600 hover:bg-dark-500 text-white font-medium rounded-lg transition-all">
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
 
           <div className="bg-dark-200 rounded-xl border border-primary-500/30 overflow-hidden">
             <div className="overflow-x-auto">
@@ -383,30 +474,41 @@ export default function Premios() {
                           {new Date(r.redeemedAt).toLocaleDateString('es-AR')}
                         </td>
                         <td className="px-6 py-4 text-right">
-                          {r.status === 'PENDING' && (
-                            <div className="flex gap-1 justify-end">
+                          <div className="flex gap-1 justify-end">
+                            {r.status === 'PENDING' && (
+                              <>
+                                <button
+                                  onClick={() => handleRedemptionStatus(r.id, 'APPROVED')}
+                                  className="px-2 py-1 bg-secondary-600/10 text-secondary-400 hover:bg-secondary-600/20 rounded text-xs font-medium"
+                                >
+                                  Aprobar
+                                </button>
+                                <button
+                                  onClick={() => handleRedemptionStatus(r.id, 'CANCELLED')}
+                                  className="px-2 py-1 bg-red-600/10 text-red-400 hover:bg-red-600/20 rounded text-xs font-medium"
+                                >
+                                  Cancelar
+                                </button>
+                              </>
+                            )}
+                            {r.status === 'APPROVED' && (
                               <button
-                                onClick={() => handleRedemptionStatus(r.id, 'APPROVED')}
-                                className="px-2 py-1 bg-secondary-600/10 text-secondary-400 hover:bg-secondary-600/20 rounded text-xs font-medium"
+                                onClick={() => handleRedemptionStatus(r.id, 'FULFILLED')}
+                                className="px-2 py-1 bg-primary-600/10 text-primary-400 hover:bg-primary-600/20 rounded text-xs font-medium"
                               >
-                                Aprobar
+                                Marcar entregado
                               </button>
+                            )}
+                            {isAdmin && (
                               <button
-                                onClick={() => handleRedemptionStatus(r.id, 'CANCELLED')}
+                                onClick={() => handleDeleteRedemption(r.id)}
                                 className="px-2 py-1 bg-red-600/10 text-red-400 hover:bg-red-600/20 rounded text-xs font-medium"
+                                title="Eliminar canje"
                               >
-                                Cancelar
+                                🗑️
                               </button>
-                            </div>
-                          )}
-                          {r.status === 'APPROVED' && (
-                            <button
-                              onClick={() => handleRedemptionStatus(r.id, 'FULFILLED')}
-                              className="px-2 py-1 bg-primary-600/10 text-primary-400 hover:bg-primary-600/20 rounded text-xs font-medium"
-                            >
-                              Marcar entregado
-                            </button>
-                          )}
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))

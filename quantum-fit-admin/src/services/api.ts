@@ -292,6 +292,16 @@ export const rewardsService = {
     const response = await api.put(`/admin/rewards/redemptions/${id}/status`, { status });
     return response.data;
   },
+
+  createRedemption: async (data: { userId: string; rewardId: string; notes?: string }) => {
+    const response = await api.post('/admin/rewards/redemptions', data);
+    return response.data;
+  },
+
+  deleteRedemption: async (id: string) => {
+    const response = await api.delete(`/admin/rewards/redemptions/${id}`);
+    return response.data;
+  },
 };
 
 export const gymService = {
