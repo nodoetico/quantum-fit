@@ -1,6 +1,6 @@
 # QuantumFit — Session Context
 
-> Última actualización: 8 de junio de 2026 (fin de Sesión 9)
+> Última actualización: 12 de junio de 2026 (fin de Sesión 10)
 
 ---
 
@@ -12,7 +12,7 @@ QuantumFit es un sistema de gestión de gimnasio con gamificación (niveles, pun
 |---|---|---|
 | App Móvil (Expo) | `quantum-fit-app/` | React Native, Expo SDK 54, React Navigation |
 | Backend API | `quantum-fit-backend/` | Node.js, Express, Prisma, PostgreSQL |
-| Landing Page | `quantum-fit-landing/` | Astro |
+| Landing Page | `quantum-fit-landing/` | Next.js |
 | Admin Panel | `quantum-fit-admin/` | React + Vite |
 
 ---
@@ -119,7 +119,7 @@ QuantumFit es un sistema de gestión de gimnasio con gamificación (niveles, pun
 - **Endpoint**: Crystal API `https://crystal.getmifit.app`
 - **Auth**: Login con email/password → obtiene Bearer token → refresca automáticamente cada 24hs
 - **Datos obtenibles**: perfil (nombre, DNI), membresías, asistencias, transacciones, afiliación
-- **Estado**: ✅ Verificado — todos los endpoints responden con datos reales de "Vilte Pablo" (DNI: 47931799)
+- **Estado**: ✅ Verificado — búsqueda por DNI trae datos reales. Ya NO hay fallback a `/user/me` que filtrara datos de "Vilte Pablo"
 
 ### 2. External Check-in (Integración con software de acceso)
 - **POST** `/api/external/checkin` — requiere DNI + timestamp ISO + type (ENTRY/EXIT)
@@ -331,6 +331,8 @@ EMAIL_FROM=nodoetico@gmail.com
 
 ## TypeScript Status
 - Backend: `npx tsc --noEmit` → **0 errors** ✅
+- Admin: `npx tsc -p tsconfig.app.json --noEmit` → **3 errors pre-existentes en ImageUpload.tsx** ⚠️
+- Landing: `npx tsc --noEmit` → **0 errors** ✅
 - App: `npx tsc --noEmit` → **0 errors** ✅
 
 ---
@@ -424,6 +426,66 @@ railway domain
 - Railway Dashboard: https://railway.app/project/4eff5ceb-1f3f-4ceb-b880-1f697686174b
 - GitHub: https://github.com/nodoetico/quantum-fit
 
+## Session 10 — Admin/Landing fixes + Premios CRUD + Features section + Crystal data leak fix
+
+**Goal:** Corregir errores visuales del admin/landing, agregar Features section, agregar CRUD de canjes, y fixear fuga de datos de Crystal.
+
+### Landing fixes:
+1. ✅ Puerto cambiado a 3001 (evita conflicto con backend en 3000)
+2. ✅ Root `package.json` con `concurrently` para `npm run dev` que inicia backend + landing
+3. ✅ Galería: CSS `columns-*` → `grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4` (simetría)
+4. ✅ Ubicaciones: `flex flex-col flex-1` para alturas iguales en cards
+5. ✅ Seed: todos los upserts cambiados a `create` + `.catch(() => {})` — nunca sobrescribe datos del usuario
+6. ✅ Navbar: eliminado link "Cursos"
+7. ✅ "Ofertas" renombrado a "Planes" en navbar, section id, heading, Hero CTA
+8. ✅ Hero CTA link corregido en DB (`#ofertas` → `#planes`)
+9. ✅ Imágenes agregadas en: Nosotros (banner), CursosClases (banner), Contacto (banner + título/descripción dinámicos), Buffet (imagen de categoría)
+10. ✅ DescargaApp: agregado `id="descargar"` para anchor del navbar
+11. ✅ Navbar: "Testimonios" ahora es dropdown con "¿Por qué Quantum Fit?" y "Nosotros"
+12. ✅ Creada sección **Features** (`Features.tsx`) que renderiza el contenido editado desde Admin > Landing > Contenido > Features
+
+### Admin fixes:
+13. ✅ Banner tab eliminado (componente `BannersSection` eliminado, tab quitado de TABS)
+14. ✅ Content list: thumbnails de imágenes agregados
+15. ✅ Buffet admin: imágenes mostradas en cards de items
+16. ✅ Premios: texto `text-dark-400` → `text-primary-400` en tabs, filtros, empty states (era negro sobre negro)
+17. ✅ Canjes (CRUD completo):
+    - Backend: `POST /api/admin/rewards/redemptions` (crear canje manual para cualquier usuario)
+    - Backend: `DELETE /api/admin/rewards/redemptions/:id` (eliminar canje, revierte puntos y stock)
+    - Frontend: formulario para crear canje (selector de usuario + premio + notas)
+    - Frontend: botón 🗑️ para eliminar canje en cada fila de la tabla
+
+### Crystal data leak fix:
+18. **`external-pull.service.ts`**: Eliminado el fallback a `/user/me` cuando falla la búsqueda por DNI. Esto paró la fuga de datos de "Vilte Pablo" a usuarios nuevos que no existen en Crystal. Ahora devuelve `null`.
+19. **`auth.service.ts`**: Al registrarse un usuario con DNI, automáticamente sincroniza perfil, membresías y asistencias desde Crystal (MiFit). No bloquea el registro si Crystal no responde.
+
+### Commits:
+- `d244d9e` — NaN guards + port conflict fix + root dev script
+- `107882c` — gallery grid, card heights, seed no-overwrite, navbar cleanup, Ofertas→Planes, remove Banners tab
+- `c92cab1` — image display in Nosotros, Clases, Contacto, Buffet sections + admin
+- `b329bd8` — Features section, canjes CRUD, Premios text colors
+- `4bd7668` — navbar dropdown for Testimonios
+- `3e629b4` — usersService → authService fix
+- `4b175c4` — add id to DescargaApp section
+- `96d9d2d` — stop Vilte data leak + auto-sync Crystal data on registration
+
+### Current URLs/dev:
+- Backend: `http://localhost:3000` (health ✅)
+- Landing: `http://localhost:3001`
+- Admin: `http://localhost:5173`
+- Root: `npm run dev` inicia backend + landing
+
+### Admin login:
+- `admin@quantumfit.com` / `Admin123!`
+
+### Next steps (pendientes):
+1. Hacer build de la app mobile con EAS CLI
+2. Deploy frontends (admin + landing) a Railway
+3. Configurar SMTP funcional (contraseña de app Gmail)
+4. Migrar cuentas a Gmail de la propietaria
+5. MercadoPago: cambiar de sandbox a producción
+
+---
 ## Running the App (Development)
 ```bash
 # Backend
@@ -433,4 +495,8 @@ npx tsx src/index.ts
 # App
 cd quantum-fit-app
 npx expo start
+
+# Full stack (landing + backend)
+cd quantum-fit
+npm run dev
 ```
