@@ -1,4 +1,5 @@
 import express, { Application } from 'express';
+import path from 'path';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
@@ -12,6 +13,7 @@ import http from 'http';
 import { connectDatabase } from './database';
 
 import authRoutes from './routes/auth.routes';
+import uploadRoutes from './routes/upload.routes';
 import checkinsRoutes from './routes/checkins.routes';
 import activityLogRoutes from './routes/activity-log.routes';
 import achievementsRoutes from './routes/achievements.routes';
@@ -30,6 +32,8 @@ import bookingsRoutes from './routes/bookings.routes';
 import paymentRoutes from './routes/payment.routes';
 import referralRoutes from './routes/referral.routes';
 import mercadopagoRoutes from './routes/mercadopago.routes';
+import pointsConfigRoutes from './routes/points-config.routes';
+import siteConfigRoutes from './routes/site-config.routes';
 
 import { errorHandler, notFoundHandler } from './middleware/error';
 import { authenticate } from './middleware/auth';
@@ -61,7 +65,9 @@ app.use(pinoHttp({ logger }));
 app.use(morgan(isProduction ? 'combined' : 'dev'));
 
 // === SEGURIDAD ===
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+}));
 
 const allowedOriginsStr = process.env.ALLOWED_ORIGINS;
 if (!allowedOriginsStr) {
@@ -86,11 +92,12 @@ app.use(cookieParser());
 // === RATE LIMITING ===
 const limiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000'),
-  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100'),
+  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '500'),
   message: {
     success: false,
     error: 'Demasiadas peticiones. Por favor intenta más tarde.',
   },
+  skip: (req) => req.method === 'OPTIONS',
 });
 app.use('/api', limiter);
 
@@ -104,8 +111,11 @@ const loginLimiter = rateLimit({
 });
 app.use('/api/auth/login', loginLimiter);
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// === ARCHIVOS ESTÁTICOS ===
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // === HEALTH CHECK ===
 app.get('/health', (_req, res) => {
@@ -137,6 +147,9 @@ app.use('/api/bookings', bookingsRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/referral', referralRoutes);
 app.use('/api/mercadopago', mercadopagoRoutes);
+app.use('/api/admin/points-config', pointsConfigRoutes);
+app.use('/api/landing/site-config', siteConfigRoutes);
+app.use('/api', uploadRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

@@ -1,9 +1,27 @@
 // Servicio de Check-ins
 import { prisma } from '../database';
-import { POINTS_TABLE } from '../types';
 import { CheckInType, ValidationMethod, User } from '@prisma/client';
 import { notifyUser } from './notification.service';
 import { recalculateUserLevel } from './level.service';
+import { getPointsForActivity } from './points-config.service';
+
+const FALLBACK_POINTS: Record<string, number> = {
+  CHECK_IN_CLASS: 75,
+  CHECK_IN_OPEN_GYM: 50,
+  CHECK_IN_PT: 100,
+  STREAK_BONUS_7_DAYS: 100,
+  STREAK_BONUS_30_DAYS: 500,
+  PERFECT_WEEK_BONUS: 200,
+};
+
+async function getPoints(key: string, fallback: number): Promise<number> {
+  try {
+    const dbPoints = await getPointsForActivity(key);
+    return dbPoints > 0 ? dbPoints : fallback;
+  } catch {
+    return fallback;
+  }
+}
 
 interface CreateCheckInInput {
   userId: string;
@@ -51,13 +69,13 @@ export async function createCheckIn(data: CreateCheckInInput): Promise<CheckInRe
   let pointsEarned = 0;
   switch (checkInType) {
     case 'CLASS':
-      pointsEarned = POINTS_TABLE.CHECK_IN_CLASS;
+      pointsEarned = await getPoints('CHECK_IN_CLASS', FALLBACK_POINTS.CHECK_IN_CLASS);
       break;
     case 'OPEN_GYM':
-      pointsEarned = POINTS_TABLE.CHECK_IN_OPEN_GYM;
+      pointsEarned = await getPoints('CHECK_IN_OPEN_GYM', FALLBACK_POINTS.CHECK_IN_OPEN_GYM);
       break;
     case 'PERSONAL_TRAINER':
-      pointsEarned = POINTS_TABLE.CHECK_IN_PT;
+      pointsEarned = await getPoints('CHECK_IN_PT', FALLBACK_POINTS.CHECK_IN_PT);
       break;
   }
 
@@ -151,11 +169,11 @@ export async function createCheckIn(data: CreateCheckInInput): Promise<CheckInRe
   // Verificar bonus de racha
   let streakBonusPoints = 0;
   if (newStreak === 7) {
-    streakBonusPoints = POINTS_TABLE.STREAK_BONUS_7_DAYS;
+    streakBonusPoints = await getPoints('STREAK_BONUS_7_DAYS', FALLBACK_POINTS.STREAK_BONUS_7_DAYS);
     updatedUser = await addPoints(userId, streakBonusPoints, 'BONUS_RACHA_7_DIAS');
     achievementsUnlocked.push({ name: 'Racha de 7 días', points: streakBonusPoints });
   } else if (newStreak === 30) {
-    streakBonusPoints = POINTS_TABLE.STREAK_BONUS_30_DAYS;
+    streakBonusPoints = await getPoints('STREAK_BONUS_30_DAYS', FALLBACK_POINTS.STREAK_BONUS_30_DAYS);
     updatedUser = await addPoints(userId, streakBonusPoints, 'BONUS_RACHA_30_DIAS');
     achievementsUnlocked.push({ name: 'Racha de 30 días', points: streakBonusPoints });
   }
@@ -271,7 +289,7 @@ async function updateWeeklyStats(
   });
 
   if (updatedStats.isPerfectWeek && activeDays === 7) {
-    const bonusPoints = POINTS_TABLE.PERFECT_WEEK_BONUS;
+    const bonusPoints = await getPoints('PERFECT_WEEK_BONUS', FALLBACK_POINTS.PERFECT_WEEK_BONUS);
     await addPoints(userId, bonusPoints, 'SEMANA_PERFECTA');
   }
 

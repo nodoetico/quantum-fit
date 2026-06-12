@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
 import { newsService } from '../services/api';
 import type { NewsItem } from '../types';
+import ImageUpload from '../components/ImageUpload';
 
 export default function Noticias() {
   const [items, setItems] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<NewsItem | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const today = new Date().toISOString().slice(0, 10);
   const [formData, setFormData] = useState<Partial<NewsItem>>({
-    title: '', summary: '', content: '', imageUrl: '', author: '', publishedAt: new Date().toISOString().slice(0, 10), isActive: true,
+    title: '', summary: '', content: '', imageUrl: '', author: '', publishedAt: today, isActive: true,
   });
 
   useEffect(() => { loadItems(); }, []);
@@ -98,11 +100,7 @@ export default function Noticias() {
               rows={5} className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500" />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-primary-300 mb-1">URL de Imagen</label>
-              <input type="text" value={formData.imageUrl || ''} onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500" placeholder="https://..." />
-            </div>
+            <ImageUpload value={formData.imageUrl || ''} onChange={(url) => setFormData({ ...formData, imageUrl: url })} label="URL de Imagen" />
             <div>
               <label className="block text-sm font-medium text-primary-300 mb-1">Fecha de publicación</label>
               <input type="date" value={formData.publishedAt || ''} onChange={(e) => setFormData({ ...formData, publishedAt: e.target.value })}

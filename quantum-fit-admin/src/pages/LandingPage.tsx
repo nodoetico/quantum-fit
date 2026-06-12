@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { landingService, gymService } from '../services/api';
 import type { LandingContent, Testimonial, Plan, Banner, GalleryImage, Gym } from '../types';
+import ImageUpload from '../components/ImageUpload';
 
 // Tabs de secciones
 const TABS = [
@@ -18,9 +19,22 @@ export default function LandingPage() {
   return (
     <div>
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">Gestionar Landing Page</h1>
-        <p className="text-primary-300">Administra el contenido visible en la página pública del gimnasio</p>
+      <div className="mb-8 flex items-start justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-white mb-2">Gestionar Landing Page</h1>
+          <p className="text-primary-300">Administra el contenido visible en la página pública del gimnasio</p>
+        </div>
+        <a
+          href="http://localhost:3001"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-medium text-sm hover:opacity-90 transition-opacity shrink-0"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          </svg>
+          Ver Landing
+        </a>
       </div>
 
       {/* Tabs */}
@@ -119,7 +133,7 @@ function ContentSection() {
 
   if (loading) return <div className="text-center py-8 text-primary-400">Cargando...</div>;
 
-  const sections = ['hero', 'about', 'features', 'contact'];
+  const sections = ['hero', 'about', 'features', 'clases', 'contact'];
 
   return (
     <div>
@@ -155,7 +169,7 @@ function ContentSection() {
               <input
                 type="number"
                 value={formData.order || 0}
-                onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) })}
+                onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
                 className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500"
               />
             </div>
@@ -187,16 +201,7 @@ function ContentSection() {
               className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-primary-300 mb-1">URL de Imagen</label>
-            <input
-              type="text"
-              value={formData.imageUrl || ''}
-              onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-              className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500"
-              placeholder="https://..."
-            />
-          </div>
+          <ImageUpload value={formData.imageUrl || ''} onChange={(url) => setFormData({ ...formData, imageUrl: url })} label="URL de Imagen" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-primary-300 mb-1">Texto CTA</label>
@@ -378,26 +383,20 @@ function TestimonialsSection() {
               className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500" required />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-primary-300 mb-1">URL Foto</label>
-              <input type="text" value={formData.photoUrl || ''} onChange={(e) => setFormData({ ...formData, photoUrl: e.target.value })}
-                className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500" />
+            <div className="md:col-span-3">
+              <ImageUpload value={formData.photoUrl || ''} onChange={(url) => setFormData({ ...formData, photoUrl: url })} label="URL Foto" />
             </div>
             <div>
               <label className="block text-sm font-medium text-primary-300 mb-1">Rating (1-5)</label>
-              <input type="number" min={1} max={5} value={formData.rating || 5} onChange={(e) => setFormData({ ...formData, rating: parseInt(e.target.value) })}
+              <input type="number" min={1} max={5} value={formData.rating || 5} onChange={(e) => setFormData({ ...formData, rating: parseInt(e.target.value) || 5 })}
                 className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500" />
             </div>
             <div>
               <label className="block text-sm font-medium text-primary-300 mb-1">Orden</label>
-              <input type="number" value={formData.order || 0} onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) })}
+              <input type="number" value={formData.order || 0} onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
                 className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500" />
             </div>
           </div>
-          <label className="flex items-center gap-2">
-            <input type="checkbox" checked={formData.isActive !== false} onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })} className="accent-primary-500" />
-            <span className="text-sm text-primary-300">Activo</span>
-          </label>
           <div className="flex gap-3">
             <button type="submit" className="px-6 py-2 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-medium text-sm hover:opacity-90">
               {editing ? 'Actualizar' : 'Crear'}
@@ -548,7 +547,7 @@ function PlansSection() {
             </div>
             <div>
               <label className="block text-sm font-medium text-primary-300 mb-1">Precio</label>
-              <input type="number" step="0.01" value={formData.price || 0} onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
+              <input type="number" step="0.01" value={formData.price || 0} onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })}
                 className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500" />
             </div>
             <div>
@@ -600,7 +599,7 @@ function PlansSection() {
             </label>
             <div>
               <label className="block text-sm font-medium text-primary-300 mb-1">Orden</label>
-              <input type="number" value={formData.order || 0} onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) })}
+              <input type="number" value={formData.order || 0} onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
                 className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500" />
             </div>
           </div>
@@ -748,12 +747,7 @@ function BannersSection() {
             <input type="text" value={formData.subtitle || ''} onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
               className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500" />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-primary-300 mb-1">URL de Imagen</label>
-            <input type="text" value={formData.imageUrl || ''} onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-              className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500" required
-              placeholder="https://..." />
-          </div>
+          <ImageUpload value={formData.imageUrl || ''} onChange={(url) => setFormData({ ...formData, imageUrl: url })} label="URL de Imagen" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-primary-300 mb-1">URL de Link</label>
@@ -773,7 +767,7 @@ function BannersSection() {
             </label>
             <div>
               <label className="block text-sm font-medium text-primary-300 mb-1">Orden</label>
-              <input type="number" value={formData.order || 0} onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) })}
+              <input type="number" value={formData.order || 0} onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
                 className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500" />
             </div>
           </div>
@@ -907,10 +901,8 @@ function GallerySection() {
         <form onSubmit={handleSubmit} className="bg-dark-100 rounded-lg border border-primary-500/30 p-6 mb-6 space-y-4">
           <h3 className="text-lg font-semibold text-white">{editing ? 'Editar' : 'Nueva'} Imagen</h3>
           <div>
-            <label className="block text-sm font-medium text-primary-300 mb-1">URL de Imagen</label>
-            <input type="text" value={formData.url || ''} onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-              className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500" required
-              placeholder="https://..." />
+            <ImageUpload value={formData.url || ''} onChange={(url) => setFormData({ ...formData, url: url })} label="URL de Imagen" />
+            <input type="hidden" value={formData.url || ''} required />
           </div>
           <div>
             <label className="block text-sm font-medium text-primary-300 mb-1">Descripción (alt)</label>
@@ -929,7 +921,7 @@ function GallerySection() {
             </div>
             <div>
               <label className="block text-sm font-medium text-primary-300 mb-1">Orden</label>
-              <input type="number" value={formData.order || 0} onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) })}
+              <input type="number" value={formData.order || 0} onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
                 className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500" />
             </div>
             <label className="flex items-center gap-2 pt-6">
@@ -955,10 +947,10 @@ function GallerySection() {
         return (
           <div key={cat} className="mb-6">
             <h3 className="text-lg font-semibold text-white mb-3 capitalize">{cat}</h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {catItems.map((item) => (
                 <div key={item.id} className="relative group bg-dark-100 rounded-lg overflow-hidden border border-primary-500/20">
-                  <img src={item.url} alt={item.alt || ''} className="w-full h-36 object-cover" />
+                  <img src={item.url} alt={item.alt || ''} className="w-full h-36 object-cover bg-dark-300" onError={(e) => { (e.target as HTMLImageElement).style.opacity = '0'; }} />
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                     <button onClick={() => handleEdit(item)} className="p-2 bg-primary-500/80 text-white rounded-full hover:bg-primary-500">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>

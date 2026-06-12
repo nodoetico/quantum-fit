@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { rewardsService } from '../services/api';
 import { useAuth } from '../context/useAuth';
 import type { Reward, RedeemedReward } from '../types';
+import ImageUpload from '../components/ImageUpload';
 
 type Tab = 'rewards' | 'redemptions';
 
@@ -204,65 +205,53 @@ export default function Premios() {
               </h2>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <input
-                    type="text"
-                    placeholder="Nombre del premio"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    required
-                    className="px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  />
-                  <select
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value as Reward['category'] })}
-                    className="px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  >
-                    <option value="PRODUCTO">Producto</option>
-                    <option value="BEBIDA">Bebida</option>
-                    <option value="DESCUENTO">Descuento</option>
-                    <option value="PROMOCION">Promoción</option>
-                  </select>
-                  <input
-                    type="number"
-                    placeholder="Costo en puntos"
-                    value={formData.pointsCost}
-                    onChange={(e) => setFormData({ ...formData, pointsCost: parseInt(e.target.value) || 0 })}
-                    required
-                    min="1"
-                    className="px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  />
-                  <input
-                    type="number"
-                    placeholder="Stock total"
-                    value={formData.stockTotal}
-                    onChange={(e) => setFormData({ ...formData, stockTotal: parseInt(e.target.value) || 0 })}
-                    min="0"
-                    className="px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  />
-                  <input
-                    type="text"
-                    placeholder="URL de imagen (opcional)"
-                    value={formData.imageUrl}
-                    onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                    className="px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  />
-                  <label className="flex items-center gap-2 text-white">
-                    <input
-                      type="checkbox"
-                      checked={formData.isFeatured}
-                      onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
-                      className="w-4 h-4 rounded border-primary-500/50 bg-dark-400 text-primary-500 focus:ring-primary-500"
-                    />
-                    Destacado
-                  </label>
+                  <div>
+                    <label className="block text-sm font-medium text-primary-300 mb-1">Nombre del premio *</label>
+                    <input type="text" placeholder="Ej: Batido Proteico" value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })} required
+                      className="w-full px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-primary-300 mb-1">Categoría</label>
+                    <select value={formData.category}
+                      onChange={(e) => setFormData({ ...formData, category: e.target.value as Reward['category'] })}
+                      className="w-full px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500">
+                      <option value="PRODUCTO">Producto</option>
+                      <option value="BEBIDA">Bebida</option>
+                      <option value="DESCUENTO">Descuento</option>
+                      <option value="PROMOCION">Promoción</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-primary-300 mb-1">Costo en puntos *</label>
+                    <input type="number" placeholder="Ej: 100" value={formData.pointsCost}
+                      onChange={(e) => setFormData({ ...formData, pointsCost: parseInt(e.target.value) || 0 })} required min="1"
+                      className="w-full px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-primary-300 mb-1">Stock total</label>
+                    <input type="number" placeholder="Ej: 10" value={formData.stockTotal}
+                      onChange={(e) => setFormData({ ...formData, stockTotal: parseInt(e.target.value) || 0 })} min="0"
+                      className="w-full px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                  </div>
+                  <div className="md:col-span-2">
+                    <ImageUpload value={formData.imageUrl || ''} onChange={(url) => setFormData({ ...formData, imageUrl: url })} label="Imagen del premio" />
+                  </div>
+                  <div>
+                    <label className="flex items-center gap-2 text-white pt-6">
+                      <input type="checkbox" checked={formData.isFeatured}
+                        onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
+                        className="w-4 h-4 rounded border-primary-500/50 bg-dark-400 text-primary-500 focus:ring-primary-500" />
+                      Destacado
+                    </label>
+                  </div>
                 </div>
-                <textarea
-                  placeholder="Descripción (opcional)"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  rows={3}
-                  className="w-full px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                />
+                <div>
+                  <label className="block text-sm font-medium text-primary-300 mb-1">Descripción</label>
+                  <textarea placeholder="Descripción opcional del premio" value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3}
+                    className="w-full px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                </div>
                 <div className="flex gap-2">
                   <button type="submit" className="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-all">
                     {editingId ? 'Actualizar' : 'Guardar'}
@@ -295,12 +284,12 @@ export default function Premios() {
                       </span>
                     </div>
                   </div>
-                  <div className="space-y-2 text-sm text-dark-400 mb-4">
+                  <div className="space-y-2 text-sm text-primary-400 mb-4">
                     <p>⭐ {reward.pointsCost} puntos</p>
                     <p>📦 Stock: {reward.stockAvailable}/{reward.stockTotal}</p>
                     {reward.isFeatured && <p className="text-secondary-400">★ Destacado</p>}
                   </div>
-                  <p className="text-sm text-dark-400 mb-4 line-clamp-2">{reward.description}</p>
+                  <p className="text-sm text-primary-400 mb-4 line-clamp-2">{reward.description}</p>
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleEdit(reward)}

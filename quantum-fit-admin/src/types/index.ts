@@ -227,3 +227,28 @@ export interface NewsItem {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface PointsConfig {
+  id: string;
+  activityKey: string;
+  label: string;
+  points: number;
+  category: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SiteConfig {
+  id: string;
+  siteName: string;
+  slogan: string;
+  description: string;
+  email: string;
+  phone: string;
+  whatsapp: string;
+  instagramUrl?: string | null;
+  youtubeUrl?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}

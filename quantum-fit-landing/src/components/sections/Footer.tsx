@@ -1,7 +1,9 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { MapPin, Clock, Phone, Mail } from "lucide-react";
-import { siteInfo, navLinks, sedes } from "@/data/siteData";
+import { siteInfo as staticSiteInfo, navLinks, sedes as staticSedes } from "@/data/siteData";
+import { api, type ApiSiteConfig, type ApiGym } from "@/lib/api";
 
 function IconInstagram({ size }: { size: number }) {
   return (
@@ -22,18 +24,30 @@ function IconYoutube({ size }: { size: number }) {
   );
 }
 
-const redes = [
-  { label: "Instagram", icon: IconInstagram, href: "#" },
-  { label: "YouTube", icon: IconYoutube, href: "#" },
-];
-
 export default function Footer() {
+  const [siteConfig, setSiteConfig] = useState<ApiSiteConfig | null>(null);
+  const [gyms, setGyms] = useState<ApiGym[]>([]);
+
+  useEffect(() => {
+    api.site.getConfig().then(setSiteConfig).catch(() => {});
+    api.gyms.getAll().then((data) => setGyms(data.filter((g) => g.isActive))).catch(() => {});
+  }, []);
+
+  const info = siteConfig || staticSiteInfo;
+  const sedesList = gyms.length > 0 ? gyms : staticSedes.map((s) => ({
+    name: s.nombre, address: s.direccion, hours: s.horarios, phone: s.telefono, isActive: true,
+  } as ApiGym));
+
+  const redes = [
+    { label: "Instagram", icon: IconInstagram, href: siteConfig?.instagramUrl || "#" },
+    { label: "YouTube", icon: IconYoutube, href: siteConfig?.youtubeUrl || "#" },
+  ];
   return (
     <footer className="bg-night px-6 py-16 text-silver">
       <div className="mx-auto max-w-7xl">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <h3 className="mb-4 text-lg font-bold text-white">{siteInfo.name}</h3>
+            <h3 className="mb-4 text-lg font-bold text-white">{siteConfig ? siteConfig.siteName : staticSiteInfo.name}</h3>
             <p className="mb-4 text-sm leading-relaxed text-silver/70">
               Transformá tu cuerpo. Potenciá tu mente.
             </p>
@@ -55,7 +69,7 @@ export default function Footer() {
             <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-white">Enlaces</h4>
             <ul className="flex flex-col gap-2">
               {navLinks.map((link) => (
-                <li key={link.href}>
+                <li key={link.label}>
                   <a href={link.href} className="text-sm text-silver/70 transition-colors hover:text-white">
                     {link.label}
                   </a>
@@ -67,11 +81,11 @@ export default function Footer() {
           <div>
             <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-white">Horarios</h4>
             <ul className="flex flex-col gap-2">
-              {sedes.map((s) => (
-                <li key={s.nombre} className="text-sm text-silver/70">
-                  <span className="font-medium text-white">{s.nombre}:</span>
+              {sedesList.map((s) => (
+                <li key={s.name} className="text-sm text-silver/70">
+                  <span className="font-medium text-white">{s.name}:</span>
                   <br />
-                  {s.horarios}
+                  {s.hours}
                 </li>
               ))}
             </ul>
@@ -80,24 +94,24 @@ export default function Footer() {
           <div>
             <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-white">Contacto</h4>
             <ul className="flex flex-col gap-3">
-              {sedes.map((s) => (
-                <li key={s.nombre}>
+              {sedesList.map((s) => (
+                <li key={s.name}>
                   <div className="flex items-start gap-2 text-sm text-silver/70">
                     <MapPin size={14} className="mt-0.5 shrink-0" />
-                    {s.direccion}
+                    {s.address}
                   </div>
                 </li>
               ))}
               <li>
                 <div className="flex items-center gap-2 text-sm text-silver/70">
                   <Phone size={14} className="shrink-0" />
-                  {siteInfo.phone}
+                  {info.phone}
                 </div>
               </li>
               <li>
                 <div className="flex items-center gap-2 text-sm text-silver/70">
                   <Mail size={14} className="shrink-0" />
-                  {siteInfo.email}
+                  {info.email}
                 </div>
               </li>
             </ul>
@@ -105,7 +119,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-12 border-t border-white/10 pt-8 text-center text-sm text-silver/50">
-          &copy; {new Date().getFullYear()} {siteInfo.name} &mdash; Todos los derechos reservados.
+          &copy; {new Date().getFullYear()} {siteConfig ? siteConfig.siteName : staticSiteInfo.name} &mdash; Todos los derechos reservados.
         </div>
       </div>
     </footer>

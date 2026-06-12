@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { API_URL } from '../config/api';
 import type { AuthResponse, LoginInput, User, Class, Reward } from '../types';
-import type { LandingContent, Testimonial, Plan, Banner, GalleryImage, Gym, Course, BuffetItem, NewsItem } from '../types';
+import type { LandingContent, Testimonial, Plan, Banner, GalleryImage, Gym, Course, BuffetItem, NewsItem, PointsConfig, SiteConfig } from '../types';
 
 const api = axios.create({
   baseURL: API_URL,
@@ -72,6 +72,16 @@ export const authService = {
 
   deleteUser: async (userId: string): Promise<void> => {
     await api.delete(`/auth/users/${userId}`);
+  },
+
+  forgotPassword: async (email: string): Promise<{ message: string }> => {
+    const response = await api.post('/auth/forgot-password', { email });
+    return response.data;
+  },
+
+  resetPassword: async (token: string, password: string): Promise<{ message: string }> => {
+    const response = await api.post('/auth/reset-password', { token, password });
+    return response.data;
   },
 };
 
@@ -373,6 +383,38 @@ export const integrationService = {
   syncUser: async (userId: string) => {
     const response = await api.post('/admin/integration/sync/user', { userId });
     return response.data;
+  },
+};
+
+export const pointsConfigService = {
+  getAll: async (): Promise<PointsConfig[]> => {
+    const response = await api.get<{ success: boolean; data: PointsConfig[] }>('/admin/points-config');
+    return response.data.data;
+  },
+
+  upsert: async (data: Partial<PointsConfig> & { activityKey: string; label: string; points: number; category: string }): Promise<PointsConfig> => {
+    const response = await api.post<{ success: boolean; data: PointsConfig }>('/admin/points-config', data);
+    return response.data.data;
+  },
+
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`/admin/points-config/${id}`);
+  },
+
+  seedDefaults: async (): Promise<PointsConfig[]> => {
+    const response = await api.post<{ success: boolean; data: PointsConfig[] }>('/admin/points-config/seed');
+    return response.data.data;
+  },
+};
+
+export const siteConfigService = {
+  get: async (): Promise<SiteConfig> => {
+    const response = await api.get<{ success: boolean; data: SiteConfig }>('/landing/site-config');
+    return response.data.data;
+  },
+  update: async (data: Partial<SiteConfig>): Promise<SiteConfig> => {
+    const response = await api.put<{ success: boolean; data: SiteConfig }>('/landing/site-config', data);
+    return response.data.data;
   },
 };
 

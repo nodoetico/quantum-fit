@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { coursesService } from '../services/api';
 import type { Course } from '../types';
+import ImageUpload from '../components/ImageUpload';
 
 export default function Cursos() {
   const [items, setItems] = useState<Course[]>([]);
@@ -83,7 +84,7 @@ export default function Cursos() {
             </div>
             <div>
               <label className="block text-sm font-medium text-primary-300 mb-1">Orden</label>
-              <input type="number" value={formData.order || 0} onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) })}
+              <input type="number" value={formData.order || 0} onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
                 className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500" />
             </div>
           </div>
@@ -92,11 +93,7 @@ export default function Cursos() {
             <textarea value={formData.description || ''} onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3} className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500" />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-primary-300 mb-1">URL de Imagen</label>
-            <input type="text" value={formData.imageUrl || ''} onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-              className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500" placeholder="https://..." />
-          </div>
+          <ImageUpload value={formData.imageUrl || ''} onChange={(url) => setFormData({ ...formData, imageUrl: url })} label="URL de Imagen" />
           <label className="flex items-center gap-2">
             <input type="checkbox" checked={formData.isActive !== false} onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })} className="accent-primary-500" />
             <span className="text-sm text-primary-300">Activo</span>

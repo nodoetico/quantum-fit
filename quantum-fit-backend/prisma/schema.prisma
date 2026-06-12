@@ -8,7 +8,7 @@ generator client {
 datasource db {
   provider          = "postgresql"
   url               = env("DATABASE_URL")
-  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+  // shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 // ============================================
@@ -724,4 +724,38 @@ model News {
 
   @@index([isActive])
   @@index([publishedAt])
+}
+
+// ============================================
+// SITE CONFIG (Configuración general del sitio)
+// ============================================
+model SiteConfig {
+  id           String   @id @default(uuid())
+  siteName     String   @default("Quantum Fit")
+  slogan       String   @default("Transforma tu cuerpo. Potencia tu mente.")
+  description  String   @default("Entrenamiento de última generación para personas que buscan resultados reales.")
+  email        String   @default("info@quantumfit.com")
+  phone        String   @default("+54 11 1234-5678")
+  whatsapp     String   @default("541112345678")
+  instagramUrl String?
+  youtubeUrl   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ============================================
+// POINTS CONFIG (Configuración de puntajes)
+// ============================================
+model PointsConfig {
+  id          String   @id @default(uuid())
+  activityKey String   @unique // "CHECK_IN_CLASS", "CHECK_IN_OPEN_GYM", "CHECK_IN_PT", etc.
+  label       String   // Nombre visible: "Clase", "Open Gym", "Entrenamiento Personal"
+  points      Int      // Puntos que otorga
+  category    String   // "checkin", "streak", "referral"
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category])
+  @@index([activityKey])
 }

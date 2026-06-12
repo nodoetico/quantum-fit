@@ -269,7 +269,7 @@ export async function updateClass(req: Request, res: Response): Promise<void> {
     }
 
     // Si se actualiza totalSpots, validar que no sea menor a bookedSpots
-    if (updateData.totalSpots) {
+    if (updateData.totalSpots !== undefined) {
       const clase = await prisma.class.findUnique({ where: { id } });
       
       if (clase && (updateData.totalSpots as number) < clase.bookedSpots) {

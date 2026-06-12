@@ -471,6 +471,14 @@ export async function getNewsById(id: string) {
   return prisma.news.findUnique({ where: { id } });
 }
 
+function normalizeDate(dateStr?: string): string | undefined {
+  if (!dateStr) return undefined;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    return `${dateStr}T00:00:00.000Z`;
+  }
+  return dateStr;
+}
+
 export async function createNews(data: {
   title: string;
   summary?: string;
@@ -480,7 +488,9 @@ export async function createNews(data: {
   publishedAt?: string;
   isActive?: boolean;
 }) {
-  return prisma.news.create({ data });
+  return prisma.news.create({
+    data: { ...data, publishedAt: normalizeDate(data.publishedAt) },
+  });
 }
 
 export async function updateNews(
@@ -497,7 +507,7 @@ export async function updateNews(
 ) {
   return prisma.news.update({
     where: { id },
-    data,
+    data: { ...data, publishedAt: normalizeDate(data.publishedAt) },
   });
 }
 

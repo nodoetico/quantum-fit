@@ -2,23 +2,28 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { siteInfo } from "@/data/siteData";
-import { api, type ApiContent } from "@/lib/api";
+import { siteInfo as staticSiteInfo } from "@/data/siteData";
+import { api, type ApiContent, type ApiSiteConfig } from "@/lib/api";
 
 export default function Hero() {
   const [hero, setHero] = useState<ApiContent | null>(null);
+  const [siteConfig, setSiteConfig] = useState<ApiSiteConfig | null>(null);
 
   useEffect(() => {
     api.content.getBySection("hero").then((items) => {
       if (items.length > 0) setHero(items[0]);
     }).catch(() => {});
+    api.site.getConfig().then(setSiteConfig).catch(() => {});
   }, []);
 
-  const title = hero?.title || siteInfo.slogan;
-  const description = hero?.subtitle || hero?.description || siteInfo.description;
+  const title = hero?.title || staticSiteInfo.slogan;
+  const description = hero?.subtitle || hero?.description || staticSiteInfo.description;
   const bgImage = hero?.imageUrl || "/imagenes/hero-bg.jpeg";
   const ctaText = hero?.ctaText || "Comenzar Ahora";
   const ctaLink = hero?.ctaLink || "#ofertas";
+  const whatsappUrl = siteConfig
+    ? `https://wa.me/${siteConfig.whatsapp}?text=Hola%20${encodeURIComponent(siteConfig.siteName)}%2C%20me%20gustar%C3%ADa%20recibir%20informaci%C3%B3n.`
+    : staticSiteInfo.whatsappUrl;
 
   return (
     <section
@@ -63,7 +68,7 @@ export default function Hero() {
             {ctaText}
           </a>
           <a
-            href={siteInfo.whatsappUrl}
+            href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="rounded-full border border-white px-8 py-3.5 text-sm font-semibold text-white transition-all hover:bg-white/10"

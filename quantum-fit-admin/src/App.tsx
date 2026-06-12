@@ -13,6 +13,8 @@ import Integracion from './pages/Integracion';
 import Buffet from './pages/Buffet';
 import Cursos from './pages/Cursos';
 import Noticias from './pages/Noticias';
+import Gamificacion from './pages/Gamificacion';
+import SiteConfig from './pages/SiteConfig';
 import NotFound from './pages/NotFound';
 
 type UserRole = 'ADMIN' | 'MANAGER' | 'STAFF' | 'USER' | 'VIP';
@@ -104,6 +106,22 @@ function AppRoutes() {
           element={
             <RoleGuard roles={['ADMIN', 'MANAGER', 'STAFF']}>
               <Noticias />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path="gamificacion"
+          element={
+            <RoleGuard roles={['ADMIN', 'MANAGER']}>
+              <Gamificacion />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path="site-config"
+          element={
+            <RoleGuard roles={['ADMIN']}>
+              <SiteConfig />
             </RoleGuard>
           }
         />

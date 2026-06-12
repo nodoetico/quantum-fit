@@ -11,7 +11,7 @@ export const siteInfo = {
 export const navLinks = [
   { label: "Inicio", href: "#inicio" },
   { label: "Clases", href: "#clases" },
-  { label: "Cursos", href: "#cursos" },
+  { label: "Cursos", href: "#clases" },
   { label: "Galería", href: "#galeria" },
   { label: "Noticias", href: "#noticias" },
   { label: "Ofertas", href: "#ofertas" },

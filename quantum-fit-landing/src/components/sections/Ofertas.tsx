@@ -44,7 +44,7 @@ export default function Ofertas() {
           {display.map((plan, i) => (
             <ScrollReveal key={plan.id || plan.name} delay={i * 0.1}>
               <div
-                className={`relative flex flex-col rounded-2xl border p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${
+                className={`relative flex h-full flex-col rounded-2xl border p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${
                   plan.isFeatured
                     ? "border-night bg-night text-white"
                     : "border-silver bg-white text-night"
@@ -57,9 +57,9 @@ export default function Ofertas() {
                 )}
                 <h3 className="mb-2 text-lg font-semibold">{plan.name}</h3>
                 <p className={`mb-6 text-3xl font-bold ${plan.isFeatured ? "text-white" : "text-night"}`}>
-                  ${plan.price.toLocaleString()}
+                  ${plan.price.toLocaleString('es-AR')}
                 </p>
-                <ul className="mb-8 flex flex-col gap-3">
+                <ul className="mb-8 flex flex-1 flex-col gap-3">
                   {plan.features.map((b) => (
                     <li key={b} className="flex items-start gap-2 text-sm">
                       <Check

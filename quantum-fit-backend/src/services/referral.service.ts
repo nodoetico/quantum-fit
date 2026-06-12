@@ -1,7 +1,7 @@
 import { prisma } from '../database';
-import { POINTS_TABLE } from '../types';
 import { recalculateUserLevel } from './level.service';
 import { notifyUser } from './notification.service';
+import { getPointsForActivity } from './points-config.service';
 import crypto from 'crypto';
 
 export function generateReferralCode(name: string): string {
@@ -54,7 +54,7 @@ export async function processReferral(newUserId: string, referralCode: string) {
     data: { referredBy: referrer.id },
   });
 
-  const bonusPoints = POINTS_TABLE.REFERRAL_BONUS;
+  const bonusPoints = await getPointsForActivity('REFERRAL_BONUS').catch(() => 150);
 
   await prisma.user.update({
     where: { id: referrer.id },

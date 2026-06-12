@@ -1,9 +1,9 @@
 // Servicio de Sincronización Externa
 import { prisma } from '../database';
-import { POINTS_TABLE } from '../types';
 import { CheckInType, ValidationMethod } from '@prisma/client';
 import { notifyUser } from './notification.service';
 import { recalculateUserLevel } from './level.service';
+import { getPointsForActivity } from './points-config.service';
 
 interface ExternalCheckIn {
   dni: string;
@@ -80,7 +80,7 @@ export async function processExternalCheckIn(data: ExternalCheckIn): Promise<Che
     };
   }
 
-  const pointsEarned = POINTS_TABLE.CHECK_IN_OPEN_GYM;
+  const pointsEarned = await getPointsForActivity('CHECK_IN_OPEN_GYM').catch(() => 50);
 
   const yesterday = new Date(checkInTime);
   yesterday.setDate(yesterday.getDate() - 1);

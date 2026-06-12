@@ -1,12 +1,21 @@
+# Node
 node_modules/
-dist/
 .next/
-.expo/
-*.tsbuildinfo
+
+# Backend uploads & data
+quantum-fit-backend/uploads/
+quantum-fit-backend/data/
+
+# Scratch files
+PROMPT-LANDING.txt
+CORRECCION-LANDING-txt
+panel-descripcion.txt
+imagenes/
+
+# Windows reserved names
+nul
+
+# Env files
 .env
 .env.local
 *.log
-.DS_Store
-Thumbs.db
-*.sqlite
-coverage/

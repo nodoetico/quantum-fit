@@ -496,6 +496,16 @@ async function main() {
       isFeatured: false,
       order: 3,
     },
+    {
+      id: 'plan_004',
+      name: 'Plan Anual',
+      price: 42000,
+      period: 'anual',
+      currency: 'ARS',
+      features: ['Todo del plan semestral', '6 meses gratis', 'Merchandising oficial', 'Invitado gratis cada mes'],
+      isFeatured: false,
+      order: 4,
+    },
   ];
 
   for (const p of landingPlans) {
@@ -514,6 +524,8 @@ async function main() {
     { id: 'gal_004', url: 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=400&h=300&fit=crop', alt: 'Zona de estiramiento', category: 'instalaciones', order: 1 },
     { id: 'gal_005', url: 'https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=400&h=300&fit=crop', alt: 'Equipamiento', category: 'instalaciones', order: 2 },
     { id: 'gal_006', url: 'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=400&h=300&fit=crop', alt: 'Evento del gimnasio', category: 'eventos', order: 0 },
+    { id: 'gal_007', url: 'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=400&h=300&fit=crop', alt: 'Boxeo y artes marciales', category: 'clases', order: 2 },
+    { id: 'gal_008', url: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&h=300&fit=crop', alt: 'Zona de pesas libre', category: 'instalaciones', order: 3 },
   ];
 
   for (const img of galleryImages) {
@@ -570,6 +582,73 @@ async function main() {
    console.log(`   • ${landingTestimonials.length} Testimonios`);
    console.log(`   • ${landingPlans.length} Planes`);
    console.log(`   • ${galleryImages.length} Imágenes de Galería`);
+
+  // ============================================
+  // 8. Cursos
+  // ============================================
+  console.log('📚 Creando cursos...');
+  const courses = [
+    { id: 'course_001', name: 'CrossFit', description: 'Entrenamiento funcional de alta intensidad para mejorar tu condición física general.', imageUrl: '', isActive: true, order: 0 },
+    { id: 'course_002', name: 'Musculación', description: 'Desarrollá fuerza y masa muscular con equipamiento de última generación.', imageUrl: '', isActive: true, order: 1 },
+    { id: 'course_003', name: 'Funcional', description: 'Ejercicios que imitan movimientos de la vida diaria para un cuerpo equilibrado.', imageUrl: '', isActive: true, order: 2 },
+    { id: 'course_004', name: 'Yoga', description: 'Encontrá el equilibrio entre cuerpo y mente con nuestras clases guiadas.', imageUrl: '', isActive: true, order: 3 },
+    { id: 'course_005', name: 'Boxeo', description: 'Liberá estrés y mejorá tu condición cardiovascular con técnicas de boxeo.', imageUrl: '', isActive: true, order: 4 },
+    { id: 'course_006', name: 'Spinning', description: 'Clases de ciclismo indoor con música motivante y entrenadores expertos.', imageUrl: '', isActive: true, order: 5 },
+    { id: 'course_007', name: 'Pilates', description: 'Fortalece tu core y mejora tu postura con ejercicios controlados.', imageUrl: '', isActive: true, order: 6 },
+    { id: 'course_008', name: 'Personalizado', description: 'Programas diseñados a tu medida con un coach profesional.', imageUrl: '', isActive: true, order: 7 },
+  ];
+  for (const c of courses) {
+    await prisma.course.upsert({
+      where: { id: c.id },
+      update: c,
+      create: c,
+    });
+  }
+  console.log(`✅ ${courses.length} cursos creados`);
+
+  // ============================================
+  // 9. Buffet Items
+  // ============================================
+  console.log('🥤 Creando items de buffet...');
+  const buffetItems = [
+    { id: 'buf_001', name: 'Whey Shake', description: 'Batido de proteína de suero de leche', price: 800, category: 'batidos', imageUrl: '', isActive: true, order: 0 },
+    { id: 'buf_002', name: 'Protein Blast', description: 'Batido con doble proteína y banana', price: 950, category: 'batidos', imageUrl: '', isActive: true, order: 1 },
+    { id: 'buf_003', name: 'Verde Detox', description: 'Licuado de espinaca, manzana y jengibre', price: 700, category: 'licuados', imageUrl: '', isActive: true, order: 0 },
+    { id: 'buf_004', name: 'Energía Natural', description: 'Licuado de frutos rojos y avena', price: 750, category: 'licuados', imageUrl: '', isActive: true, order: 1 },
+    { id: 'buf_005', name: 'Espresso', description: 'Café espresso italiano', price: 400, category: 'cafeteria', imageUrl: '', isActive: true, order: 0 },
+    { id: 'buf_006', name: 'Café con Leche', description: 'Café con leche vegetal o común', price: 500, category: 'cafeteria', imageUrl: '', isActive: true, order: 1 },
+    { id: 'buf_007', name: 'Barra de Proteína', description: 'Barra energética alta en proteínas', price: 350, category: 'snacks', imageUrl: '', isActive: true, order: 0 },
+    { id: 'buf_008', name: 'Mix de Frutos Secos', description: 'Mix de almendras, nueces y castañas', price: 450, category: 'snacks', imageUrl: '', isActive: true, order: 1 },
+    { id: 'buf_009', name: 'Creatina', description: 'Monohidrato de creatina 300g', price: 2500, category: 'suplementacion', imageUrl: '', isActive: true, order: 0 },
+    { id: 'buf_010', name: 'BCAA', description: 'Aminoácidos ramificados 200g', price: 2000, category: 'suplementacion', imageUrl: '', isActive: true, order: 1 },
+  ];
+  for (const item of buffetItems) {
+    await prisma.buffetItem.upsert({
+      where: { id: item.id },
+      update: item,
+      create: item,
+    });
+  }
+  console.log(`✅ ${buffetItems.length} items de buffet creados`);
+
+  // ============================================
+  // 10. Noticias
+  // ============================================
+  console.log('📰 Creando noticias...');
+  const newsItems = [
+    { id: 'news_001', title: 'Nuevo equipamiento de última generación', summary: 'Incorporamos máquinas de última tecnología para tu entrenamiento.', content: 'En Quantum Fit seguimos innovando. Ahora contamos con nuevas máquinas de última generación que te permitirán entrenar de forma más eficiente y segura. ¡Venía a probarlas!', imageUrl: '', author: 'Quantum Fit', publishedAt: new Date().toISOString(), isActive: true },
+    { id: 'news_002', title: 'Llega el Quantum Fit Challenge 2026', summary: 'Inscripciones abiertas para el desafío anual de transformación.', content: 'El desafío más esperado del año está por comenzar. 12 semanas de entrenamiento intensivo, nutrición guiada y premios increíbles. ¡Inscribite ya!', imageUrl: '', author: 'Quantum Fit', publishedAt: new Date(Date.now() - 86400000 * 7).toISOString(), isActive: true },
+    { id: 'news_003', title: 'Nuevos horarios de clases nocturnas', summary: 'Ampliamos nuestra oferta horaria para adaptarnos a tu rutina.', content: 'Ahora podés entrenar hasta más tarde. Sumamos nuevos horarios nocturnos de clases grupales para que no te pierdas tu entrenamiento.', imageUrl: '', author: 'Quantum Fit', publishedAt: new Date(Date.now() - 86400000 * 14).toISOString(), isActive: true },
+  ];
+  for (const n of newsItems) {
+    await prisma.news.upsert({
+      where: { id: n.id },
+      update: n,
+      create: n,
+    });
+  }
+  console.log(`✅ ${newsItems.length} noticias creadas`);
+
   console.log('═══════════════════════════════════════════════════════');
   console.log('');
   console.log('🔐 CREDENCIALES:');

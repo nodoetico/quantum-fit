@@ -57,8 +57,8 @@ export default function Clases() {
       name: clase.name,
       description: clase.description || '',
       instructorName: clase.instructorName,
-      startTime: clase.startTime.slice(0, 16),
-      endTime: clase.endTime.slice(0, 16),
+      startTime: new Date(clase.startTime).toLocaleString('sv-SE').slice(0, 16),
+      endTime: new Date(clase.endTime).toLocaleString('sv-SE').slice(0, 16),
       totalSpots: clase.totalSpots,
       activityType: clase.activityType,
       difficultyLevel: clase.difficultyLevel,
@@ -132,77 +132,71 @@ export default function Clases() {
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <input
-                type="text"
-                placeholder="Nombre de la clase"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                required
-                className="px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
-              />
-              <input
-                type="text"
-                placeholder="Instructor"
-                value={formData.instructorName}
-                onChange={(e) => setFormData({ ...formData, instructorName: e.target.value })}
-                required
-                className="px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
-              />
-              <input
-                type="text"
-                placeholder="Tipo de actividad (ej: CrossFit, Yoga, Pilates)"
-                value={formData.activityType}
-                onChange={(e) => setFormData({ ...formData, activityType: e.target.value })}
-                required
-                className="px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
-              />
-              <select
-                value={formData.difficultyLevel}
-                onChange={(e) => setFormData({ ...formData, difficultyLevel: e.target.value as Class['difficultyLevel'] })}
-                className="px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
-                <option value="PRINCIPIANTE">Principiante</option>
-                <option value="INTERMEDIO">Intermedio</option>
-                <option value="AVANZADO">Avanzado</option>
-              </select>
-              <input
-                type="datetime-local"
-                value={formData.startTime}
-                onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-                required
-                className="px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-              />
-              <input
-                type="datetime-local"
-                value={formData.endTime}
-                onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
-                required
-                className="px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-              />
-              <input
-                type="number"
-                placeholder="Cantidad de lugares"
-                value={formData.totalSpots}
-                onChange={(e) => setFormData({ ...formData, totalSpots: parseInt(e.target.value) })}
-                required
-                min="1"
-                className="px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-              />
-              <input
-                type="text"
-                placeholder="Ubicación (opcional)"
-                value={formData.location}
-                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                className="px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
-              />
+              <div>
+                <label className="block text-sm font-medium text-primary-300 mb-1">Nombre de la clase *</label>
+                <input type="text" placeholder="Ej: CrossFit Intenso" value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })} required
+                  className="w-full px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-primary-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-primary-300 mb-1">Instructor *</label>
+                <input type="text" placeholder="Nombre del instructor" value={formData.instructorName}
+                  onChange={(e) => setFormData({ ...formData, instructorName: e.target.value })} required
+                  className="w-full px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-primary-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-primary-300 mb-1">Tipo de actividad *</label>
+                <input type="text" placeholder="Ej: CrossFit, Yoga, Pilates" value={formData.activityType}
+                  onChange={(e) => setFormData({ ...formData, activityType: e.target.value })} required
+                  className="w-full px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-primary-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-primary-300 mb-1">Nivel de dificultad</label>
+                <select value={formData.difficultyLevel}
+                  onChange={(e) => setFormData({ ...formData, difficultyLevel: e.target.value as Class['difficultyLevel'] })}
+                  className="w-full px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500">
+                  <option value="PRINCIPIANTE">Principiante</option>
+                  <option value="INTERMEDIO">Intermedio</option>
+                  <option value="AVANZADO">Avanzado</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-primary-300 mb-1">Fecha y hora de inicio *</label>
+                  <input type="datetime-local" value={formData.startTime}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setFormData({ ...formData, startTime: val ? new Date(val).toISOString() : '' });
+                  }} required
+                  className="w-full px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-primary-300 mb-1">Fecha y hora de fin *</label>
+                <input type="datetime-local" value={formData.endTime}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setFormData({ ...formData, endTime: val ? new Date(val).toISOString() : '' });
+                  }} required
+                  className="w-full px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-primary-300 mb-1">Cupo máximo *</label>
+                <input type="number" placeholder="Cantidad de lugares" value={formData.totalSpots}
+                   onChange={(e) => setFormData({ ...formData, totalSpots: parseInt(e.target.value) || 0 })} required min="1"
+                  className="w-full px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-primary-300 mb-1">Ubicación</label>
+                <input type="text" placeholder="Ej: Sala A, Piso 2" value={formData.location}
+                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                  className="w-full px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-primary-500" />
+              </div>
             </div>
-            <textarea
-              placeholder="Descripción (opcional)"
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              rows={3}
-              className="w-full px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
-            />
+            <div>
+              <label className="block text-sm font-medium text-primary-300 mb-1">Descripción</label>
+              <textarea placeholder="Descripción opcional de la clase" value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3}
+                className="w-full px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-primary-500" />
+            </div>
             <div className="flex gap-2">
               <button
                 type="submit"
@@ -248,7 +242,7 @@ export default function Clases() {
                   {clase.difficultyLevel}
                 </span>
               </div>
-              <div className="space-y-2 text-sm text-dark-400 mb-4">
+              <div className="space-y-2 text-sm text-primary-400 mb-4">
                 <p>👨‍🏫 {clase.instructorName}</p>
                 <p>📅 {new Date(clase.startTime).toLocaleString('es-AR')}</p>
                 <p>👥 {clase.bookedSpots}/{clase.totalSpots} lugares ocupados</p>

@@ -1,9 +1,9 @@
 // Servicio de PULL - Consulta datos desde el sistema externo (Crystal MiFit)
 import { getCrystalClient, getCrystalToken } from './crystal-auth.service';
 import { prisma } from '../database';
-import { POINTS_TABLE } from '../types';
 import { notifyUser } from './notification.service';
 import { recalculateUserLevel } from './level.service';
+import { getPointsForActivity } from './points-config.service';
 
 const EXTERNAL_API_BASE_URL = process.env.EXTERNAL_API_URL || 'https://crystal.getmifit.app';
 
@@ -255,7 +255,7 @@ export async function syncAttendancesFromExternal(user: { id: string; dni?: stri
       });
 
       if (!existingCheckIn && attendance.type !== 'exit') {
-        const pointsToAdd = POINTS_TABLE.CHECK_IN_OPEN_GYM;
+        const pointsToAdd = await getPointsForActivity('CHECK_IN_OPEN_GYM').catch(() => 50);
 
         const updatedUser = await prisma.user.update({
           where: { id: user.id },

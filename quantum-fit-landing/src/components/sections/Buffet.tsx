@@ -1,9 +1,24 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import ScrollReveal from "@/components/ui/ScrollReveal";
-import { buffet } from "@/data/siteData";
+import { api, type ApiBuffetItem } from "@/lib/api";
 
 export default function Buffet() {
+  const [items, setItems] = useState<ApiBuffetItem[]>([]);
+
+  useEffect(() => {
+    api.buffet.getAll().then((data) => {
+      setItems(data.filter((i) => i.isActive).sort((a, b) => a.order - b.order));
+    }).catch(() => {});
+  }, []);
+
+  const grouped = items.reduce<Record<string, ApiBuffetItem[]>>((acc, item) => {
+    if (!acc[item.category]) acc[item.category] = [];
+    acc[item.category].push(item);
+    return acc;
+  }, {});
+
   return (
     <section id="buffet" className="bg-white px-6 py-24 sm:py-32">
       <div className="mx-auto max-w-7xl">
@@ -17,14 +32,14 @@ export default function Buffet() {
         </ScrollReveal>
 
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-          {buffet.map((cat, i) => (
-            <ScrollReveal key={cat.categoria} delay={i * 0.1}>
-              <div className="rounded-2xl border border-silver p-6 transition-all duration-300 hover:shadow-md">
-                <h3 className="mb-4 text-lg font-semibold text-night">{cat.categoria}</h3>
-                <ul className="flex flex-col gap-3">
-                  {cat.items.map((item) => (
-                    <li key={item} className="text-sm text-charcoal">
-                      {item}
+          {Object.entries(grouped).map(([category, categoryItems], i) => (
+            <ScrollReveal key={category} delay={i * 0.1}>
+              <div className="flex h-full flex-col rounded-2xl border border-silver p-6 transition-all duration-300 hover:shadow-md">
+                <h3 className="mb-4 text-lg font-semibold text-night capitalize">{category}</h3>
+                <ul className="flex flex-1 flex-col gap-3">
+                  {categoryItems.map((item) => (
+                    <li key={item.id} className="text-sm text-charcoal">
+                      {item.name}{item.price ? ` — $${item.price}` : ""}
                     </li>
                   ))}
                 </ul>
