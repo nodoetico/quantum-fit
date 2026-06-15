@@ -25,12 +25,6 @@ export default function Hero() {
     ? `https://wa.me/${siteConfig.whatsapp}?text=Hola%20${encodeURIComponent(siteConfig.siteName)}%2C%20me%20gustar%C3%ADa%20recibir%20informaci%C3%B3n.`
     : staticSiteInfo.whatsappUrl;
 
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   return (
     <section
       id="inicio"
@@ -44,7 +38,7 @@ export default function Hero() {
 
       <div className="relative z-10 mx-auto max-w-4xl px-6 text-center">
         <motion.h1
-          initial={mounted ? { opacity: 0, y: 30 } : { opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
           className="mb-6 text-4xl font-bold leading-tight text-white sm:text-5xl md:text-6xl lg:text-7xl"
@@ -53,7 +47,7 @@ export default function Hero() {
         </motion.h1>
 
         <motion.p
-          initial={mounted ? { opacity: 0, y: 20 } : { opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
           className="mx-auto mb-10 max-w-2xl text-lg text-silver sm:text-xl"
@@ -62,7 +56,7 @@ export default function Hero() {
         </motion.p>
 
         <motion.div
-          initial={mounted ? { opacity: 0, y: 20 } : { opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
           className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center"
