@@ -49,7 +49,8 @@ export default function ImageUpload({ value, onChange, label = 'Imagen' }: Image
         throw new Error(result?.error || `Error del servidor (${response.status})`);
       }
 
-      const url = result.data.url;
+      const url = result.data?.url;
+      if (!url) throw new Error('No se recibió la URL de la imagen');
       setPreview(url);
       onChange(url);
     } catch (err: unknown) {

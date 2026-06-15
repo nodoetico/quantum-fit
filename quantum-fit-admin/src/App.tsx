@@ -48,14 +48,16 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
-      <Route
-        path="/"
-        element={
-          <PrivateRoute>
-            <DashboardLayout />
-          </PrivateRoute>
-        }
-      >
+<Route
+  path="/"
+  element={
+    <PrivateRoute>
+      <RoleGuard roles={['ADMIN', 'MANAGER', 'STAFF']}>
+        <DashboardLayout />
+      </RoleGuard>
+    </PrivateRoute>
+  }
+>
         <Route index element={<Navigate to="/dashboard" />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="reservas" element={<Reservas />} />
