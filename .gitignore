@@ -19,3 +19,7 @@ nul
 .env
 .env.local
 *.log
+
+# Railway generated files
+.railway/
+.railway.ts
