@@ -17,8 +17,6 @@ import Gamificacion from './pages/Gamificacion';
 import SiteConfig from './pages/SiteConfig';
 import NotFound from './pages/NotFound';
 
-type UserRole = 'ADMIN' | 'MANAGER' | 'STAFF' | 'USER' | 'VIP';
-
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
 
@@ -33,100 +31,31 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
 }
 
-function RoleGuard({ children, roles }: { children: React.ReactNode; roles: UserRole[] }) {
-  const { user } = useAuth();
-  const userRole = (user?.role || 'USER') as UserRole;
-
-  if (!roles.includes(userRole)) {
-    return <Navigate to="/dashboard" />;
-  }
-
-  return <>{children}</>;
-}
-
 function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
-<Route
-  path="/"
-  element={
-    <PrivateRoute>
-      <RoleGuard roles={['ADMIN', 'MANAGER', 'STAFF']}>
-        <DashboardLayout />
-      </RoleGuard>
-    </PrivateRoute>
-  }
->
+      <Route
+        path="/"
+        element={
+          <PrivateRoute>
+            <DashboardLayout />
+          </PrivateRoute>
+        }
+      >
         <Route index element={<Navigate to="/dashboard" />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="reservas" element={<Reservas />} />
         <Route path="clases" element={<Clases />} />
-        <Route
-          path="usuarios"
-          element={
-            <RoleGuard roles={['ADMIN', 'MANAGER']}>
-              <Usuarios />
-            </RoleGuard>
-          }
-        />
+        <Route path="usuarios" element={<Usuarios />} />
         <Route path="premios" element={<Premios />} />
-        <Route
-          path="integracion"
-          element={
-            <RoleGuard roles={['ADMIN', 'MANAGER']}>
-              <Integracion />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path="landing"
-          element={
-            <RoleGuard roles={['ADMIN']}>
-              <LandingPage />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path="cursos"
-          element={
-            <RoleGuard roles={['ADMIN', 'MANAGER']}>
-              <Cursos />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path="buffet"
-          element={
-            <RoleGuard roles={['ADMIN', 'MANAGER', 'STAFF']}>
-              <Buffet />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path="noticias"
-          element={
-            <RoleGuard roles={['ADMIN', 'MANAGER', 'STAFF']}>
-              <Noticias />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path="gamificacion"
-          element={
-            <RoleGuard roles={['ADMIN', 'MANAGER']}>
-              <Gamificacion />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path="site-config"
-          element={
-            <RoleGuard roles={['ADMIN']}>
-              <SiteConfig />
-            </RoleGuard>
-          }
-        />
+        <Route path="landing" element={<LandingPage />} />
+        <Route path="integracion" element={<Integracion />} />
+        <Route path="buffet" element={<Buffet />} />
+        <Route path="cursos" element={<Cursos />} />
+        <Route path="noticias" element={<Noticias />} />
+        <Route path="gamificacion" element={<Gamificacion />} />
+        <Route path="site-config" element={<SiteConfig />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>

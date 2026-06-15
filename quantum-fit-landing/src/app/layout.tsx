@@ -41,6 +41,11 @@ export default function RootLayout({
       lang="es"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <noscript>
+          <style>{`*[style*="opacity: 0"] { opacity: 1 !important; transform: none !important; }`}</style>
+        </noscript>
+      </head>
       <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );
