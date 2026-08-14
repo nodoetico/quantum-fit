@@ -147,10 +147,18 @@ export async function registerUser(data: RegisterInput): Promise<AuthResponse> {
     }
   }
 
-  // NOTA: Crystal no tiene endpoint público por DNI.
-  // La sincronización de datos históricos (membresías, asistencias) se hará
-  // cuando Crystal envíe check-ins vía POST /api/external/checkin.
-  // Mientras tanto, el usuario arranca con puntos de bienvenida.
+  // Cachear datos de Crystal/MiFit por DNI (no bloqueante)
+  if (data.dni) {
+    try {
+      const { pullUserProfile, pullUserMemberships } = await import('./external-pull.service');
+      Promise.all([
+        pullUserProfile(data.dni).catch(() => null),
+        pullUserMemberships(data.dni).catch(() => null),
+      ]).catch(() => {});
+    } catch {
+      // Si falla la cache, no bloquear el registro
+    }
+  }
 
   // Generar tokens con el rol del usuario
   const accessToken = generateAccessToken({

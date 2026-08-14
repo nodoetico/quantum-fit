@@ -3,18 +3,18 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { AuthProvider } from './src/context/AuthContext';
-import AppNavigator from './src/navigation/AppNavigator';
-import { colors } from './src/constants/theme';
+import { ProveedorAuth } from './src/contexto/ContextoAuth';
+import NavegadorApp from './src/navegacion/NavegadorApp';
+import { colores } from './src/constantes/tema';
 
 export default function App() {
   return (
     <GestureHandlerRootView style={styles.container}>
       <SafeAreaProvider>
-        <AuthProvider>
-          <AppNavigator />
+        <ProveedorAuth>
+          <NavegadorApp />
           <StatusBar style="light" />
-        </AuthProvider>
+        </ProveedorAuth>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
@@ -23,6 +23,6 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colores.fondo,
   },
 });

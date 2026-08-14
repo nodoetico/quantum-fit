@@ -23,12 +23,12 @@ export default function LandingPage() {
           <h1 className="text-3xl font-bold text-white mb-2">Gestionar Landing Page</h1>
           <p className="text-primary-300">Administra el contenido visible en la página pública del gimnasio</p>
         </div>
-        <a
-          href="http://localhost:3001"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-medium text-sm hover:opacity-90 transition-opacity shrink-0"
-        >
+          <a
+              href={import.meta.env.VITE_LANDING_URL || 'https://quantum-fit-landing-production.up.railway.app/'}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-medium text-sm hover:opacity-90 transition-opacity"
+            >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
           </svg>

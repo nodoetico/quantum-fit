@@ -50,6 +50,9 @@ model User {
   // DNI para integración con software externo
   dni               String?   @unique
 
+  // Cache de datos de Crystal MiFit (perfil, membresías, etc.)
+  crystalData       Json?
+
   // Estado
   isActive          Boolean   @default(true)
 

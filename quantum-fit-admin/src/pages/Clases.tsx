@@ -71,10 +71,15 @@ export default function Clases() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     try {
+      const payload = {
+        ...formData,
+        startTime: formData.startTime ? new Date(formData.startTime).toISOString() : formData.startTime,
+        endTime: formData.endTime ? new Date(formData.endTime).toISOString() : formData.endTime,
+      };
       if (editingId) {
-        await classesService.update(editingId, formData);
+        await classesService.update(editingId, payload);
       } else {
-        await classesService.create(formData);
+        await classesService.create(payload);
       }
       resetForm();
       await loadClasses();
@@ -163,20 +168,14 @@ export default function Clases() {
               <div>
                 <label className="block text-sm font-medium text-primary-300 mb-1">Fecha y hora de inicio *</label>
                   <input type="datetime-local" value={formData.startTime}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setFormData({ ...formData, startTime: val ? new Date(val).toISOString() : '' });
-                  }} required
-                  className="w-full px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                  onChange={(e) => setFormData({ ...formData, startTime: e.target.value })} required
+                  className="w-full px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white [color-scheme:dark] focus:outline-none focus:ring-2 focus:ring-primary-500" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-primary-300 mb-1">Fecha y hora de fin *</label>
                 <input type="datetime-local" value={formData.endTime}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setFormData({ ...formData, endTime: val ? new Date(val).toISOString() : '' });
-                  }} required
-                  className="w-full px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                  onChange={(e) => setFormData({ ...formData, endTime: e.target.value })} required
+                  className="w-full px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white [color-scheme:dark] focus:outline-none focus:ring-2 focus:ring-primary-500" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-primary-300 mb-1">Cupo máximo *</label>

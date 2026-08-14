@@ -1,0 +1,15 @@
+[3:47 p.m., 12/6/2026] Buczek Guillermo: Nico buenas tardes que tal? Te molestaba porque necesitaba un endpoint de búsqueda por DNI que use X-API-Token como autenticación, el tema esque necesito que reciba un DNI como parámetro y devuelva los datos de ese usuario, así el back de la app puede consultar los datos del usuario sin necesidad de las credenciales de cada cliente.
+[4:24 p.m., 12/6/2026] Crystal Desarrollo S.R.L: Buenas! Lo veo. Lo charlo con los chicos y vemos que podemos hacer 👌🏻
+[4:24 p.m., 12/6/2026] Crystal Desarrollo S.R.L: Te aviso!
+[4:27 p.m., 12/6/2026] Buczek Guillermo: Dale Nico gracias.
+[6:29 p.m., 12/6/2026] Crystal Desarrollo S.R.L: Aquí de nuevo jajaja. Déjame consultarte la finalidad del endpoint así vemos exacto cuales son los datos que necesitas que pasemos
+[6:30 p.m., 13/6/2026] Buczek Guillermo: Hola Nico que tal, la finalidad es poder traer los datos del cliente una vez que el mismo se registre en la app, es decir. El cliente que ya tiene antigüedad en Quantum, se hace una cuenta en la app, y al registrarse, la app a través del ID que es el DNI, trae los datos de MiFit a la app. Y así el cliente ve sus datos reales. Y puede llevar control de ellos en la app.
+[4:09 p.m., 15/6/2026] Crystal Desarrollo S.R.L: Hola cómo estás? Leí ahí la finalidad que me pusiste. No te sirve con la endpoint /api/user/me?. Que lo que te devuelve es la información del usuario que está autorizada?. Osea justamente lo que buscas
+[11:29 p.m., 16/6/2026] Buczek Guillermo: Nico que tal, perdón la demora, claro si intenté. Pero no tengo forma de tener acceso a los datos reales del sistema con ese endpoint, lo que necesito es un endpoint que acepte un DNI (o email) como parámetro y devuelva los datos de ese usuario específico, autenticando con el x-api-token del gimnasio.
+[12:01 a.m., 17/6/2026] Crystal Desarrollo S.R.L: Buenas noches!
+[12:02 a.m., 17/6/2026] Crystal Desarrollo S.R.L: La duda que tengo es si los datos que necesitas es del usuario que tenés con la sesión iniciada. Si es así deberías usar el me y si te falta algún dato decime y lo agrego
+[12:02 a.m., 17/6/2026] Crystal Desarrollo S.R.L: O si me estás diciendo es que el sistema en general querés que haga un endpoint para que te busque datos sin que esté la sesión iniciada
+[8:15 p.m., 18/6/2026] Buczek Guillermo: Entiendo , yo probé usando el /me cuando el usuario se logea a la app una vez que se hizo la cuenta y siempre devuelve los datos de Vilte.. porque es al único al que tengo acceso supongo.
+[9:01 p.m., 18/6/2026] Crystal Desarrollo S.R.L: Si el me te devuelve los datos de la persona que tenés logueada nada más
+[9:02 p.m., 18/6/2026] Crystal Desarrollo S.R.L: Es lo que necesitas? O necesitas uno general con el DNI? Lo que no entendemos es para que usas el dato de una persona sin que esté la sesión iniciada
+[9:03 p.m., 18/6/2026] Crystal Desarrollo S.R.L: Si necesitas más datos del me o ese endpoint con el DNI. Avisame

@@ -9,6 +9,7 @@ import {
   syncMembershipsFromExternal,
   syncAttendancesFromExternal,
 } from '../../services/external-pull.service';
+import { syncAllUsers } from '../../services/external-sync-scheduler.service';
 import { prisma } from '../../database';
 
 const router = Router();
@@ -43,6 +44,22 @@ router.get('/profile', async (_req, res) => {
     });
   } catch (error: unknown) {
     res.status(500).json({ success: false, message: error instanceof Error ? error.message : 'Error desconocido' });
+  }
+});
+
+router.post('/sync/all', async (_req, res) => {
+  try {
+    const result = await syncAllUsers();
+    res.json({
+      success: true,
+      message: `Sincronización completada: ${result.processed} procesados, ${result.errors} errores`,
+      data: result,
+    });
+  } catch (error: unknown) {
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Error desconocido',
+    });
   }
 });
 
