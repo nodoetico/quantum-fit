@@ -21,7 +21,7 @@ const CLAVE_TUTORIAL_VISTO = 'quantumfit.tutorial.seen';
 type PropsPantallaInicio = PropsPantallaTabPrincipal<'Dashboard'>;
 
 export default function PantallaInicio({ navigation }: PropsPantallaInicio) {
-  const { usuario, estadisticasSemanales, logros, reservas, refrescarTodo, perfilExterno, asistenciasExternas, membresiasExternas, cargandoExterno } = useAuth();
+  const { usuario, estadisticasSemanales, logros, reservas, refrescarTodo, perfilExterno, asistenciasExternas, membresiasExternas, cargandoExterno, estadoVinculacionMyFit } = useAuth();
   const [refrescando, setRefrescando] = React.useState(false);
   const [mostrarTodasEstadisticas, setMostrarTodasEstadisticas] = useState(false);
   const [mostrarTutorial, setMostrarTutorial] = useState(false);
@@ -309,6 +309,28 @@ export default function PantallaInicio({ navigation }: PropsPantallaInicio) {
             </TouchableOpacity>
           </View>
         </View>
+
+        {estadoVinculacionMyFit && !estadoVinculacionMyFit.linked && !perfilExterno && !cargandoExterno && (
+          <View style={styles.seccion}>
+            <View style={styles.tarjetaAvisoVinculacion}>
+              <View style={styles.iconoAvisoVinculacion}>
+                <Ionicons name="link-outline" size={24} color={colores.secundario} />
+              </View>
+              <View style={styles.contenidoAvisoVinculacion}>
+                <Text style={styles.tituloAvisoVinculacion}>Ver tus datos del gimnasio</Text>
+                <Text style={styles.textoAvisoVinculacion}>
+                  Vinculá tu cuenta para ver tu saldo, membresía, asistencias y vencimientos reales.
+                </Text>
+              </View>
+              <TouchableOpacity
+                style={styles.botonAvisoVinculacion}
+                onPress={() => navigation.navigate('VinculacionMyFit')}
+              >
+                <Text style={styles.textoBotonAvisoVinculacion}>Vincular</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
 
         {perfilExterno && (
           <View style={styles.seccion}>
@@ -885,6 +907,49 @@ const styles = StyleSheet.create({
     width: 1,
     height: 30,
     backgroundColor: colores.borde,
+  },
+  tarjetaAvisoVinculacion: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colores.fondoTarjeta,
+    borderRadius: radioBorde.xl,
+    padding: espaciado.lg,
+    borderWidth: 1,
+    borderColor: colores.borde,
+    gap: espaciado.md,
+  },
+  iconoAvisoVinculacion: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: colores.secundario + '20',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  contenidoAvisoVinculacion: {
+    flex: 1,
+    gap: 2,
+  },
+  tituloAvisoVinculacion: {
+    fontSize: tipografia.tamanos.sm,
+    fontWeight: '700',
+    color: colores.textoPrincipal,
+  },
+  textoAvisoVinculacion: {
+    fontSize: tipografia.tamanos.xs,
+    color: colores.textoSecundario,
+    lineHeight: 15,
+  },
+  botonAvisoVinculacion: {
+    backgroundColor: colores.secundario,
+    borderRadius: radioBorde.lg,
+    paddingVertical: espaciado.sm,
+    paddingHorizontal: espaciado.md,
+  },
+  textoBotonAvisoVinculacion: {
+    fontSize: tipografia.tamanos.sm,
+    fontWeight: '700',
+    color: colores.fondo,
   },
   botonCheckIn: {
     position: 'absolute',

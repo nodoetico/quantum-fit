@@ -3,6 +3,7 @@ import type { PreferenceCreateData } from 'mercadopago/dist/clients/preference/c
 import type { PaymentResponse } from 'mercadopago/dist/clients/payment/commonTypes';
 import { prisma } from '../database';
 import { getPaymentMethods, renewEnrollment } from './payment.service';
+import { getMemberToken, contractMyFitMembership, MyFitError } from './crystal-membership.service';
 
 const ACCESS_TOKEN = process.env.MERCADOPAGO_ACCESS_TOKEN || '';
 const SUCCESS_URL = process.env.MERCADOPAGO_SUCCESS_URL || 'quantumfit://payment/success';
@@ -59,7 +60,7 @@ export async function createPreference(input: CreatePreferenceInput): Promise<Pr
       pending: PENDING_URL,
     },
     auto_return: 'approved',
-    external_reference: input.userId,
+    external_reference: `${input.userId}::${input.planId}`,
     ...(notificationUrl ? { notification_url: notificationUrl } : {}),
   };
 
@@ -91,7 +92,10 @@ export async function processPaymentWebhook(paymentId: string, topic: string): P
 
   if (paymentResponse.status !== 'approved') return;
 
-  const userId = paymentResponse.external_reference;
+  const rawExternalRef = paymentResponse.external_reference || '';
+  const [userId, planId] = rawExternalRef.includes('::')
+    ? rawExternalRef.split('::')
+    : [rawExternalRef, undefined];
   const mpPaymentId = paymentResponse.id?.toString();
   const amount = Number(paymentResponse.transaction_amount) || 0;
 
@@ -117,14 +121,50 @@ export async function processPaymentWebhook(paymentId: string, topic: string): P
     console.error('[MercadoPago] Error al obtener métodos de pago para webhook');
   }
 
+  // Si el socio tiene su cuenta MyFit vinculada, registrar la membresía con SU sesión.
+  // Si no, caer al flujo legacy con el token global del gimnasio.
+  const memberToken = await getMemberToken(userId).catch(() => null);
   let enrollmentResult: any = null;
-  try {
-    enrollmentResult = await renewEnrollment(
-      crystalPaymentMethodId,
-      `MercadoPago - Pago ${mpPaymentId}`,
-    );
-  } catch (renewErr: unknown) {
-    console.error('[MercadoPago] Error al renovar enrollment desde webhook:', renewErr instanceof Error ? renewErr.message : 'Error');
+  let myFitContract: any = null;
+
+  if (memberToken) {
+    const membershipId = planId ? Number(planId) : undefined;
+    if (membershipId && !Number.isNaN(membershipId)) {
+      try {
+        myFitContract = await contractMyFitMembership(userId, {
+          membershipId,
+          paymentMethodId: crystalPaymentMethodId,
+          comments: `MercadoPago - Pago ${mpPaymentId}`,
+        });
+        if (myFitContract?.membership?.end_date) {
+          enrollmentResult = {
+            enrollment: {
+              due_date: myFitContract.membership.end_date,
+              is_enrolled: true,
+              is_expired: false,
+            },
+          };
+        }
+      } catch (contractErr: unknown) {
+        if (contractErr instanceof MyFitError) {
+          console.error('[MercadoPago] No se pudo contratar membresía en MyFit con sesión del socio:', contractErr.message);
+        } else {
+          console.error('[MercadoPago] Error inesperado contratando membresía MyFit:', contractErr instanceof Error ? contractErr.message : 'Error');
+        }
+      }
+    }
+  }
+
+  // Fallback: renovar inscripción con el token global (flujo legacy)
+  if (!enrollmentResult) {
+    try {
+      enrollmentResult = await renewEnrollment(
+        crystalPaymentMethodId,
+        `MercadoPago - Pago ${mpPaymentId}`,
+      );
+    } catch (renewErr: unknown) {
+      console.error('[MercadoPago] Error al renovar enrollment desde webhook:', renewErr instanceof Error ? renewErr.message : 'Error');
+    }
   }
 
   const endDate = enrollmentResult?.enrollment?.due_date

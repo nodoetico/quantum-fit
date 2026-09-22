@@ -1,5 +1,35 @@
 # Estrategia de Datos Crystal — Pull por DNI
 
+> ## ⚠️ OBSOLETO (28/08/2026)
+>
+> Este documento describe la estrategia anterior de **pull por DNI con token global**, que está
+> **completamente caída** y fue **reemplazada** por el **Modelo Espejo MyFit** (cada socio vincula su
+> cuenta y el backend opera con la sesión del socio).
+>
+> **Usar en su lugar:** `INTEGRACION/MODELO_ESPEJO_MYFIT.md`
+
+## Estado ACTUAL al 14/08/2026 — TODO CAÍDO
+
+Pruebas en vivo ejecutadas el 14/08/2026 contra `https://crystal.getmifit.app`:
+
+| Prueba | Resultado |
+|---|---|
+| `GET /users/by-dni/{dni}` | ❌ 404 — no existe |
+| `GET /users/by-dni/{dni}/profile` | ❌ 404 — no existe |
+| `GET /users/by-dni/{dni}/enrollment` | ❌ 404 — no existe |
+| `GET /users/by-dni/{dni}/memberships` | ❌ 404 — no existe |
+| `GET /users/by-dni/{dni}/attendances` | ❌ 404 — no existe |
+| `GET /users/by-dni/{dni}/transactions` | ❌ 404 — no existe |
+| `X-Api-Token` del `.env` en `/user/me` | ❌ 401 — token revocado/inválido |
+| Token Sanctum cacheado (12/06) en `/user/*` | ❌ 401 — expirado |
+| `POST /api/login` con `nodoetico@gmail.com` | ❌ 401 — es cuenta de ADMIN (panel web), no de app |
+| `POST /login` (panel web) | ✅ funciona SOLO como sesión de navegador, no da acceso a `/api/*` |
+
+**Conclusión:** la integración está completamente caída. No hay ningún token vigente y no existe ningún endpoint por DNI. El backend de QuantumFit muestra datos de respaldo locales (saldo $0, plan local) sin avisar.
+
+**Mensaje a Nico (Crystal):**
+> "Todo está caído: el X-Api-Token que tenemos está revocado (401), y no existe ningún endpoint por DNI (404, incluso enrollment y transactions que usábamos). Necesitamos un X-Api-Token nuevo y vigente, y los endpoints `/users/by-dni/{dni}/profile`, `/memberships`, `/attendances` y `/transactions`."
+
 ## Fecha
 Junio 2026
 
@@ -12,6 +42,10 @@ La app QuantumFit necesita mostrar a cada socio sus datos reales de MiFit (perfi
 Crystal API está diseñada para que cada usuario final se loguee individualmente. QuantumFit necesita un endpoint que acepte un DNI como parámetro y devuelva los datos de ESE usuario específico, autenticando con el token global del gimnasio.
 
 **Nico (Crystal Desarrollo S.R.L.)** no quiere construir ese endpoint porque no entiende el caso de uso: "¿Para qué querés datos de un usuario sin sesión iniciada?".
+
+## ⚠️ OBSOLETO (documentado en Junio 2026, desmentido el 14/08/2026)
+
+> **NOTA:** la tabla de abajo decía que `enrollment` y `transactions` por DNI funcionaban. Las pruebas en vivo del 14/08/2026 demostraron que **todos** los `/users/by-dni/*` devuelven 404. Nada funciona por DNI hoy.
 
 ## Lo que YA funciona por DNI (sin depender de Nico)
 

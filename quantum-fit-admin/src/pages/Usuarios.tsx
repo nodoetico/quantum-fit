@@ -123,7 +123,7 @@ export default function Usuarios() {
         <div className="flex gap-2">
           <button
             onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2 bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white font-medium rounded-lg transition-all glow-primary"
+            className="px-4 py-2 bg-white text-black font-medium rounded-lg transition-all hover:bg-gray-200"
           >
             + Nuevo Usuario
           </button>
@@ -323,7 +323,7 @@ export default function Usuarios() {
                   Cancelar
                 </button>
                 <button type="submit"
-                  className="flex-1 px-4 py-3 bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white font-medium rounded-lg transition-all glow-primary">
+                  className="flex-1 px-4 py-3 bg-white text-black font-medium rounded-lg transition-all hover:bg-gray-200">
                   Crear Usuario
                 </button>
               </div>

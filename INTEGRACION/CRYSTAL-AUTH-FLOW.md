@@ -1,5 +1,12 @@
 # Crystal API — Autenticación y Flujo de Integración
 
+> **NOTA (28/08/2026):** Este documento describe el flujo de **login global de una sola cuenta** del
+> gimnasio. La integración con ese token global está caída (401). El modelo actual es el
+> **Modelo Espejo MyFit** (login del socio + vincular cuenta). Ver `INTEGRACION/MODELO_ESPEJO_MYFIT.md`.
+>
+> Las advertencias sobre `X-Api-Token` y `Authorization: Bearer` siguen siendo válidas para el
+> consumo de la API de MyFit.
+
 ## ⚠️ ERROR CORREGIDO: X-Api-Token en el Login
 
 ### Síntoma

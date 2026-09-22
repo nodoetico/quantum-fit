@@ -122,7 +122,7 @@ export default function Clases() {
         {canCreate && (
           <button
             onClick={() => { resetForm(); setShowForm(!showForm); }}
-            className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-all flex items-center gap-2"
+            className="px-4 py-2 bg-white text-black font-medium rounded-lg transition-all flex items-center gap-2 hover:bg-gray-200"
           >
             <span className="text-xl">{showForm ? '✕' : '+'}</span>
             {showForm ? 'Cerrar' : 'Nueva Clase'}
@@ -199,7 +199,7 @@ export default function Clases() {
             <div className="flex gap-2">
               <button
                 type="submit"
-                className="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-all"
+                className="px-6 py-2 bg-white text-black font-medium rounded-lg transition-all hover:bg-gray-200"
               >
                 {editingId ? 'Actualizar' : 'Guardar'}
               </button>

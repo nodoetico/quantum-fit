@@ -170,7 +170,7 @@ export default function Gamificacion() {
         <div className="text-center py-12">
           <p className="text-primary-400 mb-4">No hay configuraciones de puntaje aún.</p>
           <button onClick={handleSeedDefaults} disabled={seeding}
-            className="px-6 py-2 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-medium text-sm hover:opacity-90 disabled:opacity-50">
+            className="px-6 py-2 bg-white text-black rounded-lg font-medium text-sm hover:bg-gray-200 disabled:opacity-50">
             Crear configuraciones por defecto
           </button>
         </div>

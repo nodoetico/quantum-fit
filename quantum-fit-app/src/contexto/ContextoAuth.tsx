@@ -4,17 +4,17 @@ import {
   servicioCheckIn,
   servicioUsuario,
   servicioReservas,
-  servicioPullExterno,
   servicioPagos,
+  servicioMyFit,
   estaAutenticado as verificarAutenticacion,
   obtenerToken,
 } from '../servicios/api';
 import { servicioWebSocket } from '../servicios/websocket';
-import { Usuario, Reserva, Logro, RegistroActividad, EstadisticasSemanales, SuscripcionLocal } from '../tipos';
+import { Usuario, Reserva, Logro, RegistroActividad, EstadisticasSemanales, SuscripcionLocal, PerfilMyFit, EstadoVinculacionMyFit } from '../tipos';
 
-// Los campos de este perfil vienen del sistema Crystal (contrato del backend)
+// Los campos de este perfil vienen del sistema Crystal/MiFit (contrato del backend)
 interface PerfilExterno {
-  id: number;
+  id?: number;
   name: string;
   email: string;
   dni: string;
@@ -51,6 +51,12 @@ interface TipoContextoAuth {
   cargandoExterno: boolean;
   suscripcion: SuscripcionLocal | null;
   cargarSuscripcion: () => Promise<void>;
+  estadoVinculacionMyFit: EstadoVinculacionMyFit | null;
+  vinculandoMyFit: boolean;
+  errorVinculacionMyFit: string;
+  vincularMyFit: (identificador: string, password: string, esDni?: boolean) => Promise<boolean>;
+  crearCuentaMyFit: (email: string, password: string) => Promise<boolean>;
+  desvincularMyFit: () => Promise<void>;
 }
 
 const ContextoAuth = createContext<TipoContextoAuth | undefined>(undefined);
@@ -90,6 +96,9 @@ export const ProveedorAuth: React.FC<{ children: ReactNode }> = ({ children }) =
   const [membresiasExternas, setMembresiasExternas] = useState<any[]>([]);
   const [cargandoExterno, setCargandoExterno] = useState(false);
   const [suscripcion, setSuscripcion] = useState<SuscripcionLocal | null>(null);
+  const [estadoVinculacionMyFit, setEstadoVinculacionMyFit] = useState<EstadoVinculacionMyFit | null>(null);
+  const [vinculandoMyFit, setVinculandoMyFit] = useState(false);
+  const [errorVinculacionMyFit, setErrorVinculacionMyFit] = useState('');
 
   useEffect(() => {
     cargarUsuario();
@@ -202,15 +211,35 @@ export const ProveedorAuth: React.FC<{ children: ReactNode }> = ({ children }) =
   const cargarDatosExternos = async (dniOverride?: string) => {
     try {
       setCargandoExterno(true);
-      const dni = dniOverride || usuario?.dni || undefined;
-      const [perfil, datosMembresias, datosAsistencias] = await Promise.all([
-        servicioPullExterno.obtenerPerfil(dni).catch(() => null),
-        servicioPullExterno.obtenerMembresias(dni).catch(() => null),
-        servicioPullExterno.obtenerAsistencias(dni).catch(() => null),
+      // Obtener datos reales del socio desde su sesión MyFit vinculada.
+      const [perfil, estado, datosMembresias, datosAsistencias, datosInscripcion] = await Promise.all([
+        servicioMyFit.obtenerEstadoVinculacion().catch(() => null),
+        servicioMyFit.obtenerPerfil().catch(() => null),
+        servicioMyFit.obtenerMembresias().catch(() => null),
+        servicioMyFit.obtenerAsistencias().catch(() => null),
+        servicioMyFit.obtenerInscripcion().catch(() => null),
       ]);
-      setPerfilExterno(perfil);
-      setMembresiasExternas(datosMembresias?.data || []);
-      setAsistenciasExternas(datosAsistencias?.data || []);
+      const estadoV = estado as EstadoVinculacionMyFit | null;
+      setEstadoVinculacionMyFit(estadoV);
+      const perfilRaw = (perfil as PerfilMyFit) || estadoV?.profile || null;
+      if (perfilRaw) {
+        setPerfilExterno({
+          id: perfilRaw.id,
+          name: perfilRaw.name || '',
+          email: perfilRaw.email || '',
+          dni: perfilRaw.dni || '',
+          balance: perfilRaw.balance || 0,
+          qr_code: perfilRaw.qr_code || '',
+          phone: perfilRaw.phone || null,
+        });
+      } else {
+        setPerfilExterno(null);
+      }
+      setMembresiasExternas(datosMembresias || []);
+      setAsistenciasExternas(datosAsistencias || []);
+      if (datosInscripcion) {
+        setSuscripcion(prev => prev ? prev : ({ hasSubscription: !!datosInscripcion.enrollment?.is_enrolled, isVip: false, vipSince: null, subscription: null }))
+      }
     } catch (error) {
       console.error('Error al cargar datos externos:', error);
     } finally {
@@ -232,6 +261,73 @@ export const ProveedorAuth: React.FC<{ children: ReactNode }> = ({ children }) =
   };
 
   const [errorLogin, setErrorLogin] = useState<string>('');
+
+  const vincularMyFit = async (identificador: string, password: string, esDni = false): Promise<boolean> => {
+    try {
+      setVinculandoMyFit(true);
+      setErrorVinculacionMyFit('');
+      const estado = await servicioMyFit.vincular(identificador, password, esDni);
+      setEstadoVinculacionMyFit(estado);
+      await cargarDatosExternos();
+      return true;
+    } catch (error: any) {
+      setErrorVinculacionMyFit(error?.response?.data?.error || error?.message || 'No se pudo vincular la cuenta MyFit');
+      return false;
+    } finally {
+      setVinculandoMyFit(false);
+    }
+  };
+
+  const desvincularMyFit = async () => {
+    try {
+      await servicioMyFit.desvincular();
+      setEstadoVinculacionMyFit(null);
+      setPerfilExterno(null);
+      setAsistenciasExternas([]);
+      setMembresiasExternas([]);
+      setErrorVinculacionMyFit('');
+    } catch (error) {
+      console.error('Error al desvincular MyFit:', error);
+    }
+  };
+
+  /**
+   * Crea la cuenta del socio en MyFit usando sus datos de la app (nombre, DNI, email)
+   * y después la vincula. Si la cuenta ya existe en MyFit, vincula directamente.
+   */
+  const crearCuentaMyFit = async (email: string, password: string): Promise<boolean> => {
+    if (!usuario) {
+      setErrorVinculacionMyFit('Necesitás iniciar sesión para crear tu cuenta.');
+      return false;
+    }
+    if (!usuario.dni) {
+      setErrorVinculacionMyFit('Tu cuenta no tiene DNI cargado. No se puede crear la cuenta del gimnasio.');
+      return false;
+    }
+    try {
+      setVinculandoMyFit(true);
+      setErrorVinculacionMyFit('');
+      try {
+        await servicioMyFit.registrar({
+          name: usuario.name,
+          dni: usuario.dni,
+          email,
+          password,
+        });
+      } catch (error: any) {
+        // Ya tiene cuenta en MyFit (u otro problema de creación): seguimos e intentamos vincular.
+        if (error?.response?.status !== 422) {
+          throw error;
+        }
+      }
+      return await vincularMyFit(email, password);
+    } catch (error: any) {
+      setErrorVinculacionMyFit(error?.response?.data?.error || error?.message || 'No se pudo crear la cuenta en MyFit.');
+      return false;
+    } finally {
+      setVinculandoMyFit(false);
+    }
+  };
 
   const iniciarSesion = async (email: string, contrasena: string): Promise<boolean> => {
     try {
@@ -264,8 +360,30 @@ export const ProveedorAuth: React.FC<{ children: ReactNode }> = ({ children }) =
       const datosUsuario = await servicioAuth.registrar(nombre, email, contrasena, dni);
       setUsuario(datosUsuario);
       servicioWebSocket.conectar(datosUsuario.id);
-      // Cargar datos externos (Crystal/MiFit) automáticamente post-registro
-      cargarDatosExternos(dni);
+
+      // Opción A: crear y vincular la cuenta MyFit con los mismos datos, en segundo plano.
+      // No bloquea el registro local aunque MyFit esté caído o tarde en responder.
+      void (async () => {
+        try {
+          await servicioMyFit.registrar({ name: nombre, dni, email, password: contrasena });
+        } catch {
+          // La cuenta ya puede existir en MyFit (con otra contraseña): se vincula manualmente después.
+        }
+        try {
+          const estado = await servicioMyFit.vincular(email, contrasena);
+          setEstadoVinculacionMyFit(estado);
+        } catch {
+          // Si el email no coincide con MyFit, intentamos con el DNI (la app ya lo tiene).
+          try {
+            const estado = await servicioMyFit.vincular(dni, contrasena, true);
+            setEstadoVinculacionMyFit(estado);
+          } catch {
+            // Credenciales de MyFit distintas: el socio podrá vincular desde "Cuenta MyFit".
+          }
+        }
+        await cargarDatosExternos();
+      })();
+
       cargarSuscripcion();
       return null;
     } catch (error: any) {
@@ -381,6 +499,12 @@ export const ProveedorAuth: React.FC<{ children: ReactNode }> = ({ children }) =
         cargandoExterno,
         suscripcion,
         cargarSuscripcion,
+        estadoVinculacionMyFit,
+        vinculandoMyFit,
+        errorVinculacionMyFit,
+        vincularMyFit,
+        crearCuentaMyFit,
+        desvincularMyFit,
       }}
     >
       {children}

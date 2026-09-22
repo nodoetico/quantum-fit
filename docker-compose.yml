@@ -31,12 +31,12 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET}
       RESET_TOKEN_SECRET: ${RESET_TOKEN_SECRET}
-      ALLOWED_ORIGINS: https://admin.quantumfit.com,https://quantumfit.com
+      ALLOWED_ORIGINS: http://localhost:3001,http://localhost:8081,http://localhost:19006,http://localhost:5173,https://admin.quantumfit.com,https://quantumfit.com
       INTEGRATION_API_KEY: ${INTEGRATION_API_KEY}
       EXTERNAL_API_URL: ${EXTERNAL_API_URL:-https://crystal.getmifit.app}
       EXTERNAL_API_TOKEN: ${EXTERNAL_API_TOKEN}
     ports:
-      - "3000:3000"
+      - "3002:3000"
 
   admin:
     build: ./quantum-fit-admin

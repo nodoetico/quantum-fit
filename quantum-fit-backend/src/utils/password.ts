@@ -27,7 +27,7 @@ export async function comparePassword(
  * - Al menos 1 minúscula
  * - Al menos 1 número
  */
-const SPECIAL_CHARS = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
+const SPECIAL_CHARS = /[\]!@#$%^&*()_+\-={};':"\\|,.<>/?[]+/;
 
 export function validatePassword(password: string): { valid: boolean; error?: string } {
   if (password.length < 8) {

@@ -567,4 +567,141 @@ export const servicioMercadoPago = {
   },
 };
 
+// ============================================
+// SERVICIO VINCULACIÓN MYFIT (modelo espejo)
+// ============================================
+
+export const servicioMyFit = {
+  /**
+   * Vincula la cuenta MyFit del socio (email o dni + password). El backend guarda
+   * la sesión cifrada y opera con el token del socio.
+   */
+  async vincular(identificador: string, password: string, esDni = false) {
+    const response = await clienteApi.post('/crystal-membership/link', {
+      ...(esDni ? { dni: identificador } : { email: identificador }),
+      password,
+    });
+    return response.data.data as import('../tipos').EstadoVinculacionMyFit;
+  },
+
+  /**
+   * Consulta si el socio tiene una cuenta MyFit vinculada.
+   */
+  async obtenerEstadoVinculacion() {
+    const response = await clienteApi.get('/crystal-membership/status');
+    return response.data.data as import('../tipos').EstadoVinculacionMyFit;
+  },
+
+  /**
+   * Desvincula la cuenta MyFit del socio.
+   */
+  async desvincular() {
+    const response = await clienteApi.post('/crystal-membership/logout');
+    return response.data.data;
+  },
+
+  /**
+   * Crea la cuenta del socio en MyFit (name, dni, email?, phone?, password).
+   * Se usa cuando el socio todavía no tiene cuenta en el sistema del gimnasio.
+   */
+  async registrar(datos: { name: string; dni: string; email?: string; phone?: string; password: string }) {
+    const response = await clienteApi.post('/crystal-membership/register', datos);
+    return response.data;
+  },
+
+  /**
+   * Obtiene el perfil real del socio desde MyFit.
+   */
+  async obtenerPerfil() {
+    const response = await clienteApi.get('/crystal-membership/profile');
+    return response.data.data as import('../tipos').PerfilMyFit;
+  },
+
+  /**
+   * Obtiene las membresías reales del socio desde MyFit.
+   */
+  async obtenerMembresias() {
+    const response = await clienteApi.get('/crystal-membership/memberships');
+    return response.data.data as import('../tipos').MembresiaMyFit[];
+  },
+
+  /**
+   * Obtiene las asistencias reales del socio desde MyFit.
+   */
+  async obtenerAsistencias(startDate?: string, endDate?: string) {
+    const params = new URLSearchParams();
+    if (startDate) params.append('startDate', startDate);
+    if (endDate) params.append('endDate', endDate);
+    const response = await clienteApi.get(`/crystal-membership/attendances?${params}`);
+    return response.data.data as import('../tipos').AsistenciaMyFit[];
+  },
+
+  /**
+   * Obtiene el estado de inscripción real del socio desde MyFit.
+   */
+  async obtenerInscripcion() {
+    const response = await clienteApi.get('/crystal-membership/enrollment');
+    return response.data.data as import('../tipos').InscripcionMyFit;
+  },
+
+  /**
+   * Obtiene las transacciones reales del socio desde MyFit.
+   */
+  async obtenerTransacciones(startDate?: string, endDate?: string, perPage?: number) {
+    const params = new URLSearchParams();
+    if (startDate) params.append('startDate', startDate);
+    if (endDate) params.append('endDate', endDate);
+    if (perPage) params.append('perPage', perPage.toString());
+    const response = await clienteApi.get(`/crystal-membership/transactions?${params}`);
+    return response.data.data as import('../tipos').TransaccionMyFit[];
+  },
+
+  /**
+   * Obtiene los planes de membresía disponibles.
+   */
+  async obtenerPlanes() {
+    const response = await clienteApi.get('/crystal-membership/plans');
+    return response.data.data as import('../tipos').PlanMyFit[];
+  },
+
+  /**
+   * Contrata (o renueva) una membresía para el socio usando su sesión MyFit.
+   */
+  async contratarMembresia(membershipId: number, paymentMethodId: number, comments?: string) {
+    const response = await clienteApi.post('/crystal-membership/contract', {
+      membershipId,
+      paymentMethodId,
+      ...(comments ? { comments } : {}),
+    });
+    return response.data;
+  },
+
+  /**
+   * Actualiza el perfil del socio en MyFit.
+   */
+  async actualizarPerfil(data: Record<string, unknown>) {
+    const response = await clienteApi.patch('/crystal-membership/profile', data);
+    return response.data.data as import('../tipos').PerfilMyFit;
+  },
+
+  /**
+   * Actualiza el contacto de emergencia del socio en MyFit.
+   */
+  async actualizarContactoEmergencia(data: Record<string, unknown>) {
+    const response = await clienteApi.patch('/crystal-membership/emergency-contact', data);
+    return response.data.data;
+  },
+
+  /**
+   * Cambia la contraseña del socio en MyFit.
+   */
+  async cambiarContrasena(currentPassword: string, newPassword: string) {
+    const response = await clienteApi.post('/crystal-membership/change-password', {
+      currentPassword,
+      newPassword,
+    });
+    return response.data;
+  },
+};
+
 export default clienteApi;

@@ -90,29 +90,29 @@ export default function DashboardLayout() {
   const visibleNav = navigation.filter((item) => item.roles.includes(userRole));
 
   return (
-    <div className="min-h-screen bg-dark-700">
-      {/* Sidebar móvil */}
-      <div className={`lg:hidden fixed inset-0 z-50 ${sidebarOpen ? '' : 'pointer-events-none'}`}>
-        <div
-          className={`fixed inset-0 bg-black/80 transition-opacity ${sidebarOpen ? 'opacity-100' : 'opacity-0'}`}
-          onClick={() => setSidebarOpen(false)}
-        />
-        <div
-          className={`fixed inset-y-0 left-0 w-64 bg-dark-200 border-r border-primary-500/30 transform transition-transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
-        >
-          <SidebarContent navItems={visibleNav} />
-        </div>
-      </div>
+    <div className="min-h-screen bg-black">
+{/* Sidebar móvil */}
+       <div className={`lg:hidden fixed inset-0 z-50 ${sidebarOpen ? '' : 'pointer-events-none'}`}>
+         <div
+           className={`fixed inset-0 bg-black/80 transition-opacity ${sidebarOpen ? 'opacity-100' : 'opacity-0'}`}
+           onClick={() => setSidebarOpen(false)}
+         />
+         <div
+           className={`fixed inset-y-0 left-0 w-64 bg-neutral-950 border-r border-neutral-700 transform transition-transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
+         >
+           <SidebarContent navItems={visibleNav} />
+         </div>
+       </div>
 
       {/* Sidebar desktop */}
-      <aside className="hidden lg:block lg:fixed lg:inset-y-0 lg:left-0 lg:w-64 bg-dark-200 border-r border-primary-500/30">
+      <aside className="hidden lg:block lg:fixed lg:inset-y-0 lg:left-0 lg:w-64 bg-neutral-950 border-r border-neutral-700">
         <SidebarContent navItems={visibleNav} />
       </aside>
 
       {/* Contenido principal */}
       <div className="lg:pl-64">
         {/* Header */}
-        <header className="sticky top-0 z-40 bg-dark-700/80 backdrop-blur-sm border-b border-primary-500/30">
+        <header className="sticky top-0 z-40 bg-neutral-950/80 backdrop-blur-sm border-b border-neutral-700">
           <div className="flex items-center justify-between px-4 py-4">
             <button
               onClick={() => setSidebarOpen(true)}
@@ -126,17 +126,13 @@ export default function DashboardLayout() {
             <div className="flex items-center gap-4 ml-auto">
               <div className="text-right hidden sm:block">
                 <p className="text-sm font-medium text-white">{user?.name}</p>
-                <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                  userRole === 'ADMIN' ? 'bg-red-500/20 text-red-400' :
-                  userRole === 'MANAGER' ? 'bg-purple-500/20 text-purple-400' :
-                  'bg-secondary-500/20 text-secondary-400'
-                }`}>
+                <span className="px-2 py-0.5 rounded text-xs font-medium bg-neutral-800 text-gray-300 border border-neutral-600">
                   {userRole}
                 </span>
               </div>
               <button
                 onClick={handleLogout}
-                className="px-4 py-2 text-sm font-medium text-primary-400 hover:text-primary-300 bg-dark-200 hover:bg-dark-100 border border-primary-500/50 rounded-lg transition-all glow-primary-hover"
+                className="px-4 py-2 text-sm font-medium text-white hover:text-gray-300 bg-neutral-800 hover:bg-neutral-700 border border-neutral-600 rounded-lg transition-all"
               >
                 Cerrar Sesión
               </button>
@@ -159,54 +155,52 @@ function SidebarContent({ navItems }: { navItems: NavItem[] }) {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Logo */}
-      <div className="flex items-center gap-3 px-6 py-6 border-b border-primary-500/30">
-        <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center glow-primary">
-          <span className="text-xl font-bold text-white">Q</span>
-        </div>
-        <div>
-          <h1 className="text-lg font-bold text-white">QUANTUM FIT</h1>
-          <p className="text-xs text-primary-400">Admin Panel</p>
-        </div>
-      </div>
+{/* Logo */}
+       <div className="flex items-center gap-3 px-6 py-6 border-b border-neutral-700">
+         <img src="/logoQuantum.jpeg" alt="Quantum Fit" className="w-10 h-10 rounded-lg object-cover" />
+         <div>
+           <h1 className="text-lg font-bold text-white">QUANTUM FIT</h1>
+           <p className="text-xs text-gray-400">Admin Panel</p>
+         </div>
+       </div>
 
-      {/* Navegación */}
-      <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-        {navItems.map((item) => {
-          const isActive = location.pathname === item.href;
-          return (
-            <Link
-              key={item.name}
-              to={item.href}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-                isActive
-                  ? 'bg-gradient-to-r from-primary-500 to-secondary-500 text-white glow-primary'
-                  : 'text-primary-300 hover:text-primary-400 hover:bg-dark-100'
-              }`}
-            >
-              {item.icon}
-              <span className="font-medium">{item.name}</span>
-            </Link>
-          );
-        })}
-      </nav>
+{/* Navegación */}
+       <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+         {navItems.map((item) => {
+           const isActive = location.pathname === item.href;
+           return (
+             <Link
+               key={item.name}
+               to={item.href}
+               className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                 isActive
+                   ? 'bg-white text-black font-medium'
+                   : 'text-gray-300 hover:text-white hover:bg-neutral-800'
+               }`}
+             >
+               {item.icon}
+               <span className="font-medium">{item.name}</span>
+             </Link>
+           );
+         })}
+       </nav>
 
-      {/* User info */}
-      <div className="p-4 border-t border-primary-500/30">
-        <div className="flex items-center gap-3 px-4 py-3 bg-dark-100 rounded-lg border border-primary-500/30">
-          <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-full flex items-center justify-center">
-            <span className="text-sm font-medium text-white">
-              {user?.name?.charAt(0) || 'U'}
-            </span>
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-white truncate">
-              {user?.name}
-            </p>
-            <p className="text-xs text-primary-400 truncate">{user?.email}</p>
-          </div>
-        </div>
-      </div>
+       {/* User info */}
+       <div className="p-4 border-t border-neutral-700">
+         <div className="flex items-center gap-3 px-4 py-3 bg-neutral-900 rounded-lg border border-neutral-700">
+           <div className="w-10 h-10 bg-neutral-700 rounded-full flex items-center justify-center">
+             <span className="text-sm font-medium text-white">
+               {user?.name?.charAt(0) || 'U'}
+             </span>
+           </div>
+           <div className="flex-1 min-w-0">
+             <p className="text-sm font-medium text-white truncate">
+               {user?.name}
+             </p>
+             <p className="text-xs text-gray-400 truncate">{user?.email}</p>
+           </div>
+         </div>
+       </div>
     </div>
   );
 }

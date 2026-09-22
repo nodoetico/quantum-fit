@@ -10,6 +10,7 @@ import PantallaHistorialPremios from '../pantallas/beneficios/PantallaHistorialP
 import PantallaConfiguracion from '../pantallas/configuracion/PantallaConfiguracion';
 import PantallaCheckIn from '../pantallas/checkin/PantallaCheckIn';
 import PantallaDatosCrystal from '../pantallas/externo/PantallaDatosCrystal';
+import PantallaVinculacionMyFit from '../pantallas/externo/PantallaVinculacionMyFit';
 import PantallaMembresia from '../pantallas/membresia/PantallaMembresia';
 import PantallaCheckout from '../pantallas/membresia/PantallaCheckout';
 import PantallaMiSuscripcion from '../pantallas/membresia/PantallaMiSuscripcion';
@@ -52,6 +53,11 @@ export default function StackPrincipal() {
       <Stack.Screen
         name="DatosCrystal"
         component={PantallaDatosCrystal}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="VinculacionMyFit"
+        component={PantallaVinculacionMyFit}
         options={{ headerShown: false }}
       />
       <Stack.Screen

@@ -169,7 +169,7 @@ export default function SiteConfigPage() {
           <button
             type="submit"
             disabled={saving}
-            className="px-6 py-2.5 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-medium text-sm hover:opacity-90 disabled:opacity-50 transition-all"
+            className="px-6 py-2.5 bg-white text-black rounded-lg font-medium text-sm hover:bg-gray-200 disabled:opacity-50 transition-all"
           >
             {saving ? 'Guardando...' : 'Guardar Cambios'}
           </button>

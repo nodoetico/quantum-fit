@@ -80,38 +80,33 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-dark-700 via-dark-600 to-dark-700 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Efecto de fondo neón */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-500/20 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary-500/20 rounded-full blur-3xl"></div>
+    <div className="min-h-screen bg-black flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
       
       <div className="max-w-md w-full relative z-10">
-        {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-2xl mb-4 glow-primary">
-            <span className="text-4xl font-bold text-white">Q</span>
-          </div>
-          <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-secondary-400 mb-2">
+          <img src="/logoQuantum.jpeg" alt="Quantum Fit" className="w-20 h-20 rounded-2xl mb-4 mx-auto object-cover border border-white/20" />
+          <h1 className="text-5xl font-bold text-white mb-2">
             QUANTUM FIT
           </h1>
-          <p className="text-primary-400 text-lg">Panel de Administración</p>
+          <p className="text-gray-400 text-lg">Panel de Administración</p>
         </div>
 
-        {/* Form */}
-        <div className="bg-dark-200/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-primary-500/30">
+        <div className="bg-white/5 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-white/10">
           <h2 className="text-2xl font-bold text-white mb-6 text-center">
             Iniciar Sesión
           </h2>
 
           {error && (
-            <div className="mb-6 p-4 bg-error/10 border border-error/50 rounded-lg text-error text-sm">
+            <div className="mb-6 p-4 bg-white/10 border border-white/20 rounded-lg text-white text-sm">
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-primary-300 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
                 Email
               </label>
               <input
@@ -120,13 +115,13 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-3 bg-dark-400 border border-border rounded-lg text-white placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all"
                 placeholder="admin@quantumfit.com"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-primary-300 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
                 Contraseña
               </label>
               <div className="relative">
@@ -136,13 +131,13 @@ export default function Login() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full px-4 py-3 pr-12 bg-dark-400 border border-border rounded-lg text-white placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 pr-12 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition-all"
                   placeholder="••••••••"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-primary-400 hover:text-primary-300 transition-colors p-1"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors p-1"
                   tabIndex={-1}
                 >
                   {showPassword ? (
@@ -162,7 +157,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 px-4 bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 disabled:from-dark-500 disabled:to-dark-600 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-all duration-300 flex items-center justify-center glow-primary-hover"
+              className="w-full py-3 px-4 bg-white text-black font-semibold rounded-lg transition-all duration-300 flex items-center justify-center hover:bg-gray-200 disabled:bg-gray-600 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <span className="flex items-center gap-2">
@@ -180,29 +175,27 @@ export default function Login() {
 
           <div className="mt-6 text-center">
             <button type="button" onClick={openRecovery}
-              className="text-sm text-primary-400 hover:text-primary-300 transition-colors underline underline-offset-2">
+              className="text-sm text-gray-400 hover:text-white transition-colors underline underline-offset-2">
               ¿Olvidaste tu contraseña? — Recuperala
             </button>
           </div>
         </div>
 
-        {/* Demo credentials */}
-        <div className="mt-6 p-4 bg-dark-200/70 backdrop-blur-sm rounded-lg border border-primary-500/30">
-          <p className="text-xs text-primary-300 text-center mb-2">🔑 Credenciales de prueba:</p>
-          <code className="text-xs text-primary-400 block text-center font-semibold">
+        <div className="mt-6 p-4 bg-white/5 backdrop-blur-sm rounded-lg border border-white/10">
+          <p className="text-xs text-gray-400 text-center mb-2">🔑 Credenciales de prueba:</p>
+          <code className="text-xs text-white block text-center font-semibold">
             admin@quantumfit.com / Admin123!
           </code>
         </div>
       </div>
 
-      {/* Modal Recuperar Contraseña */}
       {showRecovery && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80">
-          <div className="bg-dark-200 rounded-2xl border border-primary-500/30 p-8 max-w-md w-full">
+          <div className="bg-black rounded-2xl border border-white/10 p-8 max-w-md w-full">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-white">Recuperar Contraseña</h2>
               <button type="button" onClick={() => setShowRecovery(false)}
-                className="text-primary-400 hover:text-primary-300 transition-colors p-1">
+                className="text-gray-400 hover:text-white transition-colors p-1">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -210,35 +203,35 @@ export default function Login() {
             </div>
 
             {recoveryError && (
-              <div className="mb-4 p-3 bg-error/10 border border-error/50 rounded-lg text-error text-sm">{recoveryError}</div>
+              <div className="mb-4 p-3 bg-white/10 border border-white/20 rounded-lg text-white text-sm">{recoveryError}</div>
             )}
             {recoverySuccess && (
-              <div className="mb-4 p-3 bg-green-500/10 border border-green-500/50 rounded-lg text-green-400 text-sm">{recoverySuccess}</div>
+              <div className="mb-4 p-3 bg-white/10 border border-white/20 rounded-lg text-white text-sm">{recoverySuccess}</div>
             )}
 
             {recoveryStep === 'email' && (
               <form onSubmit={handleForgotPassword} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-primary-300 mb-2">Email registrado</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Email registrado</label>
                   <input type="email" value={recoveryEmail} required
                     onChange={(e) => setRecoveryEmail(e.target.value)}
                     placeholder="tu@email.com"
-                    className="w-full px-4 py-3 bg-dark-400 border border-border rounded-lg text-white placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50" />
                 </div>
-                <p className="text-xs text-primary-400">Recibirás un token por email para restablecer tu contraseña.</p>
+                <p className="text-xs text-gray-400">Recibirás un token por email para restablecer tu contraseña.</p>
                 <div className="flex gap-3 pt-2">
                   <button type="button" onClick={() => setShowRecovery(false)}
-                    className="flex-1 px-4 py-3 bg-dark-400 hover:bg-dark-300 text-white rounded-lg transition-all">
+                    className="flex-1 px-4 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all">
                     Cancelar
                   </button>
                   <button type="submit" disabled={recoveryLoading}
-                    className="flex-1 px-4 py-3 bg-gradient-to-r from-primary-500 to-secondary-500 text-white font-medium rounded-lg transition-all disabled:opacity-50">
+                    className="flex-1 px-4 py-3 bg-white text-black font-medium rounded-lg transition-all disabled:opacity-50 hover:bg-gray-200">
                     {recoveryLoading ? 'Enviando...' : 'Enviar'}
                   </button>
                 </div>
                 <div className="text-center pt-2">
                   <button type="button" onClick={() => { setRecoveryStep('reset'); setRecoveryError(''); setRecoverySuccess(''); }}
-                    className="text-xs text-primary-500 hover:text-primary-400 underline underline-offset-2">
+                    className="text-xs text-gray-400 hover:text-white underline underline-offset-2">
                     Ya tengo un token — restablecer ahora
                   </button>
                 </div>
@@ -248,26 +241,26 @@ export default function Login() {
             {recoveryStep === 'reset' && (
               <form onSubmit={handleResetPassword} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-primary-300 mb-2">Token de recuperación</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Token de recuperación</label>
                   <input type="text" value={resetToken} required
                     onChange={(e) => setResetToken(e.target.value)}
                     placeholder="Ingresá el token recibido por email"
-                    className="w-full px-4 py-3 bg-dark-400 border border-border rounded-lg text-white placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-primary-300 mb-2">Nueva contraseña</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Nueva contraseña</label>
                   <input type="password" value={newPassword} required minLength={8}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="Mín. 8 caracteres, mayúscula, número y símbolo"
-                    className="w-full px-4 py-3 bg-dark-400 border border-border rounded-lg text-white placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50" />
                 </div>
                 <div className="flex gap-3 pt-2">
                   <button type="button" onClick={() => { setRecoveryStep('email'); setRecoveryError(''); setRecoverySuccess(''); }}
-                    className="flex-1 px-4 py-3 bg-dark-400 hover:bg-dark-300 text-white rounded-lg transition-all">
+                    className="flex-1 px-4 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all">
                     Volver
                   </button>
                   <button type="submit" disabled={recoveryLoading}
-                    className="flex-1 px-4 py-3 bg-gradient-to-r from-primary-500 to-secondary-500 text-white font-medium rounded-lg transition-all disabled:opacity-50">
+                    className="flex-1 px-4 py-3 bg-white text-black font-medium rounded-lg transition-all disabled:opacity-50 hover:bg-gray-200">
                     {recoveryLoading ? 'Restableciendo...' : 'Restablecer'}
                   </button>
                 </div>
@@ -277,7 +270,7 @@ export default function Login() {
             {recoveryStep === 'done' && (
               <div className="text-center space-y-4">
                 <button type="button" onClick={() => setShowRecovery(false)}
-                  className="px-6 py-3 bg-gradient-to-r from-primary-500 to-secondary-500 text-white font-medium rounded-lg transition-all">
+                  className="px-6 py-3 bg-white text-black font-medium rounded-lg transition-all hover:bg-gray-200">
                   Volver al inicio de sesión
                 </button>
               </div>

@@ -197,7 +197,7 @@ export default function Premios() {
         <button
           onClick={() => setTab('rewards')}
           className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-            tab === 'rewards' ? 'bg-primary-600 text-white' : 'text-primary-400 hover:text-white'
+            tab === 'rewards' ? 'bg-white text-black' : 'text-primary-400 hover:text-white'
           }`}
         >
           Premios
@@ -205,7 +205,7 @@ export default function Premios() {
         <button
           onClick={() => setTab('redemptions')}
           className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-            tab === 'redemptions' ? 'bg-primary-600 text-white' : 'text-primary-400 hover:text-white'
+            tab === 'redemptions' ? 'bg-white text-black' : 'text-primary-400 hover:text-white'
           }`}
         >
           Canjes
@@ -218,7 +218,7 @@ export default function Premios() {
             <div className="flex justify-end">
               <button
                 onClick={() => { resetForm(); setShowForm(!showForm); }}
-                className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-all flex items-center gap-2"
+                className="px-4 py-2 bg-white text-black font-medium rounded-lg transition-all flex items-center gap-2 hover:bg-gray-200"
               >
                 <span className="text-xl">{showForm ? '✕' : '+'}</span>
                 {showForm ? 'Cerrar' : 'Nuevo Premio'}
@@ -282,7 +282,7 @@ export default function Premios() {
                     className="w-full px-4 py-2 bg-dark-400 border border-primary-500/30 rounded-lg text-white placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-primary-500" />
                 </div>
                 <div className="flex gap-2">
-                  <button type="submit" className="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-all">
+                  <button type="submit" className="px-6 py-2 bg-white text-black font-medium rounded-lg transition-all hover:bg-gray-200">
                     {editingId ? 'Actualizar' : 'Guardar'}
                   </button>
                   <button type="button" onClick={resetForm} className="px-6 py-2 bg-dark-600 hover:bg-dark-500 text-white font-medium rounded-lg transition-all">
@@ -365,7 +365,7 @@ export default function Premios() {
                   key={s}
                   onClick={() => { setRedemptionFilter(s); setTimeout(loadRedemptions, 0); }}
                   className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
-                    redemptionFilter === s ? 'bg-primary-600 text-white' : 'bg-dark-200 text-primary-400 hover:text-white'
+                    redemptionFilter === s ? 'bg-white text-black' : 'bg-dark-200 text-primary-400 hover:text-white'
                   }`}
                 >
                   {s ? statusLabels[s] : 'Todos'}
@@ -375,7 +375,7 @@ export default function Premios() {
             {isAdmin && (
               <button
                 onClick={() => setShowRedemptionForm(!showRedemptionForm)}
-                className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-all flex items-center gap-2"
+                className="px-4 py-2 bg-white text-black font-medium rounded-lg transition-all flex items-center gap-2 hover:bg-gray-200"
               >
                 <span className="text-xl">{showRedemptionForm ? '✕' : '+'}</span>
                 {showRedemptionForm ? 'Cerrar' : 'Nuevo Canje'}
@@ -422,7 +422,7 @@ export default function Premios() {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <button type="submit" className="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-all">
+                  <button type="submit" className="px-6 py-2 bg-white text-black font-medium rounded-lg transition-all hover:bg-gray-200">
                     Crear Canje
                   </button>
                   <button type="button" onClick={() => { setShowRedemptionForm(false); setRedemptionForm({ userId: '', rewardId: '', notes: '' }); }}

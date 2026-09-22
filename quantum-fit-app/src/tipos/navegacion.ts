@@ -37,6 +37,7 @@ export type ListaParametrosStackPrincipal = {
   Configuracion: undefined;
   CheckIn: undefined;
   DatosCrystal: undefined;
+  VinculacionMyFit: undefined;
   Membresia: undefined;
   Checkout: { plan: ResumenPlan; metodosPago: any[] };
   MiSuscripcion: undefined;

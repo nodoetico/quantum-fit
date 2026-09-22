@@ -121,7 +121,7 @@ export default function Integracion() {
           <button
             onClick={loadMiFitData}
             disabled={isLoadingData}
-            className="px-3 py-1 bg-primary-600 hover:bg-primary-700 text-white text-sm rounded-lg transition-all disabled:opacity-50"
+            className="px-3 py-1 bg-neutral-800 hover:bg-neutral-700 text-white text-sm rounded-lg transition-all disabled:opacity-50 border border-neutral-600"
           >
             {isLoadingData ? 'Cargando...' : 'Actualizar'}
           </button>
@@ -203,7 +203,7 @@ export default function Integracion() {
               <button
                 onClick={handleSync}
                 disabled={isSyncing}
-                className="px-4 py-2 bg-primary-600 hover:bg-primary-700 disabled:bg-primary-600/50 text-white font-medium rounded-lg transition-all flex items-center gap-2"
+                className="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 disabled:bg-neutral-800/50 text-white font-medium rounded-lg transition-all flex items-center gap-2 border border-neutral-600"
               >
                 {isSyncing ? (
                   <>

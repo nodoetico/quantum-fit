@@ -21,13 +21,13 @@ export default function LandingPage() {
       <div className="mb-8 flex items-start justify-between">
         <div>
           <h1 className="text-3xl font-bold text-white mb-2">Gestionar Landing Page</h1>
-          <p className="text-primary-300">Administra el contenido visible en la página pública del gimnasio</p>
+          <p className="text-gray-400">Administra el contenido visible en la página pública del gimnasio</p>
         </div>
           <a
-              href={import.meta.env.VITE_LANDING_URL || 'https://quantum-fit-landing-production.up.railway.app/'}
+              href={import.meta.env.VITE_LANDING_URL || 'http://localhost:3001/'}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-4 py-2 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-medium text-sm hover:opacity-90 transition-opacity"
+              className="px-4 py-2 bg-white text-black rounded-lg font-medium text-sm hover:bg-gray-200 transition-opacity"
             >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -44,8 +44,8 @@ export default function LandingPage() {
             onClick={() => setActiveTab(tab.id)}
             className={`px-5 py-2.5 rounded-lg font-medium text-sm whitespace-nowrap transition-all ${
               activeTab === tab.id
-                ? 'bg-gradient-to-r from-primary-500 to-secondary-500 text-white glow-primary'
-                : 'bg-dark-200 text-primary-300 hover:text-primary-400 hover:bg-dark-100 border border-primary-500/30'
+                ? 'bg-white text-black font-medium'
+                : 'bg-neutral-900 text-gray-300 hover:text-white hover:bg-neutral-800 border border-neutral-700'
             }`}
           >
             {tab.label}
@@ -54,7 +54,7 @@ export default function LandingPage() {
       </div>
 
       {/* Contenido del tab */}
-      <div className="bg-dark-200 rounded-xl border border-primary-500/30 p-6">
+      <div className="bg-neutral-900 rounded-xl border border-neutral-700 p-6">
         {activeTab === 'content' && <ContentSection />}
         {activeTab === 'testimonials' && <TestimonialsSection />}
         {activeTab === 'plans' && <PlansSection />}
@@ -129,7 +129,7 @@ function ContentSection() {
     setFormData({ section: 'hero', title: '', subtitle: '', description: '', imageUrl: '', ctaText: '', ctaLink: '', isActive: true, order: 0 });
   };
 
-  if (loading) return <div className="text-center py-8 text-primary-400">Cargando...</div>;
+  if (loading) return <div className="text-center py-8 text-gray-400">Cargando...</div>;
 
   const sections = ['hero', 'about', 'features', 'clases', 'contact'];
 
@@ -139,22 +139,22 @@ function ContentSection() {
         <h2 className="text-xl font-bold text-white">Contenido de la Landing</h2>
         <button
           onClick={() => { resetForm(); setShowForm(true); }}
-          className="px-4 py-2 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-medium text-sm hover:opacity-90 transition-opacity"
+          className="px-4 py-2 bg-white text-black rounded-lg font-medium text-sm hover:bg-gray-200 transition-opacity"
         >
           + Nuevo Contenido
         </button>
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-dark-100 rounded-lg border border-primary-500/30 p-6 mb-6 space-y-4">
+        <form onSubmit={handleSubmit} className="bg-neutral-900 rounded-lg border border-neutral-700 p-6 mb-6 space-y-4">
           <h3 className="text-lg font-semibold text-white">{editing ? 'Editar' : 'Nuevo'} Contenido</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-primary-300 mb-1">Sección</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Sección</label>
               <select
                 value={formData.section}
                 onChange={(e) => setFormData({ ...formData, section: e.target.value })}
-                className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500"
+                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-white"
                 required
               >
                 {sections.map((s) => (
@@ -163,60 +163,60 @@ function ContentSection() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-primary-300 mb-1">Orden</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Orden</label>
               <input
                 type="number"
                 value={formData.order || 0}
                 onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
-                className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500"
+                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-white"
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-primary-300 mb-1">Título</label>
+            <label className="block text-sm font-medium text-gray-300 mb-1">Título</label>
             <input
               type="text"
               value={formData.title || ''}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500"
+              className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-white"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-primary-300 mb-1">Subtítulo</label>
+            <label className="block text-sm font-medium text-gray-300 mb-1">Subtítulo</label>
             <input
               type="text"
               value={formData.subtitle || ''}
               onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
-              className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500"
+              className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-white"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-primary-300 mb-1">Descripción</label>
+            <label className="block text-sm font-medium text-gray-300 mb-1">Descripción</label>
             <textarea
               value={formData.description || ''}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3}
-              className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500"
+              className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-white"
             />
           </div>
           <ImageUpload value={formData.imageUrl || ''} onChange={(url) => setFormData({ ...formData, imageUrl: url })} label="URL de Imagen" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-primary-300 mb-1">Texto CTA</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Texto CTA</label>
               <input
                 type="text"
                 value={formData.ctaText || ''}
                 onChange={(e) => setFormData({ ...formData, ctaText: e.target.value })}
-                className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500"
+                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-white"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-primary-300 mb-1">Link CTA</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Link CTA</label>
               <input
                 type="text"
                 value={formData.ctaLink || ''}
                 onChange={(e) => setFormData({ ...formData, ctaLink: e.target.value })}
-                className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500"
+                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-white"
               />
             </div>
           </div>
@@ -225,15 +225,15 @@ function ContentSection() {
               type="checkbox"
               checked={formData.isActive !== false}
               onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-              className="accent-primary-500"
+              className="accent-white"
             />
-            <span className="text-sm text-primary-300">Activo</span>
+            <span className="text-sm text-gray-300">Activo</span>
           </label>
           <div className="flex gap-3">
-            <button type="submit" className="px-6 py-2 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-medium text-sm hover:opacity-90">
+            <button type="submit" className="px-6 py-2 bg-white text-black rounded-lg font-medium text-sm hover:bg-gray-200">
               {editing ? 'Actualizar' : 'Crear'}
             </button>
-            <button type="button" onClick={resetForm} className="px-6 py-2 bg-dark-200 text-primary-300 rounded-lg border border-primary-500/30 hover:bg-dark-100">
+            <button type="button" onClick={resetForm} className="px-6 py-2 bg-neutral-800 text-gray-300 rounded-lg border border-neutral-700 hover:bg-neutral-700">
               Cancelar
             </button>
           </div>
@@ -249,21 +249,21 @@ function ContentSection() {
             <h3 className="text-lg font-semibold text-white mb-3 capitalize">{section}</h3>
             <div className="space-y-3">
               {sectionItems.map((item) => (
-                <div key={item.id} className="flex items-center justify-between bg-dark-100 rounded-lg p-4 border border-primary-500/20">
+                <div key={item.id} className="flex items-center justify-between bg-neutral-900 rounded-lg p-4 border border-neutral-700">
                   {item.imageUrl && (
                     <div className="mr-3 shrink-0">
                       <img src={item.imageUrl} alt="" className="h-12 w-12 rounded-lg object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-white truncate">{item.title || <span className="text-primary-400 italic">Sin título</span>}</p>
-                    <p className="text-sm text-primary-400 truncate">{item.description?.substring(0, 80) || ''}</p>
+                    <p className="font-medium text-white truncate">{item.title || <span className="text-gray-400 italic">Sin título</span>}</p>
+                    <p className="text-sm text-gray-400 truncate">{item.description?.substring(0, 80) || ''}</p>
                   </div>
                   <div className="flex items-center gap-2 ml-4">
                     <span className={`px-2 py-1 rounded text-xs font-medium ${item.isActive ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
                       {item.isActive ? 'Activo' : 'Inactivo'}
                     </span>
-                    <button onClick={() => handleEdit(item)} className="p-2 text-primary-400 hover:text-primary-300 transition-colors" title="Editar">
+                    <button onClick={() => handleEdit(item)} className="p-2 text-gray-400 hover:text-gray-300 transition-colors" title="Editar">
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                     </button>
                     <button onClick={() => handleDelete(item.id)} className="p-2 text-red-400 hover:text-red-300 transition-colors" title="Eliminar">
@@ -278,7 +278,7 @@ function ContentSection() {
       })}
 
       {items.length === 0 && (
-        <div className="text-center py-12 text-primary-400">
+        <div className="text-center py-12 text-gray-400">
           No hay contenido aún. Haz clic en "+ Nuevo Contenido" para agregar.
         </div>
       )}
@@ -350,7 +350,7 @@ function TestimonialsSection() {
     setFormData({ name: '', role: '', text: '', photoUrl: '', rating: 5, isActive: true, order: 0 });
   };
 
-  if (loading) return <div className="text-center py-8 text-primary-400">Cargando...</div>;
+  if (loading) return <div className="text-center py-8 text-gray-400">Cargando...</div>;
 
   return (
     <div>
@@ -358,53 +358,53 @@ function TestimonialsSection() {
         <h2 className="text-xl font-bold text-white">Testimonios</h2>
         <button
           onClick={() => { resetForm(); setShowForm(true); }}
-          className="px-4 py-2 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-medium text-sm hover:opacity-90"
+          className="px-4 py-2 bg-white text-black rounded-lg font-medium text-sm hover:bg-gray-200"
         >
           + Nuevo Testimonio
         </button>
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-dark-100 rounded-lg border border-primary-500/30 p-6 mb-6 space-y-4">
+        <form onSubmit={handleSubmit} className="bg-neutral-900 rounded-lg border border-neutral-700 p-6 mb-6 space-y-4">
           <h3 className="text-lg font-semibold text-white">{editing ? 'Editar' : 'Nuevo'} Testimonio</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-primary-300 mb-1">Nombre</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Nombre</label>
               <input type="text" value={formData.name || ''} onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500" required />
+                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-white" required />
             </div>
             <div>
-              <label className="block text-sm font-medium text-primary-300 mb-1">Rol / Descripción</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Rol / Descripción</label>
               <input type="text" value={formData.role || ''} onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500"
+                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-white"
                 placeholder="Miembro desde 2024" />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-primary-300 mb-1">Texto del Testimonio</label>
+            <label className="block text-sm font-medium text-gray-300 mb-1">Texto del Testimonio</label>
             <textarea value={formData.text || ''} onChange={(e) => setFormData({ ...formData, text: e.target.value })} rows={3}
-              className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500" required />
+              className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-white" required />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="md:col-span-3">
               <ImageUpload value={formData.photoUrl || ''} onChange={(url) => setFormData({ ...formData, photoUrl: url })} label="URL Foto" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-primary-300 mb-1">Rating (1-5)</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Rating (1-5)</label>
               <input type="number" min={1} max={5} value={formData.rating || 5} onChange={(e) => setFormData({ ...formData, rating: parseInt(e.target.value) || 5 })}
-                className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500" />
+                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-white" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-primary-300 mb-1">Orden</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Orden</label>
               <input type="number" value={formData.order || 0} onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
-                className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500" />
+                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-white" />
             </div>
           </div>
           <div className="flex gap-3">
-            <button type="submit" className="px-6 py-2 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-medium text-sm hover:opacity-90">
+            <button type="submit" className="px-6 py-2 bg-white text-black rounded-lg font-medium text-sm hover:bg-gray-200">
               {editing ? 'Actualizar' : 'Crear'}
             </button>
-            <button type="button" onClick={resetForm} className="px-6 py-2 bg-dark-200 text-primary-300 rounded-lg border border-primary-500/30 hover:bg-dark-100">
+            <button type="button" onClick={resetForm} className="px-6 py-2 bg-neutral-800 text-gray-300 rounded-lg border border-neutral-700 hover:bg-neutral-700">
               Cancelar
             </button>
           </div>
@@ -413,7 +413,7 @@ function TestimonialsSection() {
 
       <div className="space-y-3">
         {items.map((item) => (
-          <div key={item.id} className="flex items-center justify-between bg-dark-100 rounded-lg p-4 border border-primary-500/20">
+          <div key={item.id} className="flex items-center justify-between bg-neutral-900 rounded-lg p-4 border border-neutral-700">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-3 mb-1">
                 {item.photoUrl && (
@@ -421,17 +421,17 @@ function TestimonialsSection() {
                 )}
                 <div>
                   <p className="font-medium text-white">{item.name}</p>
-                  <p className="text-xs text-primary-400">{item.role}</p>
+                  <p className="text-xs text-gray-400">{item.role}</p>
                 </div>
               </div>
-              <p className="text-sm text-primary-300 line-clamp-2">{item.text}</p>
+              <p className="text-sm text-gray-300 line-clamp-2">{item.text}</p>
             </div>
             <div className="flex items-center gap-2 ml-4">
               <span className="text-yellow-400 text-sm">{'★'.repeat(item.rating)}{'☆'.repeat(5 - item.rating)}</span>
               <span className={`px-2 py-1 rounded text-xs font-medium ${item.isActive ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
                 {item.isActive ? 'Activo' : 'Inactivo'}
               </span>
-              <button onClick={() => handleEdit(item)} className="p-2 text-primary-400 hover:text-primary-300">
+              <button onClick={() => handleEdit(item)} className="p-2 text-gray-400 hover:text-gray-300">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
               </button>
               <button onClick={() => handleDelete(item.id)} className="p-2 text-red-400 hover:text-red-300">
@@ -443,7 +443,7 @@ function TestimonialsSection() {
       </div>
 
       {items.length === 0 && (
-        <div className="text-center py-12 text-primary-400">No hay testimonios aún.</div>
+        <div className="text-center py-12 text-gray-400">No hay testimonios aún.</div>
       )}
     </div>
   );
@@ -525,7 +525,7 @@ function PlansSection() {
     setFeatureInput('');
   };
 
-  if (loading) return <div className="text-center py-8 text-primary-400">Cargando...</div>;
+  if (loading) return <div className="text-center py-8 text-gray-400">Cargando...</div>;
 
   return (
     <div>
@@ -533,30 +533,30 @@ function PlansSection() {
         <h2 className="text-xl font-bold text-white">Planes y Precios</h2>
         <button
           onClick={() => { resetForm(); setShowForm(true); }}
-          className="px-4 py-2 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-medium text-sm hover:opacity-90"
+          className="px-4 py-2 bg-white text-black rounded-lg font-medium text-sm hover:bg-gray-200"
         >
           + Nuevo Plan
         </button>
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-dark-100 rounded-lg border border-primary-500/30 p-6 mb-6 space-y-4">
+        <form onSubmit={handleSubmit} className="bg-neutral-900 rounded-lg border border-neutral-700 p-6 mb-6 space-y-4">
           <h3 className="text-lg font-semibold text-white">{editing ? 'Editar' : 'Nuevo'} Plan</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-primary-300 mb-1">Nombre</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Nombre</label>
               <input type="text" value={formData.name || ''} onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500" required />
+                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-white" required />
             </div>
             <div>
-              <label className="block text-sm font-medium text-primary-300 mb-1">Precio</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Precio</label>
               <input type="number" step="0.01" value={formData.price || 0} onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })}
-                className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500" />
+                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-white" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-primary-300 mb-1">Período</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Período</label>
               <select value={formData.period || 'mensual'} onChange={(e) => setFormData({ ...formData, period: e.target.value })}
-                className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500">
+                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-white">
                 <option value="mensual">Mensual</option>
                 <option value="trimestral">Trimestral</option>
                 <option value="anual">Anual</option>
@@ -564,26 +564,26 @@ function PlansSection() {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-primary-300 mb-1">Descripción</label>
+            <label className="block text-sm font-medium text-gray-300 mb-1">Descripción</label>
             <textarea value={formData.description || ''} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={2}
-              className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500" />
+              className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-white" />
           </div>
 
           {/* Features */}
           <div>
-            <label className="block text-sm font-medium text-primary-300 mb-1">Beneficios</label>
+            <label className="block text-sm font-medium text-gray-300 mb-1">Beneficios</label>
             <div className="flex gap-2 mb-2">
               <input type="text" value={featureInput} onChange={(e) => setFeatureInput(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addFeature(); } }}
-                className="flex-1 bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500"
+                className="flex-1 bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-white"
                 placeholder="Escribe un beneficio y presiona Enter" />
-              <button type="button" onClick={addFeature} className="px-4 py-2 bg-primary-500/20 text-primary-400 rounded-lg hover:bg-primary-500/30">
+              <button type="button" onClick={addFeature} className="px-4 py-2 bg-neutral-800 text-gray-300 rounded-lg hover:bg-neutral-700">
                 Agregar
               </button>
             </div>
             <div className="flex flex-wrap gap-2">
               {formData.features?.map((f, i) => (
-                <span key={i} className="flex items-center gap-1 px-3 py-1 bg-primary-500/20 text-primary-300 rounded-full text-sm">
+                <span key={i} className="flex items-center gap-1 px-3 py-1 bg-neutral-800 text-gray-300 rounded-full text-sm">
                   {f}
                   <button type="button" onClick={() => removeFeature(i)} className="text-red-400 hover:text-red-300 ml-1">×</button>
                 </span>
@@ -593,24 +593,24 @@ function PlansSection() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <label className="flex items-center gap-2">
-              <input type="checkbox" checked={formData.isFeatured !== false} onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })} className="accent-primary-500" />
-              <span className="text-sm text-primary-300">Destacado</span>
+              <input type="checkbox" checked={formData.isFeatured !== false} onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })} className="accent-white" />
+              <span className="text-sm text-gray-300">Destacado</span>
             </label>
             <label className="flex items-center gap-2">
-              <input type="checkbox" checked={formData.isActive !== false} onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })} className="accent-primary-500" />
-              <span className="text-sm text-primary-300">Activo</span>
+              <input type="checkbox" checked={formData.isActive !== false} onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })} className="accent-white" />
+              <span className="text-sm text-gray-300">Activo</span>
             </label>
             <div>
-              <label className="block text-sm font-medium text-primary-300 mb-1">Orden</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Orden</label>
               <input type="number" value={formData.order || 0} onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
-                className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500" />
+                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-white" />
             </div>
           </div>
           <div className="flex gap-3">
-            <button type="submit" className="px-6 py-2 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-medium text-sm hover:opacity-90">
+            <button type="submit" className="px-6 py-2 bg-white text-black rounded-lg font-medium text-sm hover:bg-gray-200">
               {editing ? 'Actualizar' : 'Crear'}
             </button>
-            <button type="button" onClick={resetForm} className="px-6 py-2 bg-dark-200 text-primary-300 rounded-lg border border-primary-500/30 hover:bg-dark-100">
+            <button type="button" onClick={resetForm} className="px-6 py-2 bg-neutral-800 text-gray-300 rounded-lg border border-neutral-700 hover:bg-neutral-700">
               Cancelar
             </button>
           </div>
@@ -619,28 +619,28 @@ function PlansSection() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {items.map((item) => (
-          <div key={item.id} className={`bg-dark-100 rounded-lg border p-5 ${item.isFeatured ? 'border-primary-500/60 glow-primary' : 'border-primary-500/20'}`}>
+          <div key={item.id} className={`bg-neutral-900 rounded-lg border p-5 ${item.isFeatured ? 'border-neutral-500' : 'border-neutral-700'}`}>
             <div className="flex items-start justify-between mb-3">
               <div>
                 <h3 className="text-lg font-bold text-white">{item.name}</h3>
-                <p className="text-2xl font-bold text-primary-400">${item.price}<span className="text-sm font-normal text-primary-300">/{item.period}</span></p>
+                <p className="text-2xl font-bold text-white">${item.price}<span className="text-sm font-normal text-gray-300">/{item.period}</span></p>
               </div>
-              {item.isFeatured && <span className="px-2 py-1 bg-primary-500/20 text-primary-400 rounded text-xs font-medium">Destacado</span>}
+              {item.isFeatured && <span className="px-2 py-1 bg-neutral-800 text-gray-300 rounded text-xs font-medium">Destacado</span>}
             </div>
-            {item.description && <p className="text-sm text-primary-300 mb-3">{item.description}</p>}
+            {item.description && <p className="text-sm text-gray-300 mb-3">{item.description}</p>}
             <ul className="space-y-1 mb-4">
               {item.features.map((f, i) => (
-                <li key={i} className="text-sm text-primary-200 flex items-center gap-2">
-                  <span className="text-secondary-500">✓</span> {f}
+                <li key={i} className="text-sm text-gray-300 flex items-center gap-2">
+                  <span className="text-white">✓</span> {f}
                 </li>
               ))}
             </ul>
-            <div className="flex items-center justify-between pt-3 border-t border-primary-500/20">
+            <div className="flex items-center justify-between pt-3 border-t border-neutral-700">
               <span className={`px-2 py-1 rounded text-xs font-medium ${item.isActive ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
                 {item.isActive ? 'Activo' : 'Inactivo'}
               </span>
               <div className="flex gap-1">
-                <button onClick={() => handleEdit(item)} className="p-2 text-primary-400 hover:text-primary-300">
+                <button onClick={() => handleEdit(item)} className="p-2 text-gray-400 hover:text-gray-300">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                 </button>
                 <button onClick={() => handleDelete(item.id)} className="p-2 text-red-400 hover:text-red-300">
@@ -653,7 +653,7 @@ function PlansSection() {
       </div>
 
       {items.length === 0 && (
-        <div className="text-center py-12 text-primary-400">No hay planes aún.</div>
+        <div className="text-center py-12 text-gray-400">No hay planes aún.</div>
       )}
     </div>
   );
@@ -723,7 +723,7 @@ function GallerySection() {
     setFormData({ url: '', alt: '', category: 'instalaciones', order: 0, isActive: true });
   };
 
-  if (loading) return <div className="text-center py-8 text-primary-400">Cargando...</div>;
+  if (loading) return <div className="text-center py-8 text-gray-400">Cargando...</div>;
 
   const categories = ['instalaciones', 'clases', 'eventos'];
 
@@ -733,49 +733,49 @@ function GallerySection() {
         <h2 className="text-xl font-bold text-white">Galería de Imágenes</h2>
         <button
           onClick={() => { resetForm(); setShowForm(true); }}
-          className="px-4 py-2 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-medium text-sm hover:opacity-90"
+          className="px-4 py-2 bg-white text-black rounded-lg font-medium text-sm hover:bg-gray-200"
         >
           + Nueva Imagen
         </button>
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-dark-100 rounded-lg border border-primary-500/30 p-6 mb-6 space-y-4">
+        <form onSubmit={handleSubmit} className="bg-neutral-900 rounded-lg border border-neutral-700 p-6 mb-6 space-y-4">
           <h3 className="text-lg font-semibold text-white">{editing ? 'Editar' : 'Nueva'} Imagen</h3>
           <div>
             <ImageUpload value={formData.url || ''} onChange={(url) => setFormData({ ...formData, url: url })} label="URL de Imagen" />
             <input type="hidden" value={formData.url || ''} required />
           </div>
           <div>
-            <label className="block text-sm font-medium text-primary-300 mb-1">Descripción (alt)</label>
+            <label className="block text-sm font-medium text-gray-300 mb-1">Descripción (alt)</label>
             <input type="text" value={formData.alt || ''} onChange={(e) => setFormData({ ...formData, alt: e.target.value })}
-              className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500" />
+              className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-white" />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-primary-300 mb-1">Categoría</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Categoría</label>
               <select value={formData.category || 'instalaciones'} onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500">
+                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-white">
                 {categories.map((c) => (
                   <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-primary-300 mb-1">Orden</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Orden</label>
               <input type="number" value={formData.order || 0} onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
-                className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500" />
+                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-white" />
             </div>
             <label className="flex items-center gap-2 pt-6">
-              <input type="checkbox" checked={formData.isActive !== false} onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })} className="accent-primary-500" />
-              <span className="text-sm text-primary-300">Activa</span>
+              <input type="checkbox" checked={formData.isActive !== false} onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })} className="accent-white" />
+              <span className="text-sm text-gray-300">Activa</span>
             </label>
           </div>
           <div className="flex gap-3">
-            <button type="submit" className="px-6 py-2 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-medium text-sm hover:opacity-90">
+            <button type="submit" className="px-6 py-2 bg-white text-black rounded-lg font-medium text-sm hover:bg-gray-200">
               {editing ? 'Actualizar' : 'Crear'}
             </button>
-            <button type="button" onClick={resetForm} className="px-6 py-2 bg-dark-200 text-primary-300 rounded-lg border border-primary-500/30 hover:bg-dark-100">
+            <button type="button" onClick={resetForm} className="px-6 py-2 bg-neutral-800 text-gray-300 rounded-lg border border-neutral-700 hover:bg-neutral-700">
               Cancelar
             </button>
           </div>
@@ -791,17 +791,17 @@ function GallerySection() {
             <h3 className="text-lg font-semibold text-white mb-3 capitalize">{cat}</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {catItems.map((item) => (
-                <div key={item.id} className="relative group bg-dark-100 rounded-lg overflow-hidden border border-primary-500/20">
-                  <img src={item.url} alt={item.alt || ''} className="w-full h-36 object-cover bg-dark-300" onError={(e) => { (e.target as HTMLImageElement).style.opacity = '0'; }} />
+                <div key={item.id} className="relative group bg-neutral-900 rounded-lg overflow-hidden border border-neutral-700">
+                  <img src={item.url} alt={item.alt || ''} className="w-full h-36 object-cover bg-neutral-800" onError={(e) => { (e.target as HTMLImageElement).style.opacity = '0'; }} />
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                    <button onClick={() => handleEdit(item)} className="p-2 bg-primary-500/80 text-white rounded-full hover:bg-primary-500">
+                    <button onClick={() => handleEdit(item)} className="p-2 bg-white/80 text-black rounded-full hover:bg-white">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                     </button>
                     <button onClick={() => handleDelete(item.id)} className="p-2 bg-red-500/80 text-white rounded-full hover:bg-red-500">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                     </button>
                   </div>
-                  {item.alt && <p className="p-2 text-xs text-primary-300 truncate">{item.alt}</p>}
+                  {item.alt && <p className="p-2 text-xs text-gray-300 truncate">{item.alt}</p>}
                 </div>
               ))}
             </div>
@@ -810,7 +810,7 @@ function GallerySection() {
       })}
 
       {items.length === 0 && (
-        <div className="text-center py-12 text-primary-400">No hay imágenes aún.</div>
+        <div className="text-center py-12 text-gray-400">No hay imágenes aún.</div>
       )}
     </div>
   );
@@ -880,7 +880,7 @@ function SedesSection() {
     setFormData({ name: '', address: '', city: '', phone: '', hours: '', isActive: true });
   };
 
-  if (loading) return <div className="text-center py-8 text-primary-400">Cargando...</div>;
+  if (loading) return <div className="text-center py-8 text-gray-400">Cargando...</div>;
 
   return (
     <div>
@@ -888,54 +888,54 @@ function SedesSection() {
         <h2 className="text-xl font-bold text-white">Sedes</h2>
         <button
           onClick={() => { resetForm(); setShowForm(true); }}
-          className="px-4 py-2 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-medium text-sm hover:opacity-90"
+          className="px-4 py-2 bg-white text-black rounded-lg font-medium text-sm hover:bg-gray-200"
         >
           + Nueva Sede
         </button>
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-dark-100 rounded-lg border border-primary-500/30 p-6 mb-6 space-y-4">
+        <form onSubmit={handleSubmit} className="bg-neutral-900 rounded-lg border border-neutral-700 p-6 mb-6 space-y-4">
           <h3 className="text-lg font-semibold text-white">{editing ? 'Editar' : 'Nueva'} Sede</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-primary-300 mb-1">Nombre</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Nombre</label>
               <input type="text" value={formData.name || ''} onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500" required />
+                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-white" required />
             </div>
             <div>
-              <label className="block text-sm font-medium text-primary-300 mb-1">Ciudad</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Ciudad</label>
               <input type="text" value={formData.city || ''} onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500" />
+                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-white" />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-primary-300 mb-1">Dirección</label>
+            <label className="block text-sm font-medium text-gray-300 mb-1">Dirección</label>
             <input type="text" value={formData.address || ''} onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-              className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500" />
+              className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-white" />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-primary-300 mb-1">Teléfono</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Teléfono</label>
               <input type="text" value={formData.phone || ''} onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500" />
+                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-white" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-primary-300 mb-1">Horarios</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Horarios</label>
               <input type="text" value={formData.hours || ''} onChange={(e) => setFormData({ ...formData, hours: e.target.value })}
-                className="w-full bg-dark-200 border border-primary-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-primary-500"
+                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-white"
                 placeholder="Lun a Vie: 6:00 - 23:00 | Sáb: 8:00 - 20:00" />
             </div>
           </div>
           <label className="flex items-center gap-2">
-            <input type="checkbox" checked={formData.isActive !== false} onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })} className="accent-primary-500" />
-            <span className="text-sm text-primary-300">Activa</span>
+            <input type="checkbox" checked={formData.isActive !== false} onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })} className="accent-white" />
+            <span className="text-sm text-gray-300">Activa</span>
           </label>
           <div className="flex gap-3">
-            <button type="submit" className="px-6 py-2 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-medium text-sm hover:opacity-90">
+            <button type="submit" className="px-6 py-2 bg-white text-black rounded-lg font-medium text-sm hover:bg-gray-200">
               {editing ? 'Actualizar' : 'Crear'}
             </button>
-            <button type="button" onClick={resetForm} className="px-6 py-2 bg-dark-200 text-primary-300 rounded-lg border border-primary-500/30 hover:bg-dark-100">
+            <button type="button" onClick={resetForm} className="px-6 py-2 bg-neutral-800 text-gray-300 rounded-lg border border-neutral-700 hover:bg-neutral-700">
               Cancelar
             </button>
           </div>
@@ -944,19 +944,19 @@ function SedesSection() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {items.map((item) => (
-          <div key={item.id} className="bg-dark-100 rounded-lg border border-primary-500/20 p-5">
+          <div key={item.id} className="bg-neutral-900 rounded-lg border border-neutral-700 p-5">
             <div className="flex items-start justify-between mb-3">
               <h3 className="text-lg font-bold text-white">{item.name}</h3>
               <span className={`px-2 py-1 rounded text-xs font-medium ${item.isActive ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
                 {item.isActive ? 'Activa' : 'Inactiva'}
               </span>
             </div>
-            {item.address && <p className="text-sm text-primary-300 mb-1"><span className="text-primary-400">📍</span> {item.address}</p>}
-            {item.city && <p className="text-sm text-primary-300 mb-1"><span className="text-primary-400">🏙️</span> {item.city}</p>}
-            {item.phone && <p className="text-sm text-primary-300 mb-1"><span className="text-primary-400">📞</span> {item.phone}</p>}
-            {item.hours && <p className="text-sm text-primary-300"><span className="text-primary-400">🕐</span> {item.hours}</p>}
-            <div className="flex justify-end gap-1 mt-3 pt-3 border-t border-primary-500/20">
-              <button onClick={() => handleEdit(item)} className="p-2 text-primary-400 hover:text-primary-300">
+            {item.address && <p className="text-sm text-gray-300 mb-1"><span className="text-gray-400">📍</span> {item.address}</p>}
+            {item.city && <p className="text-sm text-gray-300 mb-1"><span className="text-gray-400">🏙️</span> {item.city}</p>}
+            {item.phone && <p className="text-sm text-gray-300 mb-1"><span className="text-gray-400">📞</span> {item.phone}</p>}
+            {item.hours && <p className="text-sm text-gray-300"><span className="text-gray-400">🕐</span> {item.hours}</p>}
+            <div className="flex justify-end gap-1 mt-3 pt-3 border-t border-neutral-700">
+              <button onClick={() => handleEdit(item)} className="p-2 text-gray-400 hover:text-gray-300">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
               </button>
               <button onClick={() => handleDelete(item.id)} className="p-2 text-red-400 hover:text-red-300">
@@ -968,7 +968,7 @@ function SedesSection() {
       </div>
 
       {items.length === 0 && (
-        <div className="text-center py-12 text-primary-400">No hay sedes registradas.</div>
+        <div className="text-center py-12 text-gray-400">No hay sedes registradas.</div>
       )}
     </div>
   );

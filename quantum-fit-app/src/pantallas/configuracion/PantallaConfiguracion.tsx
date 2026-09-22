@@ -70,6 +70,18 @@ export default function PantallaConfiguracion({ navigation }: Props) {
             color={colores.secundario}
             alPresionar={() => navigation.navigate('MiSuscripcion')}
           />
+          <ItemConfiguracion
+            icono="link-outline"
+            etiqueta="Cuenta MyFit"
+            color={colores.informacion}
+            alPresionar={() => navigation.navigate('VinculacionMyFit')}
+          />
+          <ItemConfiguracion
+            icono="server-outline"
+            etiqueta="Mis Datos MyFit"
+            color={colores.puntos}
+            alPresionar={() => navigation.navigate('DatosCrystal')}
+          />
         </View>
 
         <View style={styles.seccion}>

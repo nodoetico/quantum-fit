@@ -53,6 +53,10 @@ model User {
   // Cache de datos de Crystal MiFit (perfil, membresías, etc.)
   crystalData       Json?
 
+  // Vinculación con la cuenta MyFit del socio (modelo espejo)
+  crystalEmail           String?
+  crystalTokenEncrypted  String?
+
   // Estado
   isActive          Boolean   @default(true)
 

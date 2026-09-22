@@ -69,7 +69,7 @@ export default function Noticias() {
           <p className="text-primary-300">Administrá las noticias y novedades del gimnasio</p>
         </div>
         <button onClick={() => { resetForm(); setShowForm(true); }}
-          className="px-4 py-2 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-medium text-sm hover:opacity-90">
+          className="px-4 py-2 bg-white text-black rounded-lg font-medium text-sm hover:bg-gray-200">
           + Nueva Noticia
         </button>
       </div>
@@ -112,7 +112,7 @@ export default function Noticias() {
             </label>
           </div>
           <div className="flex gap-3">
-            <button type="submit" className="px-6 py-2 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg font-medium text-sm hover:opacity-90">
+            <button type="submit" className="px-6 py-2 bg-white text-black rounded-lg font-medium text-sm hover:bg-gray-200">
               {editing ? 'Actualizar' : 'Crear'}
             </button>
             <button type="button" onClick={resetForm} className="px-6 py-2 bg-dark-200 text-primary-300 rounded-lg border border-primary-500/30 hover:bg-dark-100">Cancelar</button>

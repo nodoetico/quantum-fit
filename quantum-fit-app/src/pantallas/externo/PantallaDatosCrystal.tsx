@@ -11,25 +11,16 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { colores, espaciado, radioBorde, tipografia } from '../../constantes/tema';
 import { useAuth } from '../../contexto/ContextoAuth';
-import { servicioPullExterno } from '../../servicios/api';
+import { servicioMyFit } from '../../servicios/api';
 import type { PropsPantallaStackPrincipal } from '../../tipos/navegacion';
+import type { TransaccionMyFit } from '../../tipos';
 
 type Props = PropsPantallaStackPrincipal<'DatosCrystal'>;
 
-interface Transaccion {
-  id: number;
-  title: string;
-  date: string;
-  total_amount: number;
-  is_paid: boolean;
-  debt: number;
-  category: string | null;
-}
-
 export default function PantallaDatosCrystal({ navigation }: Props) {
-  const { usuario, perfilExterno, asistenciasExternas, membresiasExternas, cargandoExterno, cargarDatosExternos } = useAuth();
+  const { perfilExterno, asistenciasExternas, membresiasExternas, cargandoExterno, cargarDatosExternos } = useAuth();
   const [refrescando, setRefrescando] = useState(false);
-  const [transacciones, setTransacciones] = useState<Transaccion[]>([]);
+  const [transacciones, setTransacciones] = useState<TransaccionMyFit[]>([]);
   const [cargandoTransacciones, setCargandoTransacciones] = useState(false);
 
   useEffect(() => {
@@ -39,9 +30,8 @@ export default function PantallaDatosCrystal({ navigation }: Props) {
   const cargarTransacciones = async () => {
     setCargandoTransacciones(true);
     try {
-      const dni = usuario?.dni || undefined;
-      const datos = await servicioPullExterno.obtenerTransacciones(dni);
-      setTransacciones(datos?.data || []);
+      const datos = await servicioMyFit.obtenerTransacciones();
+      setTransacciones(datos || []);
     } catch (e) {
     } finally {
       setCargandoTransacciones(false);
@@ -68,13 +58,13 @@ export default function PantallaDatosCrystal({ navigation }: Props) {
           </TouchableOpacity>
           <View style={styles.contenedorTituloEncabezado}>
             <Ionicons name="server-outline" size={20} color={colores.primario} />
-            <Text style={styles.tituloEncabezado}>Datos Crystal</Text>
+            <Text style={styles.tituloEncabezado}>MyFit</Text>
           </View>
           <View style={styles.botonVolver} />
         </View>
         <View style={styles.contenedorSincronizando}>
           <ActivityIndicator size="large" color={colores.primario} />
-          <Text style={styles.textoSincronizando}>Sincronizando con Crystal...</Text>
+          <Text style={styles.textoSincronizando}>Sincronizando con MyFit...</Text>
         </View>
       </View>
     );
@@ -89,7 +79,7 @@ export default function PantallaDatosCrystal({ navigation }: Props) {
           </TouchableOpacity>
           <View style={styles.contenedorTituloEncabezado}>
             <Ionicons name="server-outline" size={20} color={colores.primario} />
-            <Text style={styles.tituloEncabezado}>Datos Crystal</Text>
+            <Text style={styles.tituloEncabezado}>MyFit</Text>
           </View>
           <View style={styles.botonVolver} />
         </View>
@@ -97,7 +87,7 @@ export default function PantallaDatosCrystal({ navigation }: Props) {
           <View style={styles.iconoVacio}>
             <Ionicons name="cloud-offline-outline" size={48} color={colores.textoAtenuado} />
           </View>
-          <Text style={styles.tituloVacio}>Sin datos de Crystal</Text>
+          <Text style={styles.tituloVacio}>Sin datos de MyFit</Text>
           <Text style={styles.subtituloVacio}>Deslizá para reintentar</Text>
         </View>
       </View>
@@ -112,7 +102,7 @@ export default function PantallaDatosCrystal({ navigation }: Props) {
         </TouchableOpacity>
         <View style={styles.contenedorTituloEncabezado}>
           <Ionicons name="server-outline" size={20} color={colores.primario} />
-          <Text style={styles.tituloEncabezado}>Datos Crystal</Text>
+          <Text style={styles.tituloEncabezado}>MyFit</Text>
         </View>
         <View style={styles.botonVolver} />
       </View>
@@ -235,16 +225,18 @@ export default function PantallaDatosCrystal({ navigation }: Props) {
               <Ionicons name="receipt-outline" size={18} color={colores.puntos} />
               <Text style={styles.tituloSeccion}>Transacciones ({transacciones.length})</Text>
             </View>
-            {transacciones.slice(0, 10).map((tx: Transaccion) => (
-              <View key={tx.id} style={styles.tarjetaTransaccion}>
+            {transacciones.slice(0, 10).map((tx, i) => (
+              <View key={tx.id ?? i} style={styles.tarjetaTransaccion}>
                 <View style={styles.izquierdaTransaccion}>
-                  <Text style={styles.tituloTransaccion}>{tx.title}</Text>
-                  <Text style={styles.fechaTransaccion}>{formatearFecha(tx.date)}</Text>
+                  <Text style={styles.tituloTransaccion}>{tx.title || 'Transacción'}</Text>
+                  {tx.date && <Text style={styles.fechaTransaccion}>{formatearFecha(tx.date)}</Text>}
                 </View>
                 <View style={styles.derechaTransaccion}>
-                  <Text style={styles.montoTransaccion}>${tx.total_amount.toLocaleString()}</Text>
+                  {tx.total_amount !== undefined && (
+                    <Text style={styles.montoTransaccion}>${tx.total_amount.toLocaleString()}</Text>
+                  )}
                   <Text style={[styles.estadoTransaccion, { color: tx.is_paid ? colores.secundario : colores.error }]}>
-                    {tx.is_paid ? 'Pagado' : tx.debt > 0 ? `Debe $${tx.debt}` : 'Pendiente'}
+                    {tx.is_paid ? 'Pagado' : (tx.debt || 0) > 0 ? `Debe $${tx.debt}` : 'Pendiente'}
                   </Text>
                 </View>
               </View>

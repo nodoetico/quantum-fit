@@ -192,3 +192,95 @@ export interface RespuestaRenovarInscripcion {
   };
   isVip: boolean;
 }
+
+// ============================================
+// TIPOS DE VINCULACIÓN MYFIT (modelo espejo)
+// ============================================
+
+export interface PerfilMyFit {
+  id?: number;
+  name?: string;
+  email?: string;
+  dni?: string | null;
+  balance?: number;
+  qr_code?: string;
+  phone?: string | null;
+  gender?: string | null;
+  blood_type?: string | null;
+  emergency_contact?: {
+    name?: string;
+    phone?: string;
+    email?: string;
+    relationship?: string;
+    address?: string;
+  } | null;
+}
+
+export interface EstadoVinculacionMyFit {
+  linked: boolean;
+  email?: string | null;
+  profile?: PerfilMyFit | null;
+}
+
+export interface PlanMyFit {
+  id: number;
+  name: string;
+  description?: string | null;
+  price: number;
+  is_renewable?: boolean;
+  is_visible_in_app?: boolean;
+}
+
+export interface MembresiaMyFit {
+  id: number;
+  name: string;
+  description?: string | null;
+  price: number;
+  start_date?: string;
+  end_date?: string;
+  start_time?: string | null;
+  end_time?: string | null;
+  is_active?: boolean;
+  is_renewable?: boolean;
+  is_visible_in_app?: boolean;
+}
+
+export interface AsistenciaMyFit {
+  id?: number;
+  company?: string | null;
+  comments?: string | null;
+  created_at?: string;
+  // Campos alternativos que algunas variantes de la API podrían devolver
+  date?: string;
+  time?: string;
+  type?: string;
+  location?: string;
+}
+
+export interface TransaccionMyFit {
+  id?: number;
+  visual_id?: string;
+  title?: string;
+  category?: string | null;
+  date?: string;
+  total_amount?: number;
+  paid_amount?: number;
+  debt?: number;
+  is_paid?: boolean;
+  comments?: string | null;
+}
+
+export interface InscripcionMyFit {
+  enrollment?: {
+    is_enrolled?: boolean;
+    due_date?: string | null;
+    is_expired?: boolean;
+    last_payment_date?: string | null;
+  } | null;
+  renewal?: {
+    price?: number;
+    months?: number;
+    next_due_date?: string;
+  } | null;
+}
+
